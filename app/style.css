@@ -380,3 +380,10 @@ body.apple #movie-play,body.apple #movie-resume{background:#eee;color:#151515}
 #browser.live-view .library{min-width:0}
 #browser.live-view>#detail{width:802px;padding:17px;flex-shrink:0}
 #browser.live-view #cover{width:768px;height:432px;flex-shrink:0}
+#organize-panel{position:absolute;z-index:60;left:650px;top:340px;width:440px;padding:20px;background:#1b1b1b;border:1px solid #555;border-radius:16px;box-shadow:0 18px 65px #000b;direction:ltr}
+#organize-panel p{font-size:23px;margin:0 0 16px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#organize-panel button{display:block;width:100%;padding:17px;margin:8px 0;font-size:24px;text-align:center;background:#303030}
+#organize-panel button:focus{background:#d5243e;color:white;outline:3px solid white}
+#organize-panel.move-hint{left:520px;top:920px;width:1000px;padding:18px}
+#organize-panel.move-hint p{margin:0;text-align:center}
+#browser.live-view .moving-item{outline:3px solid #ffcc54!important;background:#493811!important}
