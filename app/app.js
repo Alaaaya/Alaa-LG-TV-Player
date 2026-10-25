@@ -23,7 +23,7 @@ function connection(show){if(show)stopPreview();$('connection').hidden=!show;if(
 function focusFirst(){if(!$('series-detail').hidden){$('series-back').focus();return;}if(state.view==='home'&&$('connection').hidden){$('home-play').focus();return;}var el=$('items').querySelector('button')||document.querySelector('nav button.selected');if(el)el.focus();}
 async function sync(){
 if(state.panelBusy)return;state.panelBusy=true;$('sync').disabled=true;$('activation').textContent='جارٍ التحقق من التفعيل…';
-try{await rpc('register_device',{p_device_code:code,p_mac:'webOS-'+code,p_model:'LG webOS · Alaa Player 1.1.4'});var c=A.config(await rpc('get_device_config',{p_device_code:code}));state.status=c.status;state.expires=c.expires_at;
+try{await rpc('register_device',{p_device_code:code,p_mac:'webOS-'+code,p_model:'LG webOS · Alaa Player 1.1.5'});var c=A.config(await rpc('get_device_config',{p_device_code:code}));state.status=c.status;state.expires=c.expires_at;
 state.providers=state.providers.filter(function(p){return p.manual;}).concat(c.playlists);
 $('activation').textContent=c.status==='active'?'تم التفعيل'+(c.expires_at?' · ينتهي '+new Date(c.expires_at).toLocaleDateString():'')+' · '+c.playlists.length+' قوائم':c.status==='expired'?'انتهى التفعيل. جدّد الجهاز من لوحة التحكم.':'بانتظار تفعيل الجهاز من لوحة التحكم.';
 if(c.status!=='active'&&state.provider&&!state.provider.manual){stop();state.items=[];state.provider=null;state.request++;render();}
