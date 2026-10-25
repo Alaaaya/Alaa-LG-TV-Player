@@ -23,10 +23,10 @@ await page.goto('http://127.0.0.1:'+server.address().port);await page.waitForFun
 await page.waitForFunction(()=>document.querySelectorAll('#home-movies button').length===6);
 await page.locator('#settings-open').click();await page.locator('#theme-red').click();await page.locator('#connection-close').click();await page.locator('#nav-home').click();
 await page.locator('nav [data-kind="live"]').click();await page.waitForTimeout(200);
-const box=await page.locator('#cover').boundingBox();check(box.width,672);check(box.height,378);check(box.width/box.height,16/9);
+const box=await page.locator('#cover').boundingBox();check(box.width,768);check(box.height,432);check(box.width/box.height,16/9);
 check(await page.locator('#cover').evaluate(e=>e.getBoundingClientRect().left>document.querySelector('#items').getBoundingClientRect().right),true);
 check(await page.locator('#items').evaluate(e=>e.clientWidth>300),true);
-await page.screenshot({path:art+'/live-red-1.2.1-'+engine.name()+'.png'});
+await page.screenshot({path:art+'/live-red-1.2.2-'+engine.name()+'.png'});
 check(errors,[]);await browser.close();
 }
 server.close();console.log(checks+' live geometry assertions PASS');
