@@ -375,8 +375,8 @@ body.apple #movie-play,body.apple #movie-resume{background:#eee;color:#151515}
 .home-reference #home-tiles{margin-bottom:31px}
 .home-reference #home-tiles button{overflow:visible;height:137px;padding:106px 14px 0}
 .home-reference #home-tiles small{line-height:25px}
-/* Live-only preview is exactly 35% of the 1920px design canvas, 16:9. */
+/* Live-only preview is exactly 40% of the 1920px design canvas, 16:9. */
 #browser.live-view>aside{width:244px}
 #browser.live-view .library{min-width:0}
-#browser.live-view>#detail{width:706px;padding:17px;flex-shrink:0}
-#browser.live-view #cover{width:672px;height:378px;flex-shrink:0}
+#browser.live-view>#detail{width:802px;padding:17px;flex-shrink:0}
+#browser.live-view #cover{width:768px;height:432px;flex-shrink:0}
