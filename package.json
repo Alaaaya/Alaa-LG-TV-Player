@@ -1,10 +1,11 @@
 {
   "name": "alaa-player-webos",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "private": true,
   "scripts": {
-    "check": "node --check app/app.js && node --check app/core.js && node --test tests/core.cjs",
+    "check": "node --check app/app.js && node --check app/core.js && node --check app/featured.js && node --test tests/core.cjs tests/featured.cjs",
     "test:ui": "node tests/redesign.cjs",
-    "package": "/home/kit/alaa-tv-webos/node_modules/.bin/ares-package app -o artifacts --no-minify"
+    "package": "/home/kit/alaa-tv-webos/node_modules/.bin/ares-package app -o artifacts --no-minify",
+    "test:featured": "node tests/featured-ui.cjs"
   }
 }
