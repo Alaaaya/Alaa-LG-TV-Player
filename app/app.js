@@ -23,7 +23,7 @@ function connection(show){if(show)stopPreview();$('connection').hidden=!show;if(
 function focusFirst(){if(state.view==='home'&&$('connection').hidden){$('home-play').focus();return;}var el=$('items').querySelector('button')||document.querySelector('nav button.selected');if(el)el.focus();}
 async function sync(){
 if(state.panelBusy)return;state.panelBusy=true;$('sync').disabled=true;$('activation').textContent='جارٍ التحقق من التفعيل…';
-try{await rpc('register_device',{p_device_code:code,p_mac:'webOS-'+code,p_model:'LG webOS · Alaa Player 1.1.2'});var c=A.config(await rpc('get_device_config',{p_device_code:code}));state.status=c.status;state.expires=c.expires_at;
+try{await rpc('register_device',{p_device_code:code,p_mac:'webOS-'+code,p_model:'LG webOS · Alaa Player 1.1.3'});var c=A.config(await rpc('get_device_config',{p_device_code:code}));state.status=c.status;state.expires=c.expires_at;
 state.providers=state.providers.filter(function(p){return p.manual;}).concat(c.playlists);
 $('activation').textContent=c.status==='active'?'تم التفعيل'+(c.expires_at?' · ينتهي '+new Date(c.expires_at).toLocaleDateString():'')+' · '+c.playlists.length+' قوائم':c.status==='expired'?'انتهى التفعيل. جدّد الجهاز من لوحة التحكم.':'بانتظار تفعيل الجهاز من لوحة التحكم.';
 if(c.status!=='active'&&state.provider&&!state.provider.manual){stop();state.items=[];state.provider=null;state.request++;render();}
@@ -36,12 +36,12 @@ status(c.status==='active'?'متصل بلوحة التحكم':'Device '+code+' �
 finally{state.panelBusy=false;$('sync').disabled=false;}}
 function providers(){var select=$('providers'),old=state.provider&&state.provider.id;select.replaceChildren();state.providers.forEach(function(p){var o=document.createElement('option');o.value=p.id;o.textContent=p.name||'Playlist';select.appendChild(o);});if(old&&state.providers.some(function(p){return p.id===old;}))select.value=old;}
 async function xc(p,action,id){return JSON.parse(await request(A.xcAPI(p,action,id),null,24*1024*1024));}
-async function selectProvider(id){stopPreview();state.provider=state.providers.find(function(p){return p.id===id;})||null;state.episodes=null;await load();}
+async function selectProvider(id){homeCatalog={live:[],movies:[],series:[]};heroIndex=0;stopPreview();state.provider=state.providers.find(function(p){return p.id===id;})||null;state.episodes=null;await load();}
 async function load(){
 var p=state.provider,version=++state.request;state.items=[];state.selected=null;state.group='All';state.page=0;$('search').value='';render();if(!p)return;status('جارٍ تحميل '+(p.name||'القائمة')+'…');
 try{var list=[];if(p.type==='m3u'){if(state.kind==='live')list=A.parseM3U(await request(p.url,null,24*1024*1024),p.url);}
 else{var mode=state.kind==='live'?'live':state.kind==='movies'?'vod':'series',result=await Promise.all([xc(p,'get_'+mode+'_categories'),xc(p,state.kind==='series'?'get_series':'get_'+mode+'_streams')]);if(!Array.isArray(result[0])||!Array.isArray(result[1]))throw Error('Invalid catalogue');list=A.xcItems(result[1],result[0],p,state.kind);}
-if(version!==state.request)return;state.items=list;render();status('تم تحميل '+list.length+' عنوان'+(p.type==='m3u'&&state.kind!=='live'?' · عناصر M3U متاحة ضمن البث المباشر':''));focusFirst();
+if(version!==state.request)return;state.items=list;homeCatalog[state.kind]=list;render();loadHomeCatalog(p);status('تم تحميل '+list.length+' عنوان'+(p.type==='m3u'&&state.kind!=='live'?' · عناصر M3U متاحة ضمن البث المباشر':''));focusFirst();
 }catch(e){if(version!==state.request)return;state.items=[];render();status(errorMessage(e));}}
 function button(text,fn){var b=document.createElement('button');b.textContent=text;b.onclick=fn;return b;}
 function render(){
@@ -119,15 +119,45 @@ $('favorite-selected').textContent=item&&saved(favorites,item)?'♥ إزالة �
 var cover=$('cover'),old=cover.querySelector('img');if(old)old.remove();var mark=cover.querySelector('span');mark.hidden=!!(item&&item.logo);
 if(item&&item.logo)cover.prepend(image(item.logo));
 }
-function homeContent(){
-var item=state.items.find(function(i){return !!i.backdrop;})||state.items[0],old=$('home-hero').querySelector('img');if(old)old.remove();
-if(item&&item.backdrop)$('home-hero').prepend(image(item.backdrop));
-$('home-title').textContent=item?item.name:'كل ما تحب، في مكان واحد';
-$('home-description').textContent=item?item.group:'قنواتك وأفلامك ومسلسلاتك من مزوّدك مباشرة';
-$('home-play').onclick=function(){if(item)open(item);else navigate('live');};
-var r=$('home-recent');r.replaceChildren();state.items.slice(0,5).forEach(function(i){r.appendChild(button(i.name,function(){open(i);}));});
-if(!state.items.length){var p=document.createElement('p');p.className='note';p.textContent='أضف قائمة تشغيل لتظهر مكتبتك هنا';r.appendChild(p);}
+var homeCatalog={live:[],movies:[],series:[]},heroIndex=0,homeLoading=false;
+async function loadHomeCatalog(p){
+if(homeLoading||p.type!=='xtream')return;homeLoading=true;
+try{for(var kind of ['movies','series']){if(homeCatalog[kind].length)continue;
+var mode=kind==='movies'?'vod':'series',r=await Promise.all([xc(p,'get_'+mode+'_categories'),xc(p,kind==='series'?'get_series':'get_vod_streams')]);
+if(state.provider!==p)return;
+if(Array.isArray(r[0])&&Array.isArray(r[1]))homeCatalog[kind]=A.xcItems(r[1],r[0],p,kind);
+}homeContent();}catch(e){}finally{homeLoading=false;}
 }
+function homeContent(){
+if(!homeCatalog)return;
+var candidates=homeCatalog.movies.concat(homeCatalog.series).filter(function(i){return i.backdrop;}).slice(0,5);
+if(!candidates.length)candidates=state.items.slice(0,5);
+var item=candidates[heroIndex%candidates.length],old=$('home-hero').querySelector('img');if(old)old.remove();
+if(item&&item.backdrop)$('home-hero').prepend(image(item.backdrop));
+$('home-title').textContent=item?item.name:'مكتبتك، على شاشتك';
+$('home-meta').textContent=item?[metadata(item),item.genre||item.group].filter(Boolean).join(' · '):'';
+$('home-description').textContent=item?item.description||'':'أضف قائمة تشغيل لتظهر مكتبتك هنا';
+$('home-play').onclick=function(){if(item)open(item);else navigate('live');};
+$('home-info').disabled=!item;
+$('home-info').onclick=function(){if(!item)return;$('home-detail-title').textContent=item.name;$('home-detail-description').textContent=item.description||'لا يوفّر المزوّد وصفاً إضافياً';$('home-details').showModal();$('home-detail-close').focus();};
+var dots=$('hero-dots');dots.replaceChildren();candidates.forEach(function(i,n){var d=button('',function(){heroIndex=n;homeContent();});d.setAttribute('aria-label','العرض '+(n+1));d.className=n===heroIndex%candidates.length?'selected':'';dots.appendChild(d);});
+$('hero-prev').onclick=function(){heroIndex=(heroIndex+candidates.length-1)%Math.max(1,candidates.length);homeContent();};
+$('hero-next').onclick=function(){heroIndex=(heroIndex+1)%Math.max(1,candidates.length);homeContent();};
+var tiles=$('home-tiles');tiles.replaceChildren();
+[['live','البث المباشر','▣'],['movies','الأفلام','▤'],['series','المسلسلات','▦'],['kids','الأطفال','☆'],['news','الأخبار','◎'],['sports','الرياضة','◉']].forEach(function(t,n){
+var pattern={kids:/kids|child|أطفال|اطفال/i,news:/news|أخبار|اخبار/i,sports:/sport|رياض/i}[t[0]],list=pattern?homeCatalog.live.filter(function(i){return pattern.test(i.group);}):homeCatalog[t[0]];
+var tile=button('',function(){var kind=pattern?'live':t[0];navigate(kind);if(pattern){var match=homeCatalog.live.find(function(i){return pattern.test(i.group);});state.group=match?match.group:'All';$('search').value=match?'':'__no_matching_category__';renderItems();}});
+var im=image('assets/category-'+n+'.svg');tile.appendChild(im);var label=document.createElement('strong');label.textContent=t[2]+' '+t[1];tile.appendChild(label);var count=document.createElement('small');count.textContent=list.length+' '+(t[0]==='movies'?'فيلم':t[0]==='series'?'مسلسل':'قناة');tile.appendChild(count);tiles.appendChild(tile);
+});
+['movies','series'].forEach(function(kind){var el=$('home-'+kind);el.replaceChildren();var list=homeCatalog[kind].slice().sort(function(a,b){return b.added-a.added;}).slice(0,kind==='movies'?6:5);
+list.forEach(function(i){var card=button('',function(){open(i);});if(i.logo)card.appendChild(image(i.logo));else{var ph=document.createElement('div');ph.className='poster-blank';ph.textContent='▶';card.appendChild(ph);}
+var title=document.createElement('span');title.textContent=i.name;card.appendChild(title);
+var meta=document.createElement('small');meta.textContent=kind==='series'&&i.seasons?i.seasons+' مواسم':i.year;card.appendChild(meta);
+if(i.quality){var badge=document.createElement('b');badge.textContent=i.quality;card.appendChild(badge);}el.appendChild(card);
+});if(!list.length){var empty=document.createElement('p');empty.className='note';empty.textContent='لا توجد عناوين متاحة من المزوّد';el.appendChild(empty);}});
+}
+$('home-detail-close').onclick=function(){$('home-details').close();$('home-info').focus();};
+$('header-search').onclick=function(){$('top-search').focus();};
 function navigate(kind,filter){
 stopPreview();state.view='catalog';state.filter=filter||'all';state.episodes=null;$('search').value='';
 document.querySelectorAll('nav button').forEach(function(b){b.classList.remove('selected');});
@@ -152,7 +182,7 @@ video.addEventListener('error',function(){if(!state.playing)return;$('play-state
 video.addEventListener('ended',function(){$('play-state').textContent='انتهى التشغيل';showControls();});
 function toggle(){if(video.paused)video.play().catch(function(){$('play-state').textContent='Playback could not start';});else video.pause();showControls();}
 function seek(delta){if(state.playing&&state.playing.kind!=='live'&&isFinite(video.duration)){video.currentTime=Math.max(0,Math.min(video.duration,video.currentTime+delta));showControls();}}
-function back(){if(!$('quick-channels').hidden){$('quick-channels').hidden=true;$('quick-toggle').focus();return;}if(!$('player').hidden){stop();return;}if(!$('manual').hidden){$('manual').hidden=true;$('manual-toggle').focus();return;}if(!$('connection').hidden){connection(false);return;}if(state.episodes){state.items=state.episodes;state.episodes=null;state.group='All';state.page=0;$('search').value='';render();focusFirst();return;}if(state.view!=='home'){state.view='home';state.filter='all';render();$('nav-home').focus();return;}if(window.webOS&&webOS.platformBack)webOS.platformBack();else if(window.PalmSystem&&PalmSystem.stageReady)window.close();else connection(true);}
+function back(){if($('home-details').open){$('home-details').close();$('home-info').focus();return;}if(!$('quick-channels').hidden){$('quick-channels').hidden=true;$('quick-toggle').focus();return;}if(!$('player').hidden){stop();return;}if(!$('manual').hidden){$('manual').hidden=true;$('manual-toggle').focus();return;}if(!$('connection').hidden){connection(false);return;}if(state.episodes){state.items=state.episodes;state.episodes=null;state.group='All';state.page=0;$('search').value='';render();focusFirst();return;}if(state.view!=='home'){state.view='home';state.filter='all';render();$('nav-home').focus();return;}if(window.webOS&&webOS.platformBack)webOS.platformBack();else if(window.PalmSystem&&PalmSystem.stageReady)window.close();else connection(true);}
 $('providers').onchange=function(){selectProvider(this.value);};
 document.querySelectorAll('[data-kind]').forEach(function(b){b.onclick=function(){navigate(b.dataset.kind);};});
 $('search').oninput=function(){state.page=0;renderItems();};
