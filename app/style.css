@@ -3,3 +3,40 @@
 html,body{direction:ltr}#screen{direction:rtl}
 #browser.poster-view #items{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:0 17px;align-content:start}#browser.poster-view #items .virtual-space{grid-column:1/-1}#browser.poster-view #items button{height:297px;min-width:0;background:transparent;display:flex;flex-direction:column;gap:6px;padding:5px;margin:0 0 13px;border-radius:8px;position:relative}#browser.poster-view #items img,#browser.poster-view #items .item-icon{width:100%;height:221px;flex-shrink:0;object-fit:cover;border-radius:8px}#browser.poster-view #items .number{display:none}#browser.poster-view .title-stack{flex:0;width:100%}#browser.poster-view #items .item-name{font-size:19px;width:100%;text-align:right}#browser.poster-view #items .metadata{min-width:0;width:100%;font-size:15px;text-align:right}#browser.poster-view #items button:focus{background:var(--tint)}#browser.poster-view #hero{height:270px}#browser.poster-view .section-title{height:67px}#browser.poster-view #items .catalog-empty{grid-column:1/-1}#browser.poster-view #hero-name{font-size:36px}
 #hero-name,#home-title{direction:rtl;unicode-bidi:plaintext}#hero-meta{direction:ltr;text-align:right}footer span{direction:rtl;unicode-bidi:plaintext}#cover img{max-width:95%;max-height:95%;height:auto;width:auto}
+
+/* Physical layout stays left-to-right; Arabic labels remain RTL. */
+#screen{padding:0 0 0 274px}
+.brand{right:auto;left:28px}
+nav{right:auto;left:0;border-left:0;border-right:1px solid #202b3e}
+#connection{inset:110px 0 60px 274px}
+#browser{direction:ltr}
+#browser>aside,#browser>#subcategories,.library,#detail{direction:rtl}
+#browser.live-view .library{order:3}
+#browser.live-view .library #detail{order:0;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(200px,1fr);grid-template-rows:28px 46px 35px 56px 48px;column-gap:22px;width:100%;height:260px;padding:15px;margin:0 0 15px;flex-shrink:0;direction:ltr}
+#browser.live-view #cover{grid-column:1;grid-row:1/6;height:230px;margin:0}
+#browser.live-view #detail-kind,#browser.live-view #detail-name,#browser.live-view #detail-group{grid-column:2;margin:0;direction:rtl;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#browser.live-view #detail-name{font-size:23px}
+#browser.live-view #detail-group{font-size:18px}
+#browser.live-view #detail button{grid-column:2;margin:0;padding:9px;font-size:18px;width:auto}
+#browser.live-view #play-selected{grid-row:4;margin-bottom:5px}
+#browser.live-view #preview-selected{grid-row:5;margin-left:47%}
+#browser.live-view #favorite-selected{grid-row:5;margin-right:55%;font-size:0}
+#browser.live-view #favorite-selected:before{content:'♡';font-size:25px}
+#browser.live-view #detail .note{display:none}
+#movie-discovery h2{font-size:24px;margin:14px 0}
+#genre-cards{display:flex;gap:12px;overflow:auto;padding:4px 3px 9px}
+#genre-cards button{position:relative;isolation:isolate;min-width:178px;height:102px;padding:15px;overflow:hidden;background:linear-gradient(120deg,var(--raised),var(--tint));flex-shrink:0}
+#genre-cards img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.25;z-index:-1}
+#genre-cards span,#genre-cards small{display:block}
+#genre-cards small{font-size:16px;color:#bac6d8;margin-top:8px}
+#movie-shelf{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px}
+#movie-shelf button{padding:4px;background:transparent;min-width:0}
+#movie-shelf img,.shelf-placeholder{display:grid;place-items:center;width:100%;height:190px;object-fit:cover;border-radius:8px;background:var(--raised)}
+#movie-shelf span:not(.shelf-placeholder){display:block;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:7px}
+#movie-shelf small{display:block;color:var(--muted);font-size:15px;direction:ltr;text-align:right}
+#browser.movie-view .library{overflow:auto;padding:0 5px 15px}
+#browser.movie-view #hero{height:240px}
+#browser.movie-view #items{height:340px;flex:none;min-height:340px}
+#browser.movie-view #movie-discovery{flex:none}
+#browser.live-view #preview-selected{margin:0;width:76%;justify-self:start}
+#browser.live-view #favorite-selected{margin:0;width:21%;justify-self:end}
