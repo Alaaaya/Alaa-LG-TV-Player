@@ -1,0 +1,19 @@
+/* Alaa Player webOS. Pure catalogue helpers, no network or secrets stored here. */
+(function(root){
+'use strict';
+var alphabet='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+function safeURL(value,base){try{var u=new URL(value,base);return /^https?:$/.test(u.protocol)&&!u.username&&!u.password?u.href:null;}catch(e){return null;}}
+function deviceCode(crypto){var a=new Uint8Array(32),s='';while(s.length<8){crypto.getRandomValues(a);for(var i=0;i<a.length&&s.length<8;i++)if(a[i]<Math.floor(256/alphabet.length)*alphabet.length)s+=alphabet[a[i]%alphabet.length];}return s;}
+function parseM3U(text,base){var lines=text.replace(/^\uFEFF/,'').split(/\r?\n/),out=[],info=null;
+if(!/^#EXTM3U/.test(text.trim()))throw Error('Not an M3U playlist');
+lines.forEach(function(line){line=line.trim();if(line.indexOf('#EXTINF:')===0){var attrs={};line.replace(/([\w-]+)="([^"]*)"/g,function(_,k,v){attrs[k]=v;});var comma=line.lastIndexOf(',');info={name:comma>=0?line.slice(comma+1).trim():'Channel',group:attrs['group-title']||'Other',logo:safeURL(attrs['tvg-logo'],base),kind:'live'};}else if(line&&line[0]!=='#'){var url=safeURL(line,base);if(url){var item=info||{name:'Channel '+(out.length+1),group:'Other',kind:'live'};item.url=url;item.id='m3u-'+out.length;out.push(item);}info=null;}});
+return out;}
+function xcBase(p){var u=safeURL(p.server);if(!u)throw Error('Server must use HTTP or HTTPS');return u.replace(/\/$/,'');}
+function xcAPI(p,action,id){var u=new URL(xcBase(p)+'/player_api.php');u.searchParams.set('username',p.username);u.searchParams.set('password',p.password);if(action)u.searchParams.set('action',action);if(id!=null)u.searchParams.set('series_id',String(id));return u.href;}
+function xcStream(p,kind,id,ext){if(!/^[a-zA-Z0-9_-]+$/.test(String(id)))throw Error('Invalid stream id');ext=/^[a-zA-Z0-9]{1,8}$/.test(ext||'')?ext:(kind==='live'?'m3u8':'mp4');return xcBase(p)+'/'+(kind==='movies'?'movie':kind==='episodes'?'series':'live')+'/'+encodeURIComponent(p.username)+'/'+encodeURIComponent(p.password)+'/'+encodeURIComponent(id)+'.'+ext;}
+function xcItems(rows,cats,p,kind){var groups={};cats.forEach(function(c){groups[String(c.category_id)]=c.category_name;});return rows.filter(function(x){return x.stream_id!=null||x.series_id!=null;}).map(function(x){return {id:String(x.stream_id||x.series_id),name:x.name||'Untitled',group:groups[String(x.category_id)]||'Other',logo:safeURL(x.stream_icon||x.cover),kind:kind,provider:p,url:kind==='series'?null:xcStream(p,kind,x.stream_id,kind==='live'?'m3u8':x.container_extension)};});}
+function episodes(json,p){var out=[];Object.keys(json.episodes||{}).sort(function(a,b){return Number(a)-Number(b);}).forEach(function(season){json.episodes[season].forEach(function(e){out.push({id:String(e.id),name:'S'+season+' · '+(e.title||'Episode '+e.episode_num),group:'Season '+season,kind:'episodes',url:xcStream(p,'episodes',e.id,e.container_extension)});});});return out;}
+function config(raw){if(!raw||['active','inactive','expired','unknown'].indexOf(raw.status)<0)throw Error('Invalid panel response');return {status:raw.status,expires_at:raw.expires_at,playlists:raw.status==='active'?(raw.playlists||[]).filter(function(p){return p.id&&((p.type==='m3u'&&safeURL(p.url))||(p.type==='xtream'&&safeURL(p.server)&&p.username&&p.password));}):[]};}
+var api={safeURL:safeURL,deviceCode:deviceCode,parseM3U:parseM3U,xcAPI:xcAPI,xcItems:xcItems,episodes:episodes,xcStream:xcStream,config:config,alphabet:alphabet};
+if(typeof module!=='undefined')module.exports=api;else root.AP=api;
+})(typeof window!=='undefined'?window:this);
