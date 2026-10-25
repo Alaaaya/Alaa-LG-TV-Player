@@ -23,7 +23,7 @@ await page.goto('http://127.0.0.1:'+server.address().port);await page.waitForFun
 await page.waitForFunction(()=>document.querySelectorAll('#home-movies button').length===6);
 await page.locator('#settings-open').click();await page.locator('#theme-red').click();await page.locator('#connection-close').click();await page.locator('#nav-home').click();
 await page.evaluate(()=>document.activeElement.blur());await page.evaluate(()=>document.fonts.ready);await page.waitForTimeout(400);
-console.log(await page.evaluate(()=>Object.fromEntries(['home-hero','home-tiles','home-shelves','home-title','home-play'].map(id=>{let r=document.getElementById(id).getBoundingClientRect();return[id,[r.x,r.y,r.width,r.height]]}))));await page.screenshot({path:art+'/home-red-1.1.9-'+engine.name()+'.png'});
+console.log(await page.evaluate(()=>Object.fromEntries(['home-hero','home-tiles','home-shelves','home-title','home-play'].map(id=>{let r=document.getElementById(id).getBoundingClientRect();return[id,[r.x,r.y,r.width,r.height]]}))));await page.screenshot({path:art+'/home-red-1.2.0-'+engine.name()+'.png'});
 check(await page.locator('#home-tiles button').count(),6);check(await page.locator('#home').isVisible(),true);
 check(await page.locator('#home-tiles button').evaluateAll(es=>es[0].getBoundingClientRect().left<es[1].getBoundingClientRect().left),true);
 check(errors,[]);await browser.close();
