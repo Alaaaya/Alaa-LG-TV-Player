@@ -46,3 +46,38 @@ nav{right:auto;left:0;border-left:0;border-right:1px solid #202b3e}
 #hero-name,#home-title,#detail-name,#detail-group,.item-name,#genre-cards span,#movie-shelf span{unicode-bidi:plaintext;text-align:right}
 #clockbox{margin-right:0;margin-left:auto}
 #quick-channels{right:auto;left:32px}
+/* Apple TV: pre-composed graphite surfaces, no runtime blur. */
+body.apple{--accent:#f3f3f5;--tint:#343437;--bg:#101012;--panel:#242426;--raised:#353538;--muted:#b9b9bf;color:#f5f5f7;background:#101012}
+body.apple #screen{background:radial-gradient(ellipse at 55% 0,#29292d 0,#151517 48%,#0e0e10 100%)}
+body.apple header{border-color:#38383a}
+body.apple nav{background:rgba(34,34,37,.88);border-color:#38383c}
+body.apple .mark{background:#e7e7e9;color:#202024}
+body.apple button{border-radius:12px}
+body.apple nav button{border-radius:25px}
+body.apple button.selected,body.apple #categories button.selected,body.apple #subcategories button.selected{background:#ebebee;color:#1a1a1d}
+body.apple nav button.selected .nav-icon,body.apple #categories button.selected small{color:#303034}
+body.apple input,body.apple select{background:rgba(67,67,71,.56);border-color:#515155;color:#f5f5f7}
+body.apple input::placeholder{color:#bdbdc4}
+body.apple #clockbox,body.apple #date,body.apple .note,body.apple #count,body.apple footer,body.apple #detail-group,body.apple #hero-meta,body.apple #home-description,body.apple .metadata,body.apple #items small{color:#bdbdc5}
+body.apple #hero,body.apple #home-hero{background:#303033}
+body.apple #hero:after,body.apple #home-hero:after{background:linear-gradient(90deg,rgba(17,17,19,.15),rgba(24,24,26,.96) 85%)}
+body.apple #hero button,body.apple #home-copy button,body.apple #play-selected{background:#eeeef0;color:#17171b;border-radius:25px}
+body.apple #hero .eyebrow,body.apple .live,body.apple #detail-kind,body.apple #home-tiles .tile-icon{color:#d6d6dc}
+body.apple #genre-cards button{background:linear-gradient(135deg,#45454a,#29292c)}
+body.apple #genre-cards button.selected{background:#e2e2e6;color:#18181b}
+body.apple #genre-cards button.selected small{color:#44444a}
+body.apple .item-icon{background:#3c3c40;color:#d6d6dd}
+body.apple #preview-selected{background:#414146}
+body.apple #connection{background:#202023}
+body.apple #quick-channels{background:rgba(43,43,47,.97)}
+body.apple #player-ui{background:linear-gradient(transparent,rgba(20,20,23,.98) 25%)}
+body.apple button:focus{outline:0;background:#f2f2f5!important;color:#17171b!important;box-shadow:0 8px 22px rgba(0,0,0,.42);transform:scale(1.025)}
+body.apple button:focus .nav-icon,body.apple button:focus small,body.apple button:focus .item-name,body.apple button:focus .metadata,body.apple button:focus .live{color:#343439!important}
+body.apple #browser.poster-view #items button:focus,body.apple #movie-shelf button:focus{background:#353538!important;color:#fff!important;box-shadow:0 9px 24px #0008}
+body.apple #browser.poster-view #items button:focus .item-name,body.apple #browser.poster-view #items button:focus .metadata,body.apple #movie-shelf button:focus small{color:#f1f1f5!important}
+@media(prefers-reduced-motion:reduce){body.apple button:focus{transform:none}}
+body.apple nav button.selected:not(:focus){background:#45454a;color:#fff}
+body.apple nav button.selected:not(:focus) .nav-icon{color:#eeeef2}
+body.apple #home-copy button:not(:focus),body.apple #hero button:not(:focus),body.apple #play-selected:not(:focus){background:#48484e;color:#f5f5f7}
+body.apple button:focus{outline:2px solid #fff;outline-offset:3px}
+body.apple #providers,body.apple #detail-kind,body.apple #preview-selected,body.apple #favorite-selected{color:#e5e5eb}

@@ -23,7 +23,7 @@ function connection(show){if(show)stopPreview();$('connection').hidden=!show;if(
 function focusFirst(){if(state.view==='home'&&$('connection').hidden){$('home-play').focus();return;}var el=$('items').querySelector('button')||document.querySelector('nav button.selected');if(el)el.focus();}
 async function sync(){
 if(state.panelBusy)return;state.panelBusy=true;$('sync').disabled=true;$('activation').textContent='جارٍ التحقق من التفعيل…';
-try{await rpc('register_device',{p_device_code:code,p_mac:'webOS-'+code,p_model:'LG webOS · Alaa Player 1.1.1'});var c=A.config(await rpc('get_device_config',{p_device_code:code}));state.status=c.status;state.expires=c.expires_at;
+try{await rpc('register_device',{p_device_code:code,p_mac:'webOS-'+code,p_model:'LG webOS · Alaa Player 1.1.2'});var c=A.config(await rpc('get_device_config',{p_device_code:code}));state.status=c.status;state.expires=c.expires_at;
 state.providers=state.providers.filter(function(p){return p.manual;}).concat(c.playlists);
 $('activation').textContent=c.status==='active'?'تم التفعيل'+(c.expires_at?' · ينتهي '+new Date(c.expires_at).toLocaleDateString():'')+' · '+c.playlists.length+' قوائم':c.status==='expired'?'انتهى التفعيل. جدّد الجهاز من لوحة التحكم.':'بانتظار تفعيل الجهاز من لوحة التحكم.';
 if(c.status!=='active'&&state.provider&&!state.provider.manual){stop();state.items=[];state.provider=null;state.request++;render();}
@@ -49,7 +49,7 @@ $('home').hidden=state.view!=='home';$('browser').hidden=state.view==='home';$('
 $('categories').setAttribute('aria-label',state.episodes?'المواسم':'التصنيفات');
 $('heading').textContent=state.episodes?'الحلقات':({live:'البث المباشر',movies:'الأفلام',series:'المسلسلات'})[state.kind];
 $('search').placeholder='ابحث في '+(state.episodes?'الحلقات':state.kind==='live'?'القنوات':state.kind==='movies'?'الأفلام':'المسلسلات');
-document.querySelectorAll('[data-kind]').forEach(function(b){b.classList.toggle('selected',b.dataset.kind===state.kind);});
+document.querySelectorAll('[data-kind]').forEach(function(b){b.classList.toggle('selected',state.view!=='home'&&b.dataset.kind===state.kind);});
 var groups={All:state.items.length};state.items.forEach(function(i){groups[i.group]=(groups[i.group]||0)+1;});var cat=$('categories');cat.replaceChildren();
 Object.keys(groups).forEach(function(g){var b=button((g==='All'?(state.episodes?'كل المواسم':'جميع التصنيفات'):g.replace(/^Season /,'الموسم ')),function(){state.group=g;state.page=0;render();focusFirst();});var n=document.createElement('small');n.textContent=groups[g];b.appendChild(n);b.classList.toggle('selected',g===state.group);cat.appendChild(b);});
 renderItems();homeContent();}
@@ -174,8 +174,17 @@ $('filter-all').onclick=function(){state.filter='all';renderItems();};
 $('filter-favorites').onclick=function(){state.filter='favorites';renderItems();};
 $('filter-recent').onclick=function(){state.filter='recent';renderItems();};
 document.querySelectorAll('[data-home-kind]').forEach(function(b){b.onclick=function(){navigate(b.dataset.homeKind);};});
-function theme(value){document.body.classList.toggle('blue',value==='blue');$('theme-red').classList.toggle('selected',value!=='blue');$('theme-blue').classList.toggle('selected',value==='blue');storeWrite('ap-theme',value);}
-$('theme-red').onclick=function(){theme('red');};$('theme-blue').onclick=function(){theme('blue');};theme(storeRead('ap-theme')||'red');
+function theme(value){
+if(['apple','red','blue'].indexOf(value)<0)value='apple';
+document.body.classList.toggle('blue',value==='blue');
+document.body.classList.toggle('apple',value==='apple');
+['apple','red','blue'].forEach(function(t){$('theme-'+t).classList.toggle('selected',value===t);});
+storeWrite('ap-theme',value);
+}
+$('theme-apple').onclick=function(){theme('apple');};
+$('theme-red').onclick=function(){theme('red');};
+$('theme-blue').onclick=function(){theme('blue');};
+theme(storeRead('ap-theme')||'apple');
 function quickList(){var list=$('quick-list');list.replaceChildren();if(!state.playing||state.playing.kind!=='live')return;var index=state.filtered.indexOf(state.playing),start=Math.max(0,index-3);state.filtered.slice(start,start+10).forEach(function(i){list.appendChild(button(i.name,function(){play(i);}));});}
 $('quick-toggle').onclick=function(){$('quick-channels').hidden=!$('quick-channels').hidden;if(!$('quick-channels').hidden){var first=$('quick-list').querySelector('button');if(first)first.focus();}};
 function timestamp(s){if(!isFinite(s))return '--:--';s=Math.floor(s);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
