@@ -2,11 +2,11 @@
 (function(root){
 'use strict';
 var alphabet='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
-function safeURL(value,base){try{var u=new URL(value,base);return /^https?:$/.test(u.protocol)&&!u.username&&!u.password?u.href:null;}catch(e){return null;}}
+function safeURL(value,base){if(typeof value!=='string'||!value.trim())return null;try{var u=new URL(value,base);return /^https?:$/.test(u.protocol)&&!u.username&&!u.password?u.href:null;}catch(e){return null;}}
 function deviceCode(crypto){var a=new Uint8Array(32),s='';while(s.length<8){crypto.getRandomValues(a);for(var i=0;i<a.length&&s.length<8;i++)if(a[i]<Math.floor(256/alphabet.length)*alphabet.length)s+=alphabet[a[i]%alphabet.length];}return s;}
 function parseM3U(text,base){var lines=text.replace(/^\uFEFF/,'').split(/\r?\n/),out=[],info=null;
 if(!/^#EXTM3U/.test(text.trim()))throw Error('Not an M3U playlist');
-lines.forEach(function(line){line=line.trim();if(line.indexOf('#EXTINF:')===0){var attrs={};line.replace(/([\w-]+)="([^"]*)"/g,function(_,k,v){attrs[k]=v;});var comma=line.lastIndexOf(',');info={name:comma>=0?line.slice(comma+1).trim():'Channel',group:attrs['group-title']||'Other',logo:safeURL(attrs['tvg-logo'],base),kind:'live'};}else if(line&&line[0]!=='#'){var url=safeURL(line,base);if(url){var item=info||{name:'Channel '+(out.length+1),group:'Other',kind:'live'};item.url=url;item.id='m3u-'+out.length;out.push(item);}info=null;}});
+lines.forEach(function(line){line=line.trim();if(line.indexOf('#EXTINF:')===0){var attrs={};line.replace(/([\w-]+)="([^"]*)"/g,function(_,k,v){attrs[k]=v;});var quoted=false,comma=-1;for(var j=0;j<line.length;j++){if(line[j]==='"')quoted=!quoted;else if(line[j]===','&&!quoted){comma=j;break;}}info={name:comma>=0?line.slice(comma+1).trim():'Channel',group:attrs['group-title']||'Other',logo:safeURL(attrs['tvg-logo'],base),kind:'live'};}else if(line&&line[0]!=='#'){var url=safeURL(line,base);if(url){var item=info||{name:'Channel '+(out.length+1),group:'Other',kind:'live'};item.url=url;item.id='m3u-'+out.length;out.push(item);}info=null;}});
 return out;}
 function xcBase(p){var u=safeURL(p.server);if(!u)throw Error('Server must use HTTP or HTTPS');return u.replace(/\/$/,'');}
 function xcAPI(p,action,id){var u=new URL(xcBase(p)+'/player_api.php');u.searchParams.set('username',p.username);u.searchParams.set('password',p.password);if(action)u.searchParams.set('action',action);if(id!=null)u.searchParams.set('series_id',String(id));return u.href;}
