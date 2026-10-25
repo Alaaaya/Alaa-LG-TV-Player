@@ -20,3 +20,5 @@ test('inactive config never leaks playlists',()=>assert.equal(A.config({status:'
 test('expired config clears playlist',()=>assert.equal(A.config({status:'expired',playlists:[{}]}).playlists.length,0));
 test('unknown status rejected',()=>assert.throws(()=>A.config({status:'oops'})));
 test('active config skips unusable providers',()=>assert.equal(A.config({status:'active',playlists:[{id:'a',type:'m3u',url:'javascript:bad'},{id:'b',type:'m3u',url:'https://h/'}]}).playlists.length,1));
+test('missing logo never resolves to undefined path',()=>assert.equal(A.safeURL(undefined,'https://h/'),null));
+test('M3U channel names preserve commas',()=>assert.equal(A.parseM3U('#EXTM3U\n#EXTINF:-1 group-title="News, world",News, Arabic\nhttps://h/1','https://h/')[0].name,'News, Arabic'));
