@@ -153,7 +153,7 @@ var im=image('assets/category-'+n+'.svg');tile.appendChild(im);var label=documen
 list.forEach(function(i){var card=button('',function(){open(i);});if(i.logo)card.appendChild(image(i.logo));else{var ph=document.createElement('div');ph.className='poster-blank';ph.textContent='▶';card.appendChild(ph);}
 var title=document.createElement('span');title.textContent=i.name;card.appendChild(title);
 var meta=document.createElement('small');meta.textContent=kind==='series'&&i.seasons?i.seasons+' مواسم':i.year;card.appendChild(meta);
-if(i.quality){var badge=document.createElement('b');badge.textContent=i.quality;card.appendChild(badge);}el.appendChild(card);
+if(i.quality||(i.added>0&&Date.now()/1000-i.added>=0&&Date.now()/1000-i.added<2592000)){var badge=document.createElement('b');badge.textContent=i.quality||'جديد';card.appendChild(badge);}el.appendChild(card);
 });if(!list.length){var empty=document.createElement('p');empty.className='note';empty.textContent='لا توجد عناوين متاحة من المزوّد';el.appendChild(empty);}});
 }
 $('home-detail-close').onclick=function(){$('home-details').close();$('home-info').focus();};
