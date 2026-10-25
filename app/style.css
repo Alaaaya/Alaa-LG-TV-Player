@@ -306,3 +306,34 @@ body.apple #movie-play,body.apple #movie-resume{background:#eee;color:#151515}
 .notification svg,.profile-icon svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:1.7}
 .home-reference #top-search{background-image: none!important}
 .home-reference #home-shelves .shelf-all{font-size:18px;color:#b1bac9}
+@font-face{font-family:HomeCairo;src:url('assets/cairo-arabic-400-normal.woff2') format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:HomeCairo;src:url('assets/cairo-arabic-600-normal.woff2') format('woff2');font-weight:600;font-display:swap}
+@font-face{font-family:HomeCairo;src:url('assets/cairo-arabic-700-normal.woff2') format('woff2');font-weight:700;font-display:swap}
+@font-face{font-family:HomeCairo;src:url('assets/cairo-arabic-800-normal.woff2') format('woff2');font-weight:800;font-display:swap}
+.home-reference{font-family:HomeCairo,"Segoe UI",sans-serif}
+.home-reference nav button{font-size:21px;font-weight:600}
+.home-reference #home-title{font-family:HomeCairo,sans-serif;font-weight:800;font-size:58px}
+.home-reference #home-description{font-weight:400}
+.home-reference #home-tiles strong{font-size:22px;font-weight:700}
+.home-reference #home-tiles small{font-size:16px}
+.home-reference #home-shelves h2{font-size:24px;font-weight:700}
+.home-reference #home-shelves .shelf-all{font-size:16px}
+.home-reference .home-posters span{font-size:16px;font-weight:600}
+/* Second measured pass at 1429x804: align shelf column split and poster frame. */
+.home-reference #home-tiles{margin-bottom:31px}
+.home-reference #home-shelves{grid-template-columns:1.35fr 1fr}
+.home-reference #home-shelves h2{height:30px;line-height:30px;margin-bottom:16px}
+.home-reference .home-posters img,.home-reference .poster-blank{height:198px}
+.home-reference .home-posters span{margin-top:7px;line-height:26px}
+.home-reference .home-posters small{line-height:24px}
+.home-reference #home-copy{align-self:flex-end;margin-bottom:21px}
+.home-reference #home-title{font-size:62px;line-height:1.35}
+.home-reference #home-play{font-size:20px;padding:8px 27px}
+.home-reference #home-copy .actions{margin-top:17px}
+.home-reference #home-tiles button:nth-child(1){background:#3a1426!important}
+.home-reference #home-tiles button:nth-child(2){background:#291642!important}
+.home-reference #home-tiles button:nth-child(3){background:#1b2344!important}
+.home-reference #home-tiles button:nth-child(4){background:#4a2d17!important}
+.home-reference #home-tiles button:nth-child(5){background:#102b48!important}
+.home-reference #home-tiles button:nth-child(6){background:#133c2d!important}
+.home-reference #home-tiles img{opacity:.85!important}
