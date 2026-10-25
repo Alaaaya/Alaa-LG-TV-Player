@@ -1,10 +1,10 @@
 {
   "id": "com.alaa.player.webos",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "vendor": "Alaa",
   "type": "web",
   "main": "index.html",
-  "title": "Alaa Player",
+  "title": "Alaa IPTV",
   "appDescription": "Alaa Player for LG webOS - live TV, movies and series",
   "icon": "icon.png",
   "largeIcon": "largeIcon.png",
