@@ -214,3 +214,24 @@ body.apple #series-meta,body.apple #series-description,body.apple #episode-detai
 .poster-badge{position:absolute;top:13px;left:13px;background:var(--accent);color:white;font-size:13px;border-radius:4px;padding:3px 6px}
 body.apple .poster-badge{background:#ececf0;color:#222}
 #hero-meta,.metadata{unicode-bidi:plaintext}
+/* Red / black: monochrome foundations across every page, red accents retained. */
+body:not(.apple):not(.blue){--bg:#000;--panel:#0b0b0b;--raised:#141414;--tint:#221013;--muted:#aaa;background:#000;color:#f5f5f5}
+body:not(.apple):not(.blue) #screen{background:#000}
+body:not(.apple):not(.blue) header,body:not(.apple):not(.blue) nav{background:#050505;border-color:#252525}
+body:not(.apple):not(.blue) input,body:not(.apple):not(.blue) select{background:#141414;border-color:#333}
+body:not(.apple):not(.blue) #cover{background:#000}
+body:not(.apple):not(.blue) #hero,body:not(.apple):not(.blue) #home-hero{background:#0b0b0b}
+body:not(.apple):not(.blue) #hero:after{background:linear-gradient(90deg,#0003,#080808f5 85%)}
+body:not(.apple):not(.blue) #home-hero:after{background:linear-gradient(90deg,#000f 0%,#050505d9 35%,#0001 85%)}
+body:not(.apple):not(.blue) #connection{background:#080808}
+body:not(.apple):not(.blue) #preview-selected{background:#242424}
+body:not(.apple):not(.blue) .item-icon{background:#242424;color:#bbb}
+body:not(.apple):not(.blue) #items img{background:#141414}
+body:not(.apple):not(.blue) #genre-cards button{background:linear-gradient(135deg,#222,#0b0b0b)}
+body:not(.apple):not(.blue) #home-tiles img{filter:grayscale(1);opacity:.45}
+body:not(.apple):not(.blue) #home-tiles button{background:#141414}
+body:not(.apple):not(.blue) #quick-channels{background:rgba(12,12,12,.97)}
+body:not(.apple):not(.blue) #player{background:#000}
+body:not(.apple):not(.blue) #player-ui{background:linear-gradient(transparent,rgba(0,0,0,.98) 25%)}
+body:not(.apple):not(.blue) .note,body:not(.apple):not(.blue) #date,body:not(.apple):not(.blue) footer,body:not(.apple):not(.blue) #count,body:not(.apple):not(.blue) .metadata,body:not(.apple):not(.blue) #detail-group,body:not(.apple):not(.blue) #hero-meta,body:not(.apple):not(.blue) #home-meta,body:not(.apple):not(.blue) #home-description,body:not(.apple):not(.blue) #series-meta,body:not(.apple):not(.blue) #series-description,body:not(.apple):not(.blue) #episode-detail p{color:#b5b5b5}
+body:not(.apple):not(.blue) #home-shelves small,body:not(.apple):not(.blue) #home-tiles small,body:not(.apple):not(.blue) #categories small,body:not(.apple):not(.blue) #items small,body:not(.apple):not(.blue) .episode-row small{color:#aaa}
