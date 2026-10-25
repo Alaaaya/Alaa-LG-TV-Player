@@ -19,7 +19,7 @@ else if(a==='get_series')data=Array.from({length:36},(_,i)=>({series_id:3001+i,n
 else if(a==='get_series_info')data={episodes:{'1':[{id:4001,title:'الحلقة الأولى',container_extension:'mp4'},{id:4002,title:'الحلقة الثانية',container_extension:'mp4'}],'2':[{id:4003,title:'بداية جديدة',container_extension:'mp4'}]}};
 await r.fulfill({json:data});});
 await page.goto('http://127.0.0.1:'+server.address().port);await page.waitForFunction(()=>document.querySelector('#count').textContent==='1000 قناة');await page.waitForTimeout(100);
-check(await page.locator('#home').isVisible(),true);check(await page.locator('html').getAttribute('dir'),'rtl');check(calls[0].path.endsWith('register_device'),true);check(await page.locator('#items button').count(),24);
+check(await page.locator('#home').isVisible(),true);check(await page.locator('html').getAttribute('dir'),'ltr');check(calls[0].path.endsWith('register_device'),true);check(await page.locator('#items button').count(),24);
 await page.screenshot({path:art+'/home-1.1.1-'+engine.name()+'.png'});
 await page.locator('[data-kind="live"]').click();check(await page.locator('#browser').isVisible(),true);check(await page.locator('#items button').count(),24);
 check(await page.locator('#items button').evaluateAll(es=>es.every((e,i)=>i===0||e.getBoundingClientRect().top>es[i-1].getBoundingClientRect().top)),true);
@@ -35,7 +35,10 @@ await page.locator('#preview-selected').click();check(await page.locator('#previ
 await page.locator('#items button').first().click();check(await page.locator('#player').isVisible(),true);check(await page.locator('#preview').isVisible(),false);check(await page.locator('#video source').getAttribute('type'),'application/vnd.apple.mpegurl');
 await page.locator('#quick-toggle').click();check(await page.locator('#quick-list button').count()<=10,true);
 await page.screenshot({path:art+'/player-1.1.1-'+engine.name()+'.png'});await page.keyboard.press('Escape');check(await page.locator('#player').isVisible(),true);await page.keyboard.press('Escape');check(await page.locator('#player').isVisible(),false);check(await page.locator('#video source').count(),0);
-await page.locator('[data-kind="movies"]').click();await page.waitForFunction(()=>document.querySelector('#count').textContent==='80 عنوان');await page.waitForFunction(()=>document.querySelector('#hero img').complete);check(await page.locator('#hero-name').textContent(),'فيلم تجريبي 1');check((await page.locator('#hero-meta').textContent()).includes('HD'),true);check(await page.locator('#genre-cards button').count(),4);check(await page.locator('#movie-shelf button').count(),6);
+await page.locator('[data-kind="movies"]').click();await page.waitForFunction(()=>document.querySelector('#count').textContent==='80 عنوان');await page.waitForFunction(()=>document.querySelector('#hero img').complete);check(await page.locator('#hero-name').textContent(),'فيلم تجريبي 1');check((await page.locator('#hero-meta').textContent()).includes('HD'),true);check(await page.locator('#genre-cards button').count(),4);
+for(const selector of ['#genre-cards button','#movie-shelf button','#items button']){
+check(await page.locator(selector).evaluateAll(es=>es[0].getBoundingClientRect().left<es[1].getBoundingClientRect().left),true);}
+await page.locator('#items button').first().focus();await page.keyboard.press('ArrowRight');check(await page.locator('#items button:focus').getAttribute('data-index'),'1');await page.keyboard.press('ArrowLeft');check(await page.locator('#items button:focus').getAttribute('data-index'),'0');check(await page.locator('#movie-shelf button').count(),6);
 await page.locator('#genre-cards button').first().click();check(await page.locator('#count').textContent(),'20 عنوان · أخبار');
 await page.locator('#categories button').first().click();check(await page.locator('#count').textContent(),'80 عنوان');
 await page.screenshot({path:art+'/movies-1.1.1-'+engine.name()+'.png'});

@@ -40,3 +40,9 @@ nav{right:auto;left:0;border-left:0;border-right:1px solid #202b3e}
 #browser.movie-view #movie-discovery{flex:none}
 #browser.live-view #preview-selected{margin:0;width:76%;justify-self:start}
 #browser.live-view #favorite-selected{margin:0;width:21%;justify-self:end}
+/* Owner convention: all structure flows from physical left, including Arabic UI. */
+#screen,header,main,aside,nav,nav button,.library,#detail,#categories,#items,#items button,#home,#home-tiles,#home-recent,#hero,#hero-copy,#home-hero,#home-copy,#movie-discovery,#genre-cards,#genre-cards button,#movie-shelf,#movie-shelf button,#connection,#theme-picker,.actions,#player,#quick-channels,#quick-list,#player-ui{direction:ltr}
+#browser>aside,#browser>#subcategories,#browser .library,#browser #detail{direction:ltr}
+#hero-name,#home-title,#detail-name,#detail-group,.item-name,#genre-cards span,#movie-shelf span{unicode-bidi:plaintext;text-align:right}
+#clockbox{margin-right:0;margin-left:auto}
+#quick-channels{right:auto;left:32px}
