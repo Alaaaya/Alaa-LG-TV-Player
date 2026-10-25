@@ -337,3 +337,41 @@ body.apple #movie-play,body.apple #movie-resume{background:#eee;color:#151515}
 .home-reference #home-tiles button:nth-child(5){background:#102b48!important}
 .home-reference #home-tiles button:nth-child(6){background:#133c2d!important}
 .home-reference #home-tiles img{opacity:.85!important}
+/* Reference crops are presentation layers only. All navigation remains native buttons. */
+#screen.home-reference{background:#0b1320 url('assets/reference-foundation.jpg') 0 0/1920px 1080px no-repeat!important}
+.home-reference header{background:transparent url('assets/reference-header.jpg') 0 0/1920px 100px no-repeat!important}
+.home-reference header .brand{opacity:0;pointer-events:none}
+.home-reference #top-search{background:transparent!important;border-color:transparent!important;color:transparent;caret-color:white}
+.home-reference #top-search::placeholder{color:transparent}
+.home-reference #top-search:focus{background:#162033!important;color:white}
+.home-reference #header-tools{opacity:0}
+.home-reference #clockbox{background:#0b1220;padding:0 5px}
+.home-reference nav{background:transparent url('assets/reference-nav.jpg') 0 0/274px 900px no-repeat!important;top:100px}
+.home-reference nav button{color:transparent!important;background:transparent!important;box-shadow:none!important}
+.home-reference nav button .nav-icon{opacity:0}
+.home-reference nav button:focus{outline:3px solid white}
+.home-reference #home{padding-left:24px;padding-right:0}
+.home-reference #home-hero{padding:0;width:1622px;height:350px}
+.home-reference #home-hero .reference-hero-art{width:100%;height:100%;object-fit:fill}
+.home-reference #home-hero:after{display:none}
+.home-reference #home-copy{position:absolute;inset:0;width:100%;max-width:none;margin:0;align-self:auto}
+.home-reference #home-title,.home-reference #home-description,.home-reference #home-meta{visibility:hidden}
+.home-reference #home-copy .actions{position:absolute;left:60px;bottom:27px;margin:0}
+.home-reference #home-play{width:180px;height:50px;opacity:0}
+.home-reference #home-play:focus{opacity:1}
+.home-reference #hero-prev,.home-reference #hero-next{opacity:0}
+.home-reference #hero-prev:focus,.home-reference #hero-next:focus{opacity:1}
+.home-reference #hero-dots{opacity:0}
+.home-reference #home-tiles{width:1622px;gap:18px}
+.home-reference #home-tiles button{background:#152033!important;padding-top:100px;box-shadow:none}
+.home-reference #home-tiles img{height:106px;object-fit:fill;opacity:1!important}
+.home-reference #home-tiles button:after{display:none}
+.home-reference #home-tiles strong{display:none}
+.home-reference #home-tiles small{font-size:16px;margin:0;text-align:left}
+.home-reference #home-shelves{padding-right:24px}
+.home-reference header{background:transparent!important}
+.home-reference nav{background:transparent!important}
+.home-reference nav button.selected{background:transparent!important;box-shadow:none!important}
+.home-reference #home-tiles{margin-bottom:31px}
+.home-reference #home-tiles button{overflow:visible;height:137px;padding:106px 14px 0}
+.home-reference #home-tiles small{line-height:25px}
