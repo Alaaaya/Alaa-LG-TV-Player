@@ -504,3 +504,16 @@ body[data-theme] button:focus,body[data-theme] #items button:focus{outline:3px s
 body[data-theme=apple] button.selected,body[data-theme=apple] nav button.selected,body[data-theme=apple] .home-reference nav button.selected,body[data-theme=apple] .home-reference nav button:focus,body[data-theme=apple] nav button:focus,body[data-theme=apple] #home-copy button,body[data-theme=apple] #hero-play,body[data-theme=apple] #movie-play,body[data-theme=apple] #series-start,body[data-theme=apple] #episode-play,body[data-theme=apple] #play-selected{background:#eeeef0!important;color:#17171b!important}
 body[data-theme=apple] button:focus,body[data-theme=apple] #items button:focus{background:#eeeef0!important;color:#17171b!important;outline-color:#fff!important}
 body[data-theme=apple] .live,body[data-theme=apple] .eyebrow{color:#c2c2c7!important}
+/* Apple-only playback overlay, same reference geometry without red effects. */
+body.apple #quick-channels{background:rgba(25,25,28,.92)!important;border-color:#69696f!important;box-shadow:0 0 16px rgba(235,235,245,.14)!important}
+body.apple #quick-list button,body.apple #quick-list button.selected{background:rgba(55,55,59,.8)!important;color:#f5f5f7!important}
+body.apple #quick-list button:focus{background:linear-gradient(90deg,#f4f4f7,#ceced4)!important;color:#161619!important;border-color:#fff!important;outline:none!important;box-shadow:0 0 10px rgba(255,255,255,.35)!important}
+body.apple #quick-list button:focus .quick-quality,body.apple #quick-list button:focus .quick-name{color:#27272c!important}
+body.apple #quick-list button:focus .quick-number{background:#b9b9c1;color:#17171b}
+body.apple #zap-banner{background:#262629ee;border-color:#eeeef0}
+body.apple #organize-panel button:focus{background:#eeeef0;color:#17171b}
+body.apple #movie-play,body.apple #series-start,body.apple #episode-play{background:#eeeef0!important;color:#17171b!important}
+body.apple .home-reference #home-shelves h2{border-color:#d8d8de}
+body.apple #home-shelves b{background:#eeeef0!important;color:#202024!important}
+body.apple #home-tiles .tile-art{background:#343437}
+body.apple #filter-all,body.apple #filter-hd,body.apple #filter-4k{accent-color:#eeeef0}
