@@ -469,7 +469,7 @@ storeWrite('ap-theme',value);
 $('theme-apple').onclick=function(){theme('apple');};
 $('theme-red').onclick=function(){theme('red');};
 $('theme-blue').onclick=function(){theme('blue');};
-if(!storeRead('ap-red-audit-125')){storeWrite('ap-theme','red');storeWrite('ap-red-audit-125','1');}
+if(!storeRead('ap-red-default-126')){storeWrite('ap-theme','red');storeWrite('ap-red-default-126','1');}
 theme(storeRead('ap-theme')||'red');
 var quickItems=[],quickIndex=0;
 function renderQuick(index){
