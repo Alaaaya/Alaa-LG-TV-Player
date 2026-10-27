@@ -75,7 +75,7 @@ function providers(){var select=$('providers'),old=state.provider&&state.provide
 
 // IndexedDB keeps large catalogs off the synchronous localStorage path.
 // Provider-scoped keys contain a SHA-256 digest, never plaintext credentials.
-var cacheDB=null,cacheJobs={},cacheStorageFull=false,prefetchEpoch=0,backgroundJobs={},refreshQueue=[],refreshBusy=false,sessionRefreshed={},lastInputAt=0,refreshStats={ok:0,fail:0},manualRefresh=null,freshTimer=null,freshKinds={};
+var softKeep=null,cacheDB=null,cacheJobs={},cacheStorageFull=false,prefetchEpoch=0,backgroundJobs={},refreshQueue=[],refreshBusy=false,sessionRefreshed={},lastInputAt=0,refreshStats={ok:0,fail:0},manualRefresh=null,freshTimer=null,freshKinds={};
 document.addEventListener('keydown',function(){lastInputAt=Date.now();},true);
 function openCatalogDB(){
 if(!window.indexedDB)return Promise.resolve(null);
@@ -114,7 +114,7 @@ return data.map(function(x){return {stream_id:x.stream_id,name:x.name,stream_ico
 function rowsSignature(data){try{if(!Array.isArray(data))return JSON.stringify(data).length+':';var h=0,s=JSON.stringify(data);for(var i=0;i<s.length;i+=7)h=(h*31+s.charCodeAt(i))|0;return data.length+':'+h;}catch(e){return '';}}
 function refreshPump(){
 if(refreshBusy)return;
-if(!refreshQueue.length){if(manualRefresh){var m=manualRefresh;manualRefresh=null;m();}return;}
+if(!refreshQueue.length)return;
 refreshBusy=true;
 (async function(){
 await idleCatalogTurn();
@@ -128,29 +128,41 @@ function scheduleFresh(p,action){
 freshKinds[action]=1;clearTimeout(freshTimer);
 freshTimer=setTimeout(function(){applyFresh(p).catch(function(){});},500);
 }
+var MERGE_FIELDS=['name','group','logo','rating','year','description','genre','seasons','episodeCount','added','quality','program','backdrop','url'];
+// Stable-id merge: existing objects are kept (identity, selection, favorites), fields update in place.
+function mergeItems(oldList,newList){
+var byId=new Map(oldList.map(function(i){return [i.id,i];})),changed=oldList.length!==newList.length,out=[];
+newList.forEach(function(n,idx){var o=byId.get(n.id);
+if(!o){changed=true;out.push(n);return;}
+MERGE_FIELDS.forEach(function(f){if(o[f]!==n[f]){o[f]=n[f];changed=true;}});
+if(oldList[idx]!==o)changed=true;out.push(o);});
+return {list:out,changed:changed};
+}
 async function applyFresh(p){
 if(state.provider!==p)return;
 if(!$('player').hidden||document.hidden||Date.now()-lastInputAt<700){freshTimer=setTimeout(function(){applyFresh(p).catch(function(){});},1500);return;}
-var kinds=freshKinds;freshKinds={};var changed=false;
-var oldFocus=document.activeElement,oldIds=state.items.map(function(i){return i.id;}).join(',');
+var kinds=freshKinds;freshKinds={};var changed=false,viewChanged=false;
 for(var kind of ['movies','series']){
 var action=kind==='movies'?'get_vod_streams':'get_series';
 if(!kinds[action]||homeLoadState[kind]!=='ready')continue;
 var list=uniqueTitles(await xcCatalog(p,kind));if(state.provider!==p)return;
-if(list.length!==homeCatalog[kind].length||list.some(function(it,n){return it.id!==homeCatalog[kind][n].id;})){homeCatalog[kind]=list;changed=true;}
+var m=mergeItems(homeCatalog[kind],list);
+if(m.changed){var shown=state.items===homeCatalog[kind];homeCatalog[kind]=m.list;if(shown&&state.kind===kind&&state.view!=='home'){state.items=m.list;viewChanged=true;}changed=true;}
 }
-if(kinds.get_live_streams&&state.kind==='live'){
-var have=new Set(homeCatalog.live.map(function(i){return i.id;}));
-var cat=liveCategories.find(function(c){return c.category_name===state.group;});
-var live=uniqueTitles(await xcCatalog(p,'live',cat&&cat.category_id));if(state.provider!==p)return;
-var add=live.filter(function(i){return !have.has(i.id);});
-if(add.length){homeCatalog.live=homeCatalog.live.concat(add);changed=true;}
+if(kinds.get_live_streams&&homeCatalog.live.length){
+var cat=state.kind==='live'&&liveCategories.find(function(c){return c.category_name===state.group;});
+var fresh=uniqueTitles(await xcCatalog(p,'live',cat?cat.category_id:'All'));if(state.provider!==p)return;
+var inGroup=cat?homeCatalog.live.filter(function(i){return i.group===state.group;}):homeCatalog.live;
+var m2=mergeItems(inGroup,fresh);
+if(m2.changed){homeCatalog.live=cat?homeCatalog.live.filter(function(i){return i.group!==state.group;}).concat(m2.list):m2.list;
+if(state.kind==='live'&&state.view!=='home'){state.items=homeCatalog.live;viewChanged=true;}changed=true;}
 }
 if(!changed)return;
-if(state.kind&&homeCatalog[state.kind]&&state.items.length&&state.kind!=='live')state.items=homeCatalog[state.kind];
-else if(state.kind==='live'&&state.items.length)state.items=uniqueTitles(homeCatalog.live.filter(function(i){return i.group===state.group;}).concat(state.items));
-var newIds=state.items.map(function(i){return i.id;}).join(',');
-if(newIds!==oldIds&&$('connection').hidden&&$('movie-detail').hidden&&$('series-detail').hidden){render();if(oldFocus&&oldFocus.isConnected&&oldFocus.focus)try{oldFocus.focus({preventScroll:true});}catch(e){}}
+if(viewChanged&&$('connection').hidden&&$('movie-detail').hidden&&$('series-detail').hidden){
+var it=$('items'),f=document.activeElement,fi=f&&f.dataset&&f.dataset.index!=null&&it.contains(f)?Number(f.dataset.index):-1;
+softKeep={virtualStart:state.virtualStart||0,scrollTop:it.scrollTop,focusIndex:fi,hadFocus:fi>=0};
+render();
+}
 try{homeContent();}catch(e){}
 saveHomeSnapshot(p);
 }
@@ -203,7 +215,7 @@ function idleCatalogTurn(){return new Promise(function(resolve){setTimeout(funct
 // One category request at a time; no all-provider response or arbitrary record eviction.
 function prefetchCatalog(p){
 var epoch=++prefetchEpoch,providerEpoch=catalogEpoch;
-(async function(){
+return (async function(){
 var plans=[['live','get_live_categories','get_live_streams'],['movies','get_vod_categories','get_vod_streams'],['series','get_series_categories','get_series']];
 var lists=[];
 for(var n=0;n<plans.length;n++){
@@ -481,9 +493,13 @@ if(state.kind==='live')state.filtered=orderedChannels(state.filtered);
 $('count').textContent=state.filtered.length+' '+(state.kind==='live'?'قناة':'عنوان')+(state.group==='All'?'':' · '+(state.group==='@favorites'?'المفضلة':state.group));
 movieDiscovery(q);
 seriesControls();
-state.virtualStart=0;$('items').scrollTop=0;if(state.view!=='home')renderWindow(0);else $('items').replaceChildren();
+var keep=softKeep;softKeep=null;
+if(keep){state.virtualStart=keep.virtualStart;if(state.view!=='home')renderWindow(keep.virtualStart);else $('items').replaceChildren();$('items').scrollTop=keep.scrollTop;
+var fb=keep.focusIndex>=0&&$('items').querySelector('button[data-index="'+keep.focusIndex+'"]');if(fb&&keep.hadFocus)try{fb.focus({preventScroll:true});}catch(e){}}
+else{state.virtualStart=0;$('items').scrollTop=0;if(state.view!=='home')renderWindow(0);else $('items').replaceChildren();}
 livePages();
-if(state.filtered.length)select(state.filtered[0]);else select(null);
+if(keep&&state.selected&&state.filtered.indexOf(state.selected)>=0){var cur=state.selected;state.selected=null;select(cur);}
+else if(state.filtered.length)select(state.filtered[0]);else select(null);
 if(state.view!=='home'&&state.kind!=='live'&&state.filtered.length)hero(state.filtered[0]);else $('hero').hidden=true;
 }
 function movieDiscovery(query){
@@ -844,14 +860,17 @@ $('search').oninput=function(){clearTimeout(searchTimer);searchTimer=setTimeout(
 $('settings-open').onclick=function(){connection(true);};
 $('connection-close').onclick=function(){connection(false);};
 $('sync').onclick=sync;
+var manualTask=null;
 $('refresh-list').onclick=function(){
-var p=state.provider,b=$('refresh-list');if(!p||p.type!=='xtream'){status('لا توجد قائمة للتحديث');return;}
+var p=state.provider,b=$('refresh-list');if(manualTask)return manualTask;
+if(!p||p.type!=='xtream'){status('لا توجد قائمة للتحديث');return;}
 b.disabled=true;b.textContent='جارٍ التحديث…';status('جارٍ تحديث القائمة… القائمة المحفوظة تبقى شغالة');
 refreshStats={ok:0,fail:0};sessionRefreshed={};
-manualRefresh=function(){b.disabled=false;b.textContent='تحديث القائمة';
-status(refreshStats.fail&&!refreshStats.ok?'تعذّر التحديث · القائمة المحفوظة تعمل بدون إنترنت':'تم تحديث القائمة');};
-prefetchCatalog(p);
-setTimeout(function(){if(manualRefresh&&!refreshQueue.length&&!refreshBusy){var m=manualRefresh;manualRefresh=null;m();}},4000);
+manualTask=(async function(){
+await prefetchCatalog(p);
+while(Object.keys(backgroundJobs).length||refreshQueue.length||refreshBusy){await Promise.all(Object.keys(backgroundJobs).map(function(k){return backgroundJobs[k].catch(function(){});}));await new Promise(function(r){setTimeout(r,0);});}
+})().then(function(){status(refreshStats.fail&&!refreshStats.ok?'تعذّر التحديث · القائمة المحفوظة تعمل بدون إنترنت':'تم تحديث القائمة');},function(){status('تعذّر التحديث · القائمة المحفوظة تعمل بدون إنترنت');}).then(function(){manualTask=null;b.disabled=false;b.textContent='تحديث القائمة';});
+return manualTask;
 };
 $('manual-toggle').onclick=function(){$('manual').hidden=!$('manual').hidden;if(!$('manual').hidden)$('manual-type').focus();};
 $('manual-type').onchange=function(){$('credentials').hidden=this.value!=='xtream';};
