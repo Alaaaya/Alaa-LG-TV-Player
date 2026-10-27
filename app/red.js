@@ -137,6 +137,12 @@ function rows(){
  return [top,bot];
 }
 document.addEventListener('keydown',function(e){
+ if(!player.hidden&&list.hidden&&document.activeElement===$('progress')){
+  var seekKey=code(e);
+  if(seekKey==='ArrowDown'||seekKey==='ArrowUp'){e.preventDefault();e.stopImmediatePropagation();$('pause').focus();return;}
+  if(seekKey==='ArrowLeft'||seekKey==='ArrowRight'){e.preventDefault();e.stopImmediatePropagation();if(isFinite(video.duration))video.currentTime=Math.max(0,Math.min(video.duration,video.currentTime+(seekKey==='ArrowRight'?5:-5)));return;}
+  if(seekKey==='Enter'){e.preventDefault();e.stopImmediatePropagation();$('pause').click();return;}
+ }
  if(!player.hidden&&!isRed()){
   var sharedKey=code(e),sharedActive=document.activeElement;
   if(!list.hidden){
@@ -151,7 +157,7 @@ document.addEventListener('keydown',function(e){
    if(sharedKey==='Enter'&&sharedActive.tagName==='BUTTON'){e.preventDefault();e.stopImmediatePropagation();if(!e.repeat)sharedActive.click();return;}
    if(sharedKey==='ArrowDown'||sharedKey==='ArrowUp'){
     e.preventDefault();e.stopImmediatePropagation();
-    if(sharedKey==='ArrowDown')bSub.focus();else $('pause').focus();
+    if(sharedKey==='ArrowDown')bSub.focus();else if(sharedActive===$('pause'))$('progress').focus();else $('pause').focus();
     return;
    }
    if((sharedKey==='ArrowLeft'||sharedKey==='ArrowRight')&&sharedActive===bSub){
@@ -179,6 +185,7 @@ document.addEventListener('keydown',function(e){
   if(k==='Enter'&&a.tagName==='BUTTON'){e.preventDefault();e.stopImmediatePropagation();if(!e.repeat)a.click();return;}
   if((k==='ArrowUp'||k==='ArrowDown')&&!$('seek-back').hidden){
    var r=rows(),ri=r[0].indexOf(a)>=0?0:1,to=r[k==='ArrowDown'?1:0];
+   if(k==='ArrowUp'&&ri===0){e.preventDefault();e.stopImmediatePropagation();$('progress').focus();return;}
    if(ri===(k==='ArrowDown'?0:1)&&to.length){e.preventDefault();e.stopImmediatePropagation();to[Math.min(to.length-1,r[ri].indexOf(a))].focus();return;}
    e.preventDefault();e.stopImmediatePropagation();return;
   }
