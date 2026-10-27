@@ -56,7 +56,8 @@ if(show){stopPreview();document.querySelectorAll('nav button').forEach(function(
 $('connection').hidden=!show;
 if(show)$('sync').focus();else{render();focusFirst();}
 }
-function focusFirst(){if(!$('movie-detail').hidden){$('movie-back').focus();return;}if(!$('series-detail').hidden){$('series-back').focus();return;}if(state.view==='home'&&$('connection').hidden){$('home-play').focus();return;}var el=$('items').querySelector('button')||document.querySelector('nav button.selected');if(el)el.focus();}
+function focusFirst(force){
+if(!force&&document.querySelector('nav').contains(document.activeElement))return;if(!$('movie-detail').hidden){$('movie-back').focus();return;}if(!$('series-detail').hidden){$('series-back').focus();return;}if(state.view==='home'&&$('connection').hidden){$('home-play').focus();return;}var el=$('items').querySelector('button')||document.querySelector('nav button.selected');if(el)el.focus();}
 async function sync(){
 if(state.panelBusy)return;state.panelBusy=true;$('sync').disabled=true;$('activation').textContent='جارٍ التحقق من التفعيل…';
 try{await rpc('register_device',{p_device_code:code,p_mac:'webOS-'+code,p_model:'LG webOS · Alaa Player 1.2.5'});var c=A.config(await rpc('get_device_config',{p_device_code:code}));state.status=c.status;state.expires=c.expires_at;
@@ -706,7 +707,7 @@ if(!$('movie-detail').hidden){$('movie-back').focus();return;}
 if(!$('series-detail').hidden){$('series-back').focus();return;}
 if(state.view==='home'){$('search').focus();return;}
 if(state.kind!=='live'&&categoryWindow.nodes.length){var cb=categoryWindow.nodes.find(function(b){return b.classList.contains('selected');})||categoryWindow.nodes[0];if(!cb.isConnected)paintCategoryWindow(Math.max(0,Number(cb.dataset.categoryIndex)-3));cb.focus();return;}
-focusFirst();return;
+focusFirst(true);return;
 }
 if(key==='ArrowLeft'){e.preventDefault();return;}
 }
@@ -727,7 +728,7 @@ function focusCategory(){var ci=categoryWindow.nodes.findIndex(function(b){retur
 if(key==='ArrowLeft'&&active.dataset.index!=null&&Number(active.dataset.index)%6===0){e.preventDefault();focusCategory();return;}
 if(key==='ArrowLeft'&&inCats){e.preventDefault();(nav.querySelector('button.selected')||$('nav-home')).focus();return;}
 if(key==='ArrowRight'&&inNav){e.preventDefault();focusCategory();return;}
-if(key==='ArrowRight'&&inCats){e.preventDefault();focusFirst();return;}
+if(key==='ArrowRight'&&inCats){e.preventDefault();focusFirst(true);return;}
 if(active.dataset.index!=null){var gi=Number(active.dataset.index)+(key==='ArrowRight'?1:-1);if(gi>=0&&gi<state.filtered.length){e.preventDefault();if(!$('items').querySelector('[data-index="'+gi+'"]'))renderWindow(Math.max(0,gi-6));var gb=$('items').querySelector('[data-index="'+gi+'"]');if(gb){gb.focus();gb.scrollIntoView({block:'nearest'});}return;}}
 }
 

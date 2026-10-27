@@ -547,3 +547,6 @@ body.apple #connection{left:250px;right:0;top:100px;bottom:60px;padding:36px 48p
 #connection .actions button{text-align:left;min-height:66px;font-size:24px}
 #connection .note{font-size:17px}
 body.apple nav button.selected .nav-icon{color:#242429!important}
+body.apple #categories button.selected,body.apple #subcategories button.selected{background:#eeeef0!important;color:#17171b!important}
+body.apple #categories button.selected small{color:#343439!important}
+body.apple #preview-live{background:#eeeef0!important;color:#17171b!important}
