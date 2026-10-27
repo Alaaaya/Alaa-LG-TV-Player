@@ -167,3 +167,12 @@ Directional rows explicitly cover search, hero controls/slides, all six
 category tiles, movie View All/cards and series View All/cards. Left moves
 within rows before returning to sidebar; Up/Down traverses rows and scrolls
 focused items into view. Keyboard-only Chromium87 page audit now31checks.
+
+1.2.7 adds a real-provider five-title hero alternating series/movies, provider
+backdrop or cover, title and bounded plot snippet loaded from detail metadata.
+Hero arrows/dots and Watch Now target the actual selected item. Nine-second
+rotation pauses during hero action focus. Static hero is fallback only.
+Empty initial VOD categories are skipped until populated, category-specific
+requests remain separate from Live. Playback pipeline was intentionally
+unchanged: real LG playback was confirmed by the owner on 1.2.4; desktop
+Chromium87 codec failure is not proof of an LG regression.
