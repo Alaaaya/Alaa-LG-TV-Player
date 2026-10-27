@@ -550,3 +550,27 @@ body.apple nav button.selected .nav-icon{color:#242429!important}
 body.apple #categories button.selected,body.apple #subcategories button.selected{background:#eeeef0!important;color:#17171b!important}
 body.apple #categories button.selected small{color:#343439!important}
 body.apple #preview-live{background:#eeeef0!important;color:#17171b!important}
+body.apple #series-detail{left:250px;right:0;top:100px;bottom:60px;padding:18px 28px;display:flex;flex-direction:column;overflow:hidden;direction:ltr}
+#series-detail #series-back{align-self:flex-start;height:45px;padding:6px 18px;font-size:20px;flex-shrink:0}
+#series-detail #series-overview{height:170px;min-height:170px;display:flex;position:relative;overflow:hidden;margin:10px 0}
+#series-detail #series-poster{width:100px;height:150px;min-width:100px}
+#series-detail #series-poster img{width:100%;height:100%;object-fit:cover}
+#series-detail #series-copy{padding:0 22px;flex:1}
+#series-detail #series-title{font-size:28px;margin:0 0 6px}
+#series-detail #series-description{display:none}
+#series-detail #series-copy .actions{margin:8px 0;gap:10px}
+#series-detail #series-copy button{font-size:18px;padding:9px 15px}
+#series-detail #series-backdrop{display:none}
+#series-detail #season-tabs{flex:0 0 56px;height:56px;margin:0 0 12px;display:flex;gap:10px;overflow:auto}
+#series-detail #season-tabs button{padding:10px 20px;font-size:20px;white-space:nowrap}
+#series-detail #episode-layout{display:flex;flex:1;min-height:0;height:auto;width:100%;overflow:hidden}
+#series-detail #episode-list{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0 14px;align-content:start;flex:1;min-height:0;width:100%;height:100%;overflow:auto;padding:3px}
+#series-detail .episode-spacer{grid-column:1/-1}
+#series-detail .episode-row{height:210px;margin:0 0 10px;padding:6px;display:flex;flex-direction:column;align-items:stretch;gap:3px;position:relative;border-radius:9px;text-align:left;transform:none!important;background:#2b2b2f!important;overflow:hidden}
+#series-detail .episode-art{width:100%;height:115px;min-height:115px;object-fit:cover;border-radius:5px}
+#series-detail .episode-code{font-size:15px;color:#bcbcc4}
+#series-detail .episode-row strong{font-size:18px;line-height:23px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#series-detail .episode-row small{font-size:14px;color:#bcbcc4}
+#series-detail .episode-row progress{width:100%;height:4px;margin-top:auto;accent-color:#eeeef0}
+body.apple #series-detail .episode-row:focus{background:#eeeef0!important;color:#17171b!important}
+body.apple #series-detail .episode-row:focus small,body.apple #series-detail .episode-row:focus .episode-code{color:#45454b}
