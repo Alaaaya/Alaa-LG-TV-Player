@@ -426,3 +426,4 @@ body:not(.apple):not(.blue) button:focus{outline:3px solid #ff7888!important;out
 #connection p,#connection label,#movie-description,#series-description{unicode-bidi:plaintext}
 #connection-close{margin-bottom:15px}
 .catalog-empty{direction:rtl;text-align:center;line-height:1.8}
+#status:not([hidden]){position:absolute;bottom:22px;left:300px;max-width:1200px;background:#111b2df5;border-radius:8px;padding:12px 20px;font-size:20px;z-index:20;direction:rtl}
