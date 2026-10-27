@@ -829,8 +829,8 @@ body[data-theme] #quick-channels{
   right:auto!important;
   top:5%!important;
   bottom:5%!important;
-  width:55%!important;
-  max-width:920px;
+  width:65%!important;
+  max-width:none;
   padding:22px!important;
   overflow:hidden!important;
   direction:ltr;
@@ -839,8 +839,8 @@ body[data-theme] #quick-channels{
   border:1px solid rgba(255,255,255,.3)!important;
   border-radius:26px!important;
   box-shadow:0 22px 70px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.08)!important;
-  -webkit-backdrop-filter:blur(34px) saturate(145%);
-  backdrop-filter:blur(34px) saturate(145%);
+  -webkit-backdrop-filter:blur(14px);
+  backdrop-filter:blur(14px);
 }
 #quick-channels h2{display:none!important}
 #quick-list{
@@ -951,3 +951,5 @@ body[data-theme] #quick-channels #quick-list button:focus-visible{
   #quick-list .channel-logo{flex-basis:48px!important;width:48px!important;min-width:48px!important;height:40px!important}
   #quick-list .quick-name{font-size:16px!important}
 }
+
+#player.quick-open #player-ui{visibility:hidden!important;pointer-events:none}

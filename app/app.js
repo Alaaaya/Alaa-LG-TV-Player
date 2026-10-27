@@ -1144,3 +1144,5 @@ if(document.activeElement.tagName==='SELECT')return;if(document.activeElement.ta
 document.addEventListener('visibilitychange',function(){if(document.hidden){stopPreview();if(state.playing)stop(false);}});
 featuredWriter.clear();bootCatalog();setInterval(sync,30*60*1000);setInterval(function(){if(state.expires&&Date.parse(state.expires)<=Date.now()&&state.provider&&!state.provider.manual){stop();featuredQueue.clear();resetFeatured();state.items=[];state.provider=null;state.request++;render();$('activation').textContent='انتهى التفعيل. جدّد الجهاز من لوحة التحكم.';connection(true);}},60000);
 })();
+
+;(function(){var q=document.getElementById('quick-channels'),pl=document.getElementById('player');if(!q||!pl||!window.MutationObserver)return;function sync(){pl.classList.toggle('quick-open',!q.hidden);}new MutationObserver(sync).observe(q,{attributes:true,attributeFilter:['hidden']});sync();})();
