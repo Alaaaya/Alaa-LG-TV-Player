@@ -70,3 +70,26 @@ https://webostv.developer.lge.com/develop/specifications/streaming-protocol-drm
 https://webostv.developer.lge.com/develop/guides/mediaoption-parameter
 LG lists native HLS and HTTP/HTTPS; specifies HLS tag restrictions, matching audio/video segment durations,
 and platform-dependent format support. This port does not override those limitations.
+
+## webOS compatibility build (1.2.4)
+
+Run npm ci, npm run check, then npm run package. The packager now consumes
+dist, not the unprocessed app directory. Build-time esbuild and Lightning CSS
+both target Chrome 79. The generated entry embeds styles, Cairo fonts and all
+four classic scripts. This removes external CSS/JS loading and file-origin CSP
+self matching as startup dependencies. Scripts/styles have exact SHA-256 CSP
+allowlist hashes; arbitrary inline scripts and eval remain forbidden. Network
+provider permissions and asset URLs are unchanged. No provider data or keys
+were changed.
+
+The reported physical-TV failure was NOT reproducible with the original 1.2.3
+entry on desktop Chromium 87.0.4279.0, including file origin. Consequently this
+is a compatibility-hardening fix, not a confirmed root-cause diagnosis or a
+claim that the real LG issue is resolved.
+
+For reproducible file-origin tests, set CHROMIUM_87 to a Chromium 87 executable
+and PLAYWRIGHT_87 to a Playwright 1.40.1 installation, then npm run test:compat.
+Do not substitute a user-agent override for a real old engine. The older test
+driver avoids modern Playwright checkVisibility requirements. Mocks explicitly
+supply CORS preflight headers for the opaque file origin. Media playback and
+panel replies are fixtures, not a real-provider or physical-TV test.
