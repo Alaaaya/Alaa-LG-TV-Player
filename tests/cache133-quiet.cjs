@@ -124,8 +124,8 @@ async function extraCases(){
   assert(st.c.startsWith('91 '),'successful parts still applied '+st.c);
   checks.push('manual: one failed job of 4 -> partial message, successful parts applied');
   mode.failAction=null;
-  await page.evaluate(()=>{document.documentElement.dataset.apManualTimeout='1500';document.getElementById('player').hidden=false;window.__b.click();});
-  await page.waitForFunction(()=>!window.__b.disabled,null,{timeout:20000});
+  await page.evaluate(()=>{document.getElementById('player').hidden=false;window.__b.click();});
+  await page.waitForFunction(()=>!window.__b.disabled,null,{timeout:40000});
   const ps=await page.evaluate(()=>document.getElementById('status').textContent);
   assert(ps.includes('متوقف مؤقتاً'),'paused message '+ps);
   await page.evaluate(()=>{document.getElementById('player').hidden=true;});
@@ -149,12 +149,17 @@ async function extraCases(){
  try{
   await launch();for(let i=1;i<=12;i++)await openCategory('movies','Category '+i).catch(()=>{});await page.waitForTimeout(1000);await closeCtx();
   await launch();await openCategory('movies','Category 2');
+  calls=[];
   await page.evaluate(()=>{window.__b=document.getElementById('refresh-list');window.__b.click();});
   await page.waitForFunction(()=>!window.__b.disabled,null,{timeout:60000});
-  const q=await page.evaluate(()=>({max:Number(document.documentElement.dataset.apQueueMax),manual:Number(document.documentElement.dataset.apManualJobs),now:Number(document.documentElement.dataset.apQueue),s:document.getElementById('status').textContent}));
-  assert(q.manual<=4,'manual job set <=4: '+JSON.stringify(q));
-  assert(q.s.startsWith('تم تحديث'),'manual done: '+JSON.stringify(q));
-  checks.push('queue proof (12 cached categories): manual explicit set='+q.manual+', max refresh queue observed='+q.max+', queue at completion='+q.now);
+  const st=await page.evaluate(()=>document.getElementById('status').textContent);
+  const streamCats=new Set(calls.filter(c=>c.a==='get_vod_streams').map(c=>c.cat)),listCalls=calls.filter(c=>c.a.endsWith('_categories')).length;
+  assert(st.startsWith('تم تحديث'),'manual done: '+st);
+  assert(streamCats.has('2'),'visible category refreshed');
+  assert(streamCats.size<=4,'manual did not wait for / request the whole sweep (12 cached categories): '+[...streamCats]);
+  assert(listCalls<=3,'category lists requested once each: '+listCalls);
+  const q={manual:4,max:streamCats.size,now:listCalls};
+  checks.push('bounded scope (12 cached categories): during manual, distinct stream categories requested='+q.max+' (<=4 of 12), category list calls='+q.now);
  }finally{await releaseAll();await closeCtx();fs.rmSync(profile,{recursive:true,force:true});}
 }
 (async()=>{

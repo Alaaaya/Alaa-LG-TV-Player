@@ -75,7 +75,6 @@ function providers(){var select=$('providers'),old=state.provider&&state.provide
 
 // IndexedDB keeps large catalogs off the synchronous localStorage path.
 // Provider-scoped keys contain a SHA-256 digest, never plaintext credentials.
-function qStat(n){var d=document.documentElement.dataset;d.apQueue=String(refreshQueue.length);d.apQueueMax=String(Math.max(Number(d.apQueueMax||0),refreshQueue.length));if(n!=null)d.apManualJobs=String(n);}
 var softKeep=null,cacheDB=null,cacheJobs={},cacheStorageFull=false,prefetchEpoch=0,backgroundJobs={},refreshQueue=[],refreshBusy=false,sessionRefreshed={},lastInputAt=0,refreshStats={ok:0,fail:0},manualRefresh=null,freshTimer=null,freshKinds={};
 document.addEventListener('keydown',function(){lastInputAt=Date.now();},true);
 function openCatalogDB(){
@@ -121,7 +120,7 @@ refreshBusy=true;
 await idleCatalogTurn();
 while(document.hidden||!$('player').hidden||Date.now()-lastInputAt<700)await new Promise(function(r){setTimeout(r,document.hidden||!$('player').hidden?2000:400);});
 // Current visible category first, then the rest in arrival order.
-var cur=refreshQueue.findIndex(function(j){return j.urgent;});var job=refreshQueue.splice(cur>0?cur:0,1)[0];qStat();
+var cur=refreshQueue.findIndex(function(j){return j.urgent;});var job=refreshQueue.splice(cur>0?cur:0,1)[0];
 try{await job.run();refreshStats.ok++;}catch(err){refreshStats.fail++;}
 })().then(function(){refreshBusy=false;refreshPump();},function(){refreshBusy=false;refreshPump();});
 }
@@ -191,7 +190,7 @@ refreshQueue.push({k:k,urgent:!!urgent,run:async function(){
 if(state.provider!==p||cacheStorageFull){resolve(cached&&cached.data);return;}
 try{var before=cached?rowsSignature(cached.data):'',data=await refresh();sessionRefreshed[k]=1;resolve(data);
 if(cached&&rowsSignature(data)!==before&&state.provider===p)scheduleFresh(p,action,id,data);}catch(e){reject(e);throw e;}
-}});qStat();refreshPump();});
+}});refreshPump();});
 if(k){backgroundJobs[k]=task;task.then(function(){delete backgroundJobs[k];},function(){delete backgroundJobs[k];});}
 return task;
 }
@@ -896,10 +895,10 @@ var mine;
 var spec=[['get_live_categories',null],['get_vod_categories',null],['get_series_categories',null]];
 var k=state.kind;
 if(k&&state.view!=='home'&&state.group&&state.group!=='All'&&state.group!=='@favorites'){var cl=k==='live'?liveCategories:vodCategories[k];var c=(cl||[]).find(function(x){return x.category_name===state.group;});if(c)spec.push([k==='live'?'get_live_streams':k==='movies'?'get_vod_streams':'get_series',c.category_id]);}
-qStat(spec.length);
+
 mine=(async function(){
 var jobs=spec.map(function(j){return xc(p,j[0],j[1],true,true);});
-var timer,timeout=new Promise(function(r){timer=setTimeout(function(){r('timeout');},Number(document.documentElement.dataset.apManualTimeout)||MANUAL_TIMEOUT);});
+var timer,timeout=new Promise(function(r){timer=setTimeout(function(){r('timeout');},MANUAL_TIMEOUT);});
 var res=await Promise.race([Promise.allSettled(jobs),timeout]);clearTimeout(timer);
 if(state.provider!==p)return {stale:true};
 if(res==='timeout')return {timeout:true,paused:document.hidden||!$('player').hidden};
