@@ -130,3 +130,14 @@ without browser default focus behavior. Header icons use SVG, avoiding missing
 font glyphs. A one-time 1.2.5 migration selects the requested red theme; later
 manual theme choices are preserved. Chrome87 remote suite now has 72 checks,
 including virtual scrolling, preview activation, series detail and settings.
+
+Continuous-list follow-up removes the Live pager completely. Main channel
+list and playback channel overlay use 24-row windows with spacers and wrap
+across the whole filtered category. The remote suite traverses all 356
+category entries in both views and verifies bounded DOM size, focus retention
+and visibility. Provider logos are eager, no-referrer images with initials
+fallback on failure; relative Xtream logo paths resolve against the provider.
+No HTTPS rewrite/proxy or security bypass is used. Real Chromium87 file origin
+tests cover HTTP logo success and HTTP404 initials fallback. A provider that
+blocks its own images may still fall back; actual LG logo availability needs
+a TV retest. Total Chromium87 suite is now 103 checks.

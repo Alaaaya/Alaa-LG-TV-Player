@@ -409,3 +409,11 @@ body:not(.apple):not(.blue) nav button.selected{background:#c12237!important}
 #quick-channels{left:40px;right:auto;top:40px;bottom:40px;width:520px;z-index:14;background:#101b2df5;direction:ltr}
 #quick-list button{text-align:left}
 #quick-list button:focus{background:#bc2039!important;color:white!important;outline:2px solid #fa536a}
+#browser.live-view #pagination{display:none!important}
+#browser.live-view #items{display:block;overflow-y:auto;overflow-x:hidden;min-height:0}
+#browser.live-view #items button{height:84px;margin:0 0 9px;direction:ltr;flex-shrink:0}
+.channel-logo{position:relative;width:40px;height:40px;min-width:40px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;background:#24354c;border-radius:6px;overflow:hidden}
+.channel-logo .logo-initials{font-size:17px;color:#fff;line-height:40px;text-align:center}
+#items .channel-logo img,#quick-list .channel-logo img{position:absolute;inset:0;width:40px;height:40px;object-fit:contain;background:#24354c}
+#quick-list button{height:68px;margin:0 0 8px;display:flex;align-items:center;gap:14px;direction:ltr;padding:8px 13px}
+#quick-list button>span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
