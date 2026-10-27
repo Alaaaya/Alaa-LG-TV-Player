@@ -95,7 +95,7 @@ await page.waitForFunction(()=>document.querySelector('#count').textContent.matc
    // trigger refresh through the same path as app open
    await page.evaluate(()=>{});
    const r=await manual();
-   assert(/تم تحديث القائمة/.test(r.msg),'manual finished message after real completion: '+r.msg);
+   assert(/تم تحديث الأقسام/.test(r.msg),'manual finished message after real completion: '+r.msg);
    const cat1=r.calls.filter(c=>c.a===action&&c.cat==='1').length;
    assert.equal(cat1,1,'two clicks coalesced to one request for '+kind);
    checks.push(kind+': two manual clicks coalesce, message only after all jobs');

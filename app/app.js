@@ -213,7 +213,8 @@ return true;
 }
 function idleCatalogTurn(){return new Promise(function(resolve){setTimeout(function(){if(window.requestIdleCallback)requestIdleCallback(resolve,{timeout:1000});else resolve();},150);});}
 // One category request at a time; no all-provider response or arbitrary record eviction.
-function prefetchCatalog(p){
+function prefetchCatalog(p,opts){
+var listsOnly=opts&&opts.listsOnly;
 var epoch=++prefetchEpoch,providerEpoch=catalogEpoch;
 return (async function(){
 var plans=[['live','get_live_categories','get_live_streams'],['movies','get_vod_categories','get_vod_streams'],['series','get_series_categories','get_series']];
@@ -225,6 +226,7 @@ if(providerEpoch!==catalogEpoch||state.provider!==p)return;
 if(n===0)liveCategories=lists[n];else vodCategories[plans[n][0]]=lists[n];
 }
 await saveHomeSnapshot(p);
+if(listsOnly)return;
 for(var i=0;i<Math.max(lists[0].length,lists[1].length,lists[2].length);i++){
 for(var n=0;n<plans.length;n++){
 if(!lists[n][i])continue;
@@ -867,9 +869,15 @@ if(!p||p.type!=='xtream'){status('لا توجد قائمة للتحديث');retu
 b.disabled=true;b.textContent='جارٍ التحديث…';status('جارٍ تحديث القائمة… القائمة المحفوظة تبقى شغالة');
 refreshStats={ok:0,fail:0};sessionRefreshed={};
 manualTask=(async function(){
-await prefetchCatalog(p);
-while(Object.keys(backgroundJobs).length||refreshQueue.length||refreshBusy){await Promise.all(Object.keys(backgroundJobs).map(function(k){return backgroundJobs[k].catch(function(){});}));await new Promise(function(r){setTimeout(r,0);});}
-})().then(function(){status(refreshStats.fail&&!refreshStats.ok?'تعذّر التحديث · القائمة المحفوظة تعمل بدون إنترنت':'تم تحديث القائمة');},function(){status('تعذّر التحديث · القائمة المحفوظة تعمل بدون إنترنت');}).then(function(){manualTask=null;b.disabled=false;b.textContent='تحديث القائمة';});
+// Bounded scope: the three category lists + the visible category + jobs already queued. The full category sweep continues quietly afterwards.
+await prefetchCatalog(p,{listsOnly:true});
+var k=state.kind,cid=null;
+if(k&&state.view!=='home'&&state.group&&state.group!=='All'&&state.group!=='@favorites'){var cl=k==='live'?liveCategories:vodCategories[k];var c=(cl||[]).find(function(x){return x.category_name===state.group;});cid=c&&c.category_id;}
+if(k&&cid)await xcCatalog(p,k,cid).catch(function(){});
+var pending=Object.keys(backgroundJobs).map(function(x){return backgroundJobs[x].catch(function(){});});
+await Promise.all(pending);
+})().then(function(){status(refreshStats.fail&&!refreshStats.ok?'تعذّر التحديث · القائمة المحفوظة تعمل بدون إنترنت':'تم تحديث الأقسام والقسم الحالي · باقي الأقسام تتحدّث بالخلفية');
+if(!(refreshStats.fail&&!refreshStats.ok))prefetchCatalog(p);},function(){status('تعذّر التحديث · القائمة المحفوظة تعمل بدون إنترنت');}).then(function(){manualTask=null;b.disabled=false;b.textContent='تحديث القائمة';});
 return manualTask;
 };
 $('manual-toggle').onclick=function(){$('manual').hidden=!$('manual').hidden;if(!$('manual').hidden)$('manual-type').focus();};
