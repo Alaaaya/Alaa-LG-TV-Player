@@ -22,7 +22,7 @@ await p.setViewportSize(viewport);await p.goto('file://'+path.resolve(process.ar
 await p.waitForFunction(()=>document.querySelector('#home-tiles button')&&document.querySelector('#connection').hidden);
 for(const kind of ['movies','series']){
 await p.evaluate(k=>document.querySelector('nav [data-kind="'+k+'"]').click(),kind);
-await p.waitForFunction(()=>document.querySelector('#items button'));
+await p.waitForFunction(()=>document.querySelector('#browser').classList.contains('poster-view')&&document.querySelector('#items button .item-name')&&document.querySelector('#items button .item-name').textContent.startsWith('Title'));
 await p.evaluate(()=>document.querySelector('#items button').focus());
 await p.keyboard.press('ArrowLeft');
 assert(await p.evaluate(()=>document.querySelector('#categories').contains(document.activeElement)));
