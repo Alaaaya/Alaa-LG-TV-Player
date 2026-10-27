@@ -188,3 +188,11 @@ A first-ever installation cannot display remote catalogs offline. Allow activati
 Artwork URLs are retained in cached records. Browser image-cache warming is bounded to 120 unique images, one at a time, with a four-second timeout. This is not an offline image archive; webOS/browser eviction and provider cache headers can remove artwork. Local fallback art remains available. Provider configuration and stream URLs remain private local app data and must not be included in shared test logs.
 
 `node tests/offline-cache131.cjs dist artifacts/cache131/offline.json` exercises persistent Chromium 87 process restarts, whole-network offline browsing, the fresh 12-hour rule, stale background refresh concurrency, retention above 150 records, quota failures and an empty offline installation.
+
+### 1.3.1 Home and theme behavior
+
+Home category tiles open inline content immediately below the tiles without replacing the Home route or hero. Live has a vertical channel list; Movies and Series have poster grids. Categories filter inline, and Back returns focus to the selected tile. Kids, News and Sports match corresponding provider category names; providers without matching categories show an empty state. Sidebar routes remain independent.
+
+Settings offers Apple Graphite, Navy / Red, Red / Black and Blue. Apple is the default only when a valid saved choice is absent. Existing valid `ap-theme` choices are read without migration or reset, and explicit changes persist. The same palette applies to Home inline content, catalogs, movie details, episode grids, Settings, player chrome and the OK channel overlay.
+
+`node tests/themes-routes131.cjs dist artifacts/cache131/themes-routes.json` checks all four palettes across routes and the channel overlay, saved-choice reloads, and an unset Apple default at 1920x1080 and 1280x720. `tests/home-inline131.cjs` checks all six inline tiles and their remote navigation; `tests/offline-cache131.cjs` additionally checks inline Home after a fully offline browser-process restart. The old `apple-only131.cjs` command now delegates to the current four-theme contract.
