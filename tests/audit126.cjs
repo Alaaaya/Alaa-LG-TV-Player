@@ -13,7 +13,7 @@ const cors={'access-control-allow-origin':'*','access-control-allow-methods':'GE
 await page.route('https://jytjcdlmygwqizgydeyp.supabase.co/**',async r=>{if(r.request().method()==='OPTIONS')return r.fulfill({status:204,headers:cors,body:''});calls.push({path:new URL(r.request().url()).pathname,body:r.request().postDataJSON()});await r.fulfill({headers:cors,json:r.request().url().includes('register_device')?{}:{status:panelStatus,expires_at:'2028-01-01',playlists}});});
 const svg=(shape)=>'<svg xmlns="http://www.w3.org/2000/svg" width="'+(shape==='backdrop'?1200:240)+'" height="'+(shape==='backdrop'?500:360)+'"><rect width="100%" height="100%" fill="#27374e"/><rect x="20" y="20" width="80%" height="85%" rx="12" fill="#344862"/><text x="50%" y="48%" text-anchor="middle" fill="#bdc8d8" font-size="30">TEST '+(shape==='backdrop'?'BACKDROP':'POSTER')+'</text><text x="50%" y="60%" text-anchor="middle" fill="#879bb8" font-size="18">PROVIDER FIXTURE</text></svg>';
 await page.route('**://images.example/**',r=>r.request().url().includes('broken.svg')?r.fulfill({status:404,body:''}):r.fulfill({headers:cors,contentType:'image/svg+xml',body:svg(r.request().url().includes('backdrop')?'backdrop':'poster')}));
-await page.route('https://provider.example/**',async r=>{const a=new URL(r.request().url()).searchParams.get('action');if(a==='get_vod_streams'&&failMovies)return r.fulfill({status:403,headers:cors,body:'blocked'});if(a==='get_vod_categories')return r.fulfill({status:500,headers:cors,body:'category service unavailable'});let data=[];
+await page.route('https://provider.example/**',async r=>{const a=new URL(r.request().url()).searchParams.get('action');if(a==='get_vod_streams'&&failMovies)return r.fulfill({status:403,headers:cors,body:'blocked'});let data=[];
 if(a&&a.endsWith('_categories'))data=[{category_id:'1',category_name:'أخبار'},{category_id:'2',category_name:'ترفيه'},{category_id:'3',category_name:'وثائقي'},{category_id:'4',category_name:'رياضة'}];
 else if(a==='get_live_streams')data=Array.from({length:1424},(_,i)=>({quality:i%2?'4K':'HD',stream_id:i+1,name:['القناة الأولى','قناة الأخبار','قناة الثقافة','القناة الرياضية'][i%4]+' '+(i+1),category_id:String(i%4+1),stream_icon:i===120?'http://images.example/logo.svg':i===124?'http://images.example/broken.svg':'https://images.example/logo.svg',program_name:i===0?'عنوان برنامج من المزوّد':undefined}));
 else if(a==='get_vod_streams')data=Array.from({length:80},(_,i)=>({stream_id:2001+i,name:'فيلم تجريبي '+(i+1),category_id:String(i%4+1),stream_icon:'https://images.example/poster.svg',backdrop_path:['https://images.example/backdrop.svg'],added:String(10000-i),plot:'وصف تجريبي يقدّمه مزوّد المحتوى لاختبار عرض التفاصيل.',genre:'دراما',rating:'8.2',year:'2025',quality:'HD',container_extension:'mp4'}));
@@ -30,6 +30,18 @@ async function shot(name){await page.screenshot({path:auditDir+'/'+name+'.png'})
 async function home(){for(let i=0;i<8;i++){if(await page.evaluate(()=>!document.querySelector('#home').hidden&&document.querySelector('#connection').hidden&&document.querySelector('#player').hidden))break;await press('Escape');}await press('ArrowLeft');}
 async function nav(n){await home();await press('ArrowUp',8);await press('ArrowDown',n);await press('Enter');await page.waitForTimeout(350);}
 await shot('home-focus');
+await press('ArrowLeft');await press('ArrowRight');
+await press('ArrowUp');check(await page.evaluate(()=>document.activeElement.id),'search');
+await press('ArrowDown');check(await page.evaluate(()=>document.activeElement.id),'home-play');
+await press('ArrowRight');await press('ArrowRight');check(await page.evaluate(()=>document.activeElement.id),'hero-prev');
+await press('Enter');await press('ArrowRight');check(await page.evaluate(()=>document.activeElement.id),'hero-next');await press('Enter');
+await press('ArrowDown');check(await page.evaluate(()=>document.querySelector('#home-tiles').contains(document.activeElement)),true);
+await shot('home-tiles-focus');
+await press('ArrowDown');check(await page.evaluate(()=>document.querySelector('#home-movies').contains(document.activeElement)||document.activeElement.classList.contains('shelf-all')),true);
+await shot('home-movies-row-focus');
+await press('ArrowDown');check(await page.evaluate(()=>document.querySelector('#home-series').contains(document.activeElement)||document.activeElement.classList.contains('shelf-all')),true);
+await shot('home-series-row-focus');
+
 await nav(1);await shot('live-focus');
 await press('ArrowRight');await shot('live-preview-focus');await press('Enter');await shot('player');
 await press('Enter');await shot('player-channel-overlay');await press('Escape');await press('Escape');

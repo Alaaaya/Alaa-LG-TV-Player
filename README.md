@@ -159,3 +159,11 @@ Series: 370 categories, tested first populated category 8 titles. App Home,
 Movies and Series rendered real catalog entries; screenshots real-provider-
 {home,movies,series}-126.png. No credentials in source or committed fixtures.
 Production security is unchanged. Physical LG retest remains required.
+
+Home remote follow-up: hero Watch Now opens the actual selected catalog item,
+and hero artwork prefers provider backdrop/logo. Home has one search field
+(the same field is moved to the catalog header, never duplicated).
+Directional rows explicitly cover search, hero controls/slides, all six
+category tiles, movie View All/cards and series View All/cards. Left moves
+within rows before returning to sidebar; Up/Down traverses rows and scrolls
+focused items into view. Keyboard-only Chromium87 page audit now31checks.
