@@ -24,7 +24,7 @@ for(const width of [1920,1280]){
 await p.setViewportSize({width,height:width===1920?1080:720});await p.goto('file://'+path.resolve(process.argv[2]||'dist')+'/index.html');
 await p.waitForFunction(()=>document.querySelector('#home-movies button')&&document.querySelector('#home-series button')&&document.querySelector('#connection').hidden);
 await p.waitForTimeout(500);
-for(const tile of ['live','movies','series','kids','news','sports']){
+for(const tile of ['live','movies','series']){
 await p.evaluate(()=>document.querySelector('#nav-home').click());
 await p.locator('[data-home-tile="'+tile+'"]').focus();await p.keyboard.press('Enter');
 await p.waitForFunction(()=>document.querySelector('#home-inline-items button'));
@@ -47,7 +47,7 @@ await p.evaluate(()=>document.querySelector('#nav-home').click());
 offline=true;await p.locator('[data-home-tile="movies"]').click();await p.waitForFunction(()=>document.querySelector('#home-inline-items button'));assert(await p.locator('#home').isVisible());offline=false;
 const boxes=await p.evaluate(()=>[...document.querySelectorAll('#home-tiles button'),...document.querySelectorAll('#home-inline-items button')].map(e=>{const r=e.getBoundingClientRect();return {left:r.left,right:r.right};}));assert(boxes.every(r=>r.left>=0&&r.right<=width+1),'Home tiles and inline columns stay inside viewport');
 await p.screenshot({path:'artifacts/cache131/home-inline-'+width+'.png'});
-result[width]='PASS all six tiles, category/content Dpad, Back focus, movie/series return, live playback, hero/Home route, selected Apple tile, sidebar separate, cached offline inline';
+result[width]='PASS live/movie/series inline tiles, category/content Dpad, Back focus, movie/series return, live playback, hero/Home route, selected Apple tile, sidebar separate, cached offline inline';
 }
 assert.deepEqual(errors,[]);fs.writeFileSync(process.argv[3],JSON.stringify(result,null,2));console.log(result);await b.close();
 })().catch(e=>{console.error(e);process.exit(1)});

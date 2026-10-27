@@ -60,5 +60,5 @@ const diagnostics=await p.evaluate(()=>window.APTrackDiagnostics());assert.equal
 await focus('red-sub');await code(13);await p.waitForFunction(()=>!document.getElementById('red-sublist').hidden);await p.keyboard.press('Escape');
 if(await p.locator('#red-aspect').isVisible()){await focus('red-aspect');await code(13);assert.equal(await p.evaluate(()=>document.getElementById('video').style.objectFit),'cover');}
 await focus('stop');await code(13);await p.waitForFunction(()=>document.getElementById('player').hidden);assert.equal(await p.locator('#series-detail').isVisible(),true);
-console.log('FOCUS_MAP_PASS',tag);await c.close();
+console.log('NATIVE_TRACKS_MOCK_PASS',tag);await c.close();
 }}finally{await b.close()}})().catch(e=>{console.error(e);process.exit(1)});

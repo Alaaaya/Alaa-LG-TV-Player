@@ -345,7 +345,9 @@ function button(text,fn){var b=document.createElement('button');b.textContent=te
 function displayLabel(name){return String(name||'').normalize('NFKC').replace(/\s+/g,' ').trim();}
 function categoryIcon(name){
 name=displayLabel(name);
-var type=name==='All'?'grid':name==='@favorites'?'heart':
+var type=name==='All'?'grid':/^(?:@favorites|المفضلة)$/.test(name)?'heart':
+/المشاهدة|مؤخرا|recent/i.test(name)?'recent':
+/بحث|search/i.test(name)?'search':
 /أخبار|اخبار|news|nachricht/i.test(name)?'news':
 /رياض|sport|football|كرة/i.test(name)?'sports':
 /موسيق|اغاني|أغاني|music|hits/i.test(name)?'music':
@@ -356,6 +358,8 @@ var type=name==='All'?'grid':name==='@favorites'?'heart':
 /تعليم|مدرس|education|learn|school/i.test(name)?'education':
 /اقتصاد|اعمال|أعمال|business|finance/i.test(name)?'business':'tv';
 var shapes={
+recent:'<circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/>',
+search:'<circle cx="10" cy="10" r="6"/><path d="M15 15l6 6"/>',
 grid:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
 news:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M6 8h12M6 12h5M6 16h5M15 12h3M15 16h3"/>',
 sports:'<circle cx="12" cy="12" r="9"/><path d="M12 7l5 4-2 6H9l-2-6zM12 3v4M21 10l-4 1M18 20l-3-3M6 20l3-3M3 10l4 1"/>',
@@ -509,11 +513,11 @@ addEventListener('blur',function(){if(hold){clearTimeout(hold.timer);hold=null;}
 
 function key(item){return (state.provider?state.provider.id:'')+':'+item.kind+':'+item.id;}
 function saved(list,item){return list.indexOf(key(item))>=0;}
-function setSaved(name,list){storeWrite(name,JSON.stringify(list.slice(0,300)));}
+function setSaved(name,list){storeWrite(name,JSON.stringify(list.slice(0,300)));lastHomePaint=null;}
 function channelLogo(item){
 var box=document.createElement('span');box.className='channel-logo';
 var initials=document.createElement('span');initials.className='logo-initials';initials.textContent=(item.name||'?').trim().split(/\s+/).slice(0,2).map(function(x){return Array.from(x)[0];}).join('').toUpperCase();box.appendChild(initials);
-if(item.logo){var img=image(item.logo);img.loading='lazy';img.onload=function(){initials.hidden=true;};img.onerror=function(){img.remove();initials.hidden=false;};box.appendChild(img);}
+if(item.logo){var img=image(item.logo);img.loading='eager';img.onload=function(){initials.hidden=true;};img.onerror=function(){img.remove();initials.hidden=false;};box.appendChild(img);}
 return box;
 }
 function fallbackArt(title){
@@ -523,14 +527,14 @@ return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent('<svg xmlns="http:
 function maxWidth(text){return Math.max(100,text.length*16);}
 // Browser native lazy decoding avoids one observer and two timers per poster.
 function image(src,cls,title){
-var img=document.createElement('img');img.alt=title||'';img.loading='lazy';img.decoding='async';img.referrerPolicy='no-referrer';
+var img=document.createElement('img');img.alt=title||'';img.loading='eager';img.decoding='async';img.referrerPolicy='no-referrer';
 if(cls)img.className=cls;
 img.onerror=function(){img.onerror=null;img.dataset.fallback='true';img.src=fallbackArt(title);};
 if(src)img.src=src;else img.onerror();
 return img;
 }
 // Display-only provider decoration cleanup; IDs, provider names and search remain untouched.
-function posterTitle(name){return String(name||'').replace(/^\s*(?:(?:4K|8K|FHD|UHD|HD)\s*-\s*(?:SH|AR\s*-\s*TR\s*-\s*D|AR\s*-\s*DO|AR\s*-\s*D)\s*[-:|]\s*|SH[- ](?:4K|8K|FHD|UHD|HD)\s*[-:|]\s*)/i,'').trim();}
+function posterTitle(name){return String(name||'').replace(/^\s*(?:(?:4K|8K|FHD|UHD|HD)\s*-\s*(?:SH|AR\s*-\s*TR\s*-\s*D|AR\s*-\s*DO|AR\s*-\s*D|AR)\s*[-:|]\s*|SH[- ](?:4K|8K|FHD|UHD|HD)\s*[-:|]\s*)/i,'').trim();}
 function posterMetadata(i){return [i.year&&/^\d{4}$/.test(String(i.year))?i.year:'',i.rating&&isFinite(Number(i.rating))&&Number(i.rating)>0?'★ '+i.rating:''].filter(Boolean).join(' · ');}
 window.APPosterDisplay={title:posterTitle,metadata:posterMetadata};
 function metadata(item){return [item.year,item.seasons?item.seasons+' مواسم':'',item.episodeCount?item.episodeCount+' حلقات':'',item.rating?'★ '+item.rating:'',item.quality].filter(Boolean).join('  ·  ');}
@@ -691,9 +695,25 @@ if(pool.length<5&&movies[h]&&(movies[h].backdrop||movies[h].logo))pool.push(movi
 var candidates=pool;
 var paintKey=[heroIndex,homeLoadState.movies,homeLoadState.series,movies,series,homeCatalog.live];
 if(lastHomePaint&&paintKey.every(function(v,i){return v===lastHomePaint[i];}))return;lastHomePaint=paintKey;
-var item=candidates[heroIndex%candidates.length];enrichHero(item);Array.from($('home-hero').querySelectorAll(':scope > img')).forEach(function(old){old.remove();});
+var item=candidates[heroIndex%candidates.length];enrichHero(item);
 $('home-hero').classList.toggle('provider-hero',!!item);$('home-hero').classList.toggle('reference-fallback',!item);
-var wide=item&&heroBackdrop(item.backdrop),poster=item&&A.safeURL(item.logo);$('home-hero').classList.toggle('hero-poster-fallback',!wide);if(wide||poster){var ref=image(wide||poster,null,item&&posterTitle(item.name));ref.className='reference-hero-art';if(poster){var bg=image(wide||poster);bg.className='hero-static-bg';$('home-hero').prepend(bg);}ref.onerror=function(){this.onerror=null;if(wide&&poster){this.src=poster;$('home-hero').classList.add('hero-poster-fallback');}else this.hidden=true;};$('home-hero').prepend(ref);}
+var wide=item&&heroBackdrop(item.backdrop),poster=item&&A.safeURL(item.logo),heroHost=$('home-hero');
+var artRequest=(heroHost._artRequest||0)+1;heroHost._artRequest=artRequest;
+if(wide||poster){
+var ref=document.createElement('img');ref.alt=item?posterTitle(item.name):'';ref.className='reference-hero-art';ref.decoding='async';ref.referrerPolicy='no-referrer';
+var triedPoster=!wide;
+ref.onload=function(){
+var paint=function(){if(heroHost._artRequest!==artRequest)return;
+var previous=Array.from(heroHost.querySelectorAll(':scope > img'));
+heroHost.classList.toggle('hero-poster-fallback',triedPoster||ref.naturalWidth/ref.naturalHeight<1.5);
+heroHost.prepend(ref);previous.forEach(function(old){old.remove();});
+};
+if(ref.decode)ref.decode().then(paint,paint);else paint();
+};
+ref.onerror=function(){if(!triedPoster&&poster){triedPoster=true;ref.src=poster;}else{ref.onload=null;ref.onerror=null;}};
+ref.src=wide||poster;
+}else if(!item){heroHost.querySelectorAll(':scope > img').forEach(function(old){old.remove();});}
+
 $('home-title').textContent=item?posterTitle(item.name):'مكتبتك، على شاشتك';
 $('home-meta').textContent=item?[posterMetadata(item),item.genre||''].filter(Boolean).join(' · '):'';$('home-meta').hidden=!$('home-meta').textContent;
 $('home-description').textContent=item?(item.description||'').slice(0,240):'أضف قائمة تشغيل لتظهر مكتبتك هنا';$('home-description').hidden=!$('home-description').textContent;
@@ -705,10 +725,11 @@ var dots=$('hero-dots');dots.replaceChildren();candidates.forEach(function(i,n){
 $('hero-prev').onclick=function(){heroIndex=(heroIndex+candidates.length-1)%Math.max(1,candidates.length);homeContent();};
 $('hero-next').onclick=function(){heroIndex=(heroIndex+1)%Math.max(1,candidates.length);homeContent();};
 var tiles=$('home-tiles'),focusedTile=tiles.contains(document.activeElement)&&document.activeElement.dataset.homeTile;tiles.replaceChildren();
-[['live','البث المباشر','▣'],['movies','الأفلام','▤'],['series','المسلسلات','▦'],['kids','الأطفال','☆'],['news','الأخبار','◎'],['sports','الرياضة','◉']].forEach(function(t,n){
-var pattern={kids:/kids|child|أطفال|اطفال/i,news:/news|أخبار|اخبار/i,sports:/sport|رياض/i}[t[0]],list=pattern?homeCatalog.live.filter(function(i){return pattern.test(i.group);}):homeCatalog[t[0]];
+[['live','البث المباشر','▣'],['movies','الأفلام','▤'],['series','المسلسلات','▦'],['favorites','المفضلة','♡'],['recent','المشاهدة مؤخراً','◷'],['search','البحث','⌕']].forEach(function(t,n){
+var list=homeCatalog[t[0]]||[],savedKeys=t[0]==='favorites'?favorites:t[0]==='recent'?recent:null;
+if(savedKeys)list=savedKeys.filter(function(id){return state.provider&&id.indexOf(state.provider.id+':')===0;});
 var tile=button('',function(){selectHomeTile(t[0]);});tile.dataset.homeTile=t[0];markOrder(tile,t[0],'home-tiles');tile.classList.toggle('selected',homeInline.tile===t[0]);tile.setAttribute('aria-pressed',homeInline.tile===t[0]?'true':'false');
-var art=document.createElement('span');art.className='tile-art';art.appendChild(categoryIcon(t[1]));tile.appendChild(art);var label=document.createElement('strong');label.textContent=t[1];tile.appendChild(label);var count=document.createElement('small');count.dataset.countCoverage='loaded-only';count.textContent=homeLoadState[t[0]]==='loading'?'جارٍ التحميل…':homeLoadState[t[0]]==='error'?'تعذّر التحميل':homeLoadState[t[0]]==='unsupported'?'غير متاح لقائمة M3U':list.length+' '+(t[0]==='movies'?'فيلم محمّل':t[0]==='series'?'مسلسل محمّل':'قناة محمّلة');tile.appendChild(count);tiles.appendChild(tile);
+var art=document.createElement('span');art.className='tile-art';art.appendChild(categoryIcon(t[1]));tile.appendChild(art);var label=document.createElement('strong');label.textContent=t[1];tile.appendChild(label);var count=document.createElement('small');count.dataset.countCoverage=savedKeys?'saved-current-provider':t[0]==='search'?'action':'loaded-only';count.textContent=t[0]==='search'?'ابحث في مكتبتك':savedKeys?list.length+' عنصر محفوظ':homeLoadState[t[0]]==='loading'?'جارٍ التحميل…':homeLoadState[t[0]]==='error'?'تعذّر التحميل':homeLoadState[t[0]]==='unsupported'?'غير متاح لقائمة M3U':list.length+' '+(t[0]==='movies'?'فيلم محمّل':t[0]==='series'?'مسلسل محمّل':'قناة محمّلة');tile.appendChild(count);tiles.appendChild(tile);
 });
 if(focusedTile){var restoreTile=tiles.querySelector('[data-home-tile="'+focusedTile+'"]');if(restoreTile)restoreTile.focus();}
 ['movies','series'].forEach(function(kind){var el=$('home-'+kind);el.replaceChildren();var list=uniqueTitles(homeCatalog[kind]).slice().sort(function(a,b){return b.added-a.added;}).slice(0,kind==='movies'?6:5);
@@ -766,6 +787,17 @@ if(!$('home-inline-items').contains(document.activeElement))paintHomeInlineItems
 }catch(e){/* Keep immediately hydrated rows when provider is offline. */}
 }
 function selectHomeTile(tile){
+if(tile==='search'){$('nav-search').click();return;}
+if(tile==='favorites'||tile==='recent'){
+homeInline.request++;homeInline.tile=tile;homeInline.kind=tile;homeInline.group=null;homeInline.page=0;
+$('home-inline').hidden=false;$('home-shelves').hidden=true;
+$('home-inline-title').textContent=tile==='favorites'?'المفضلة':'المشاهدة مؤخراً';
+$('home-tiles').querySelectorAll('button').forEach(function(b){b.classList.toggle('selected',b.dataset.homeTile===tile);b.setAttribute('aria-pressed',b.dataset.homeTile===tile?'true':'false');});
+var selectedKeys=tile==='favorites'?favorites:recent,available=homeCatalog.live.concat(homeCatalog.movies,homeCatalog.series,state.items||[]),byKey={};
+available.forEach(function(i){byKey[key(i)]=i;});
+homeInline.items=selectedKeys.map(function(id){return byKey[id];}).filter(Boolean);
+$('home-inline-categories').replaceChildren();paintHomeInlineItems();return;
+}
 homeInline.tile=tile;homeInline.kind=/^(movies|series)$/.test(tile)?tile:'live';homeInline.group=null;homeInline.page=0;
 $('home-inline').hidden=false;$('home-shelves').hidden=true;
 $('home-inline-title').textContent={live:'البث المباشر',movies:'الأفلام',series:'المسلسلات',kids:'الأطفال',news:'الأخبار',sports:'الرياضة'}[tile];
@@ -1352,7 +1384,7 @@ if(key==='ArrowDown'||key==='ArrowUp'){e.preventDefault();var container=zone===1
 }
 if(baseView&&state.view==='home'&&homeInline.tile&&/^Arrow/.test(key)){
 var inlineCats=Array.from($('home-inline-categories').querySelectorAll('button')),inlineItems=Array.from($('home-inline-items').querySelectorAll('button'));
-if($('home-tiles').contains(active)&&key==='ArrowDown'){e.preventDefault();if(inlineCats[0]){inlineCats[0].focus();inlineCats[0].scrollIntoView({block:'nearest'});}return;}
+if($('home-tiles').contains(active)&&key==='ArrowDown'){e.preventDefault();var firstInline=inlineCats[0]||inlineItems[0];if(firstInline){firstInline.focus();firstInline.scrollIntoView({block:'nearest'});}return;}
 if($('home-inline-categories').contains(active)){
 e.preventDefault();var ci=inlineCats.indexOf(active),target;
 if(key==='ArrowUp'){homeTileFocus();return;}
@@ -1363,7 +1395,7 @@ if(target){target.focus();target.scrollIntoView({block:'nearest',inline:'nearest
 }
 if($('home-inline-items').contains(active)){
 e.preventDefault();var ii=inlineItems.indexOf(active),columns=homeInline.kind==='live'?1:6;
-if(key==='ArrowUp'&&ii<columns){var c=$('home-inline-categories button.selected')||inlineCats[0];if(c)c.focus();return;}
+if(key==='ArrowUp'&&ii<columns){var c=$('home-inline-categories button.selected')||inlineCats[0];if(c)c.focus();else homeTileFocus();return;}
 if(key==='ArrowLeft'&&ii%columns===0){$('nav-home').focus();return;}
 var next=ii+(key==='ArrowDown'?columns:key==='ArrowUp'?-columns:key==='ArrowRight'?1:-1);
 if(inlineItems[next]){inlineItems[next].focus();inlineItems[next].scrollIntoView({block:'nearest'});}return;
