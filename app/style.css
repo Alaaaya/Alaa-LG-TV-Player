@@ -428,3 +428,12 @@ body:not(.apple):not(.blue) button:focus{outline:3px solid #ff7888!important;out
 .catalog-empty{direction:rtl;text-align:center;line-height:1.8}
 #status:not([hidden]){position:absolute;bottom:22px;left:300px;max-width:1200px;background:#111b2df5;border-radius:8px;padding:12px 20px;font-size:20px;z-index:20;direction:rtl}
 #home>#search{display:block;width:600px;max-width:90%;margin:0 0 20px;font-size:21px}
+.home-reference #home-hero.provider-hero{overflow:hidden;border-radius:16px;background:#101724}
+.home-reference #home-hero.provider-hero .reference-hero-art{object-fit:cover;opacity:.7}
+.home-reference #home-hero.provider-hero:after{display:block;content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,9,17,.94),rgba(5,9,17,.55) 55%,rgba(5,9,17,.1));pointer-events:none}
+.home-reference #home-hero.provider-hero #home-copy{z-index:2;inset:28px 60px;width:850px;text-align:left}
+.home-reference #home-hero.provider-hero #home-title,.home-reference #home-hero.provider-hero #home-description,.home-reference #home-hero.provider-hero #home-meta{visibility:visible}
+.home-reference #home-hero.provider-hero #home-title{font-size:36px;margin:0 0 12px}
+.home-reference #home-hero.provider-hero #home-description{font-size:19px;line-height:1.5;max-height:86px;overflow:hidden}
+.home-reference #home-hero.provider-hero #home-copy .actions{left:0;bottom:20px}
+.home-reference #home-hero.provider-hero #home-play,.home-reference #home-hero.provider-hero #home-info,.home-reference #home-hero.provider-hero #hero-prev,.home-reference #home-hero.provider-hero #hero-next,.home-reference #home-hero.provider-hero #hero-dots{opacity:1;z-index:3}

@@ -79,11 +79,15 @@ var cats=vodCategories[kind];
 if(!cats.length){cats=await xc(p,'get_'+mode+'_categories');vodCategories[kind]=cats;}
 if(!cats.length)return [];
 var chosen=category||cats[0].category_id;
+var choices=category?[{category_id:category}]:cats;
+for(var c=0;c<choices.length;c++){
 var u=new URL(A.xcAPI(p,kind==='series'?'get_series':'get_vod_streams'));
-u.searchParams.set('category_id',chosen);
+u.searchParams.set('category_id',choices[c].category_id);
 var rows=JSON.parse(await request(u.href,null,24*1024*1024));
 if(!Array.isArray(rows))throw Error('Invalid catalogue');
-return A.xcItems(rows,cats,p,kind);
+if(rows.length||category)return A.xcItems(rows,cats,p,kind);
+}
+return [];
 }
 async function loadVodCategory(name){
 var cat=vodCategories[state.kind].find(function(c){return c.category_name===name;});
@@ -148,7 +152,7 @@ $('heading').textContent=state.episodes?'الحلقات':({live:'البث الم
 $('search').placeholder='ابحث في '+(state.episodes?'الحلقات':state.kind==='live'?'القنوات':state.kind==='movies'?'الأفلام':'المسلسلات');
 document.querySelectorAll('[data-kind]').forEach(function(b){b.classList.toggle('selected',state.view!=='home'&&state.filter==='all'&&b.dataset.kind===state.kind);});
 $('nav-favorites').classList.toggle('selected',state.view!=='home'&&state.filter==='favorites');$('nav-recent').classList.toggle('selected',state.view!=='home'&&state.filter==='recent');
-var groups={All:state.items.length};if(state.provider&&state.provider.type==='xtream'&&state.kind!=='live')vodCategories[state.kind].forEach(function(c){groups[c.category_name]='';});state.items.forEach(function(i){groups[i.group]=(groups[i.group]||0)+1;});var cat=$('categories');cat.replaceChildren();
+var groups={All:state.items.length};if(state.provider&&state.provider.type==='xtream'&&state.kind!=='live')vodCategories[state.kind].forEach(function(c){groups[c.category_name]='';});state.items.forEach(function(i){groups[i.group]=(Number(groups[i.group])||0)+1;});var cat=$('categories');cat.replaceChildren();
 orderedGroups(Object.keys(groups)).forEach(function(g){var b=button((g==='All'?(state.episodes?'كل المواسم':'جميع التصنيفات'):g==='@favorites'?'المفضلة':g.replace(/^Season /,'الموسم ')),function(){if(state.kind!=='live'&&state.provider&&state.provider.type==='xtream'&&g!=='All'){loadVodCategory(g);return;}state.group=g;state.page=0;render();if(state.kind==='live'){var chosen=$('categories').querySelector('button.selected');if(chosen)chosen.focus();}else focusFirst();});if(state.kind==='live')b.dataset.organizeGroup=g;var n=document.createElement('small');n.textContent=g==='@favorites'?state.items.filter(isFavorite).length:groups[g];b.appendChild(n);b.classList.toggle('selected',g===state.group);var icon=document.createElement('span');icon.className='category-symbol';icon.appendChild(categoryIcon(g));b.prepend(icon);cat.appendChild(b);});
 renderItems();homeContent();}
 
@@ -319,16 +323,38 @@ featuredWriter.publish(homeCatalog.movies.concat(homeCatalog.series),p);flushFea
 })().finally(function(){if(epoch===catalogEpoch)homeLoadTask=null;});
 homeLoadTask=task;return task;
 }
+var heroMetadataBusy={},heroMetadataDone={};
+function enrichHero(item){
+if(!item||!item.provider||item.description||heroMetadataBusy[key(item)]||heroMetadataDone[key(item)])return;
+var id=key(item),provider=state.provider;
+heroMetadataBusy[id]=true;
+xc(item.provider,item.kind==='series'?'get_series_info':'get_vod_info',item.id).then(function(data){
+if(provider!==state.provider)return;
+var info=data.info||{};
+item.description=info.plot||info.description||'';
+item.backdrop=A.safeURL(Array.isArray(info.backdrop_path)?info.backdrop_path[0]:info.backdrop_path)||item.backdrop;
+heroMetadataDone[id]=true;if(state.view==='home')homeContent();
+}).catch(function(){heroMetadataDone[id]=true;}).finally(function(){delete heroMetadataBusy[id];});
+}
+setInterval(function(){
+if(state.view==='home'&&$('player').hidden&&$('connection').hidden&&!$('home-details').open&&document.activeElement!==$('home-play')&&document.activeElement!==$('home-info')&&!$('hero-dots').contains(document.activeElement)){
+heroIndex++;homeContent();
+}
+},9000);
 function homeContent(){
 if(!homeCatalog)return;
-var candidates=homeCatalog.movies.concat(homeCatalog.series).filter(function(i){return i.backdrop;}).slice(0,6);
-if(!candidates.length)candidates=state.items.slice(0,5);
-var item=candidates[heroIndex%candidates.length],old=$('home-hero').querySelector('img');if(old)old.remove();
-$('home-hero').classList.add('reference-fallback');
+var pool=[],movies=homeCatalog.movies,series=homeCatalog.series;
+for(var h=0;h<Math.max(movies.length,series.length)&&pool.length<5;h++){
+if(series[h]&&(series[h].backdrop||series[h].logo))pool.push(series[h]);
+if(pool.length<5&&movies[h]&&(movies[h].backdrop||movies[h].logo))pool.push(movies[h]);
+}
+var candidates=pool;
+var item=candidates[heroIndex%candidates.length];enrichHero(item);var old=$('home-hero').querySelector('img');if(old)old.remove();
+$('home-hero').classList.toggle('provider-hero',!!item);$('home-hero').classList.toggle('reference-fallback',!item);
 var ref=image(item&&(item.backdrop||item.logo)||'assets/reference-hero.jpg');ref.className='reference-hero-art';$('home-hero').prepend(ref);
 $('home-title').textContent=item?item.name:'مكتبتك، على شاشتك';
 $('home-meta').textContent=item?[metadata(item),item.genre||item.group].filter(Boolean).join(' · '):'';
-$('home-description').textContent=item?item.description||'':'أضف قائمة تشغيل لتظهر مكتبتك هنا';
+$('home-description').textContent=item?(item.description||'').slice(0,240):'أضف قائمة تشغيل لتظهر مكتبتك هنا';
 $('home-play').disabled=!item;$('home-play').setAttribute('aria-label',item?'شاهد '+item.name:'شاهد الآن');
 $('home-play').onclick=function(){if(item)open(item);};
 $('home-info').disabled=!item;
@@ -489,7 +515,7 @@ storeWrite('ap-theme',value);
 $('theme-apple').onclick=function(){theme('apple');};
 $('theme-red').onclick=function(){theme('red');};
 $('theme-blue').onclick=function(){theme('blue');};
-if(!storeRead('ap-red-default-126')){storeWrite('ap-theme','red');storeWrite('ap-red-default-126','1');}
+if(!storeRead('ap-red-default-127')){storeWrite('ap-theme','red');storeWrite('ap-red-default-127','1');}
 theme(storeRead('ap-theme')||'red');
 var quickItems=[],quickIndex=0;
 function renderQuick(index){
