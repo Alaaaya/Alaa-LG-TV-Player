@@ -43,7 +43,7 @@ await page.keyboard.press('Escape');check(await firstName(),first);check(await p
 await holdOK(page.locator('#items button').first());await menuMove();await page.keyboard.press('ArrowDown');await page.keyboard.press('Enter');
 await holdOK(page.locator('#items button').first());await menuMove();for(let j=0;j<30;j++)await page.keyboard.press('ArrowDown');check(await page.locator('.moving-item').getAttribute('data-index'),'30');await page.keyboard.press('Escape');
 const newFirst=await firstName();check(newFirst===first,false);
-await page.reload();await waitFor(()=>document.querySelector('#count').textContent.startsWith('250 قناة'));await page.locator('nav [data-kind="live"]').click();check(await firstName(),newFirst);
+await page.reload();await waitFor(()=>document.querySelector('#count').textContent.startsWith('250 قناة'));await page.locator('nav [data-kind="live"]').click();await page.locator('#categories button').first().click();await page.waitForTimeout(500);check(await firstName(),newFirst);
 await holdOK(page.locator('#items button').nth(1));await page.keyboard.press('Enter');check(JSON.parse(await page.evaluate(()=>localStorage.getItem('ap-favorites'))).length,0);
 const cat=page.locator('#categories button').nth(1);const categoryName=(await cat.textContent());
 await holdOK(cat);await page.keyboard.press('Enter');
@@ -54,7 +54,7 @@ await holdOK(page.locator('#categories button').nth(1));await menuMove();await p
 await holdOK(page.locator('#categories button').nth(1));await menuMove();await page.keyboard.press('ArrowDown');await page.keyboard.press('Enter');check((await page.locator('#categories button').nth(2).textContent()),categoryName);
 await page.reload();await waitFor(()=>document.querySelector('#count').textContent.startsWith('250 قناة'));await page.locator('nav [data-kind="live"]').click();check(await page.locator('#categories button').nth(2).textContent(),categoryName);
 await holdOK(page.locator('#categories button').nth(2));await page.keyboard.press('Enter');check(JSON.parse(await page.evaluate(()=>localStorage.getItem('ap-category-favorites'))).length,0);
-await page.locator('#items button').first().focus();await page.keyboard.press('Enter');check(await page.locator('#player').isVisible(),true);await page.locator('#stop').click();
+await page.locator('#items button').first().focus();await page.keyboard.press('Enter');check(await page.locator('#player').isVisible(),true);await page.keyboard.press('Escape');await page.waitForFunction(()=>document.querySelector('#player').hidden);
 check(errors,[]);await browser.close();
 }
 console.log(checks+' Chrome 87 file-origin organization and styling assertions PASS');
