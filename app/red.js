@@ -136,7 +136,31 @@ function rows(){
  var bot=all.filter(function(b){return top.indexOf(b)<0;});
  return [top,bot];
 }
-document.addEventListener('keydown',function(e){
+// Deterministic VOD focus map shared by every palette. No spatial guessing.
+function vodRows(){
+ var first=[$('seek-back'),$('pause'),$('progress'),$('seek-forward')].filter(visible);
+ var order=['stop','red-sub','red-aspect','red-fs','quick-toggle','retry'];
+ var second=order.map($).filter(visible);
+ Array.prototype.slice.call(ui.querySelectorAll('button')).filter(visible).forEach(function(b){if(first.indexOf(b)<0&&second.indexOf(b)<0)second.push(b);});
+ return [first,second];
+}
+window.addEventListener('keydown',function(e){
+ if(player.hidden||player.dataset.playbackKind==='live'||!list.hidden||!$('quick-channels').hidden||ui.classList.contains('dim'))return;
+ var k=code(e),a=document.activeElement;
+ if(!ui.contains(a))return;
+ if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Enter'].indexOf(k)<0)return;
+ e.preventDefault();e.stopImmediatePropagation();
+ document.dispatchEvent(new Event('ap-vod-controls'));
+ if(k==='Enter'){if(!e.repeat&&a.tagName==='BUTTON')a.click();else if(a===$('progress')&&!e.repeat)$('pause').click();return;}
+ if(a===$('progress')&&(k==='ArrowLeft'||k==='ArrowRight')){
+  if(isFinite(video.duration)&&video.duration>0&&isFinite(video.currentTime))video.currentTime=Math.max(0,Math.min(video.duration,video.currentTime+(k==='ArrowRight'?10:-10)));return;
+ }
+ var r=vodRows(),ri=r[0].indexOf(a)>=0?0:1,ix=r[ri].indexOf(a),target;
+ if(k==='ArrowLeft'||k==='ArrowRight')target=r[ri][Math.max(0,Math.min(r[ri].length-1,ix+(k==='ArrowRight'?1:-1)))];
+ else{var nr=k==='ArrowDown'?1:0;target=r[nr][Math.max(0,Math.min(r[nr].length-1,ix))];}
+ if(target)target.focus({preventScroll:true});
+},true);
+window.addEventListener('keydown',function(e){
  // Live OK belongs to the app's channel overlay, never the focused Stop button.
  // Let its bubbling handler open/select the virtualized channel list in every theme.
  if(!player.hidden&&$('seek-back').hidden&&code(e)==='Enter')return;
