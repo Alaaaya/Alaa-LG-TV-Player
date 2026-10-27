@@ -227,7 +227,7 @@ var initials=document.createElement('span');initials.className='logo-initials';i
 if(item.logo){var img=image(item.logo);img.loading='eager';img.onload=function(){initials.hidden=true;};img.onerror=function(){img.remove();initials.hidden=false;};box.appendChild(img);}
 return box;
 }
-function image(src,cls){var img=document.createElement('img');img.src=src;img.alt='';img.loading='lazy';img.decoding='async';img.referrerPolicy='no-referrer';if(cls)img.className=cls;img.onerror=function(){this.remove();};return img;}
+function image(src,cls){var img=document.createElement('img');img.src=src;img.alt='';img.loading='eager';img.decoding='async';img.referrerPolicy='no-referrer';if(cls)img.className=cls;img.onerror=function(){this.remove();};return img;}
 function metadata(item){return [item.year,item.seasons?item.seasons+' مواسم':'',item.episodeCount?item.episodeCount+' حلقات':'',item.rating?'★ '+item.rating:'',item.quality].filter(Boolean).join('  ·  ');}
 function renderItems(){
 ['hd','4k'].forEach(function(f){$('filter-'+f).hidden=!state.items.some(function(i){return (f==='hd'?/\bHD\b|FHD|1080|720/i:/4K|UHD|2160/i).test(i.quality||i.name);});});
