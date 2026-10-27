@@ -587,18 +587,18 @@ $('filter-favorites').onclick=function(){state.filter='favorites';renderItems();
 $('filter-recent').onclick=function(){state.filter='recent';renderItems();};
 document.querySelectorAll('[data-home-kind]').forEach(function(b){b.onclick=function(){navigate(b.dataset.homeKind);};});
 function theme(value){
-value='red';
-if(['apple','red','blue'].indexOf(value)<0)value='apple';
+if(['apple','red','blue','navy'].indexOf(value)<0)value='navy';
+document.body.dataset.theme=value;
 document.body.classList.toggle('blue',value==='blue');
 document.body.classList.toggle('apple',value==='apple');
-['apple','red','blue'].forEach(function(t){$('theme-'+t).classList.toggle('selected',value===t);});
+['apple','red','blue','navy'].forEach(function(t){$('theme-'+t).classList.toggle('selected',value===t);});
 storeWrite('ap-theme',value);
 }
 $('theme-apple').onclick=function(){theme('apple');};
 $('theme-red').onclick=function(){theme('red');};
 $('theme-blue').onclick=function(){theme('blue');};
-if(!storeRead('ap-red-default-127')){storeWrite('ap-theme','red');storeWrite('ap-red-default-127','1');}
-theme(storeRead('ap-theme')||'red');
+$('theme-navy').onclick=function(){theme('navy');};
+theme(storeRead('ap-theme')||'navy');
 var quickItems=[],quickIndex=0;
 function quickChannelLabel(item){
 var normalized=String(item.name||'').normalize('NFKC'),parts=[];
