@@ -1015,12 +1015,13 @@ body.no-glass #quick-channels,body.no-glass.apple #quick-channels,body.no-glass[
 }
 #player-ui button:before{font-size:clamp(19px,1.55vw,27px)!important;line-height:1!important}
 #player-ui button:focus,#player-ui button:focus-visible{
-  outline:2px solid rgba(255,255,255,.98)!important;outline-offset:2px!important;
+  outline:none!important;
   border-color:rgba(255,255,255,.95)!important;
   background:linear-gradient(145deg,var(--accent,#ed3549),rgba(255,255,255,.18))!important;
-  box-shadow:0 0 0 1px rgba(255,255,255,.18),0 0 24px color-mix(in srgb,var(--accent,#ed3549) 38%,transparent),inset 0 1px 1px rgba(255,255,255,.32)!important;
-  transform:scale(1.035)!important;
+  box-shadow:0 0 0 2px #fff,0 0 0 4px rgba(0,0,0,.55)!important;
+  transform:none!important;
 }
+#red-sublist button:focus,#red-sublist button:focus-visible{outline:none!important;box-shadow:0 0 0 2px #fff,0 0 0 4px rgba(0,0,0,.55)!important;transform:none!important}
 #player-ui #seek-back{grid-row:4!important;grid-column:1!important}
 #player-ui #seek-back:before{content:"\25C0\25C0"!important;font-size:clamp(15px,1.3vw,21px)!important}
 #player-ui #pause{grid-row:4!important;grid-column:2!important}
@@ -1038,11 +1039,12 @@ body.no-glass #quick-channels,body.no-glass.apple #quick-channels,body.no-glass[
   margin:0!important;padding:0!important;
   -webkit-appearance:none!important;appearance:none!important;
   background:transparent!important;border:0!important;min-width:0!important;
+  --thumb:clamp(13px,1.35vw,20px);
   z-index:1!important;outline:none!important;
 }
 #player-ui #progress::-webkit-slider-runnable-track{
   height:4px!important;border-radius:999px!important;
-  background:rgba(255,255,255,.42)!important;
+  background:linear-gradient(to right,var(--accent,#ed3549) 0,var(--accent,#ed3549) calc(var(--thumb,16px)/2 + var(--p,0)*(100% - var(--thumb,16px))),rgba(255,255,255,.42) calc(var(--thumb,16px)/2 + var(--p,0)*(100% - var(--thumb,16px))),rgba(255,255,255,.42) 100%)!important;
   box-shadow:0 1px 2px rgba(0,0,0,.25)!important;
 }
 #player-ui #progress::-webkit-slider-thumb{
@@ -1114,7 +1116,8 @@ body.no-glass #quick-channels,body.no-glass.apple #quick-channels,body.no-glass[
 /* Owner glass controls retain native hidden semantics and the persisted fallback. */
 #player-ui [hidden],#player-ui #red-pills [hidden]{display:none!important}
 body:not([data-theme=red]) #player-ui #red-aspect,body:not([data-theme=red]) #player-ui #red-fs{display:none!important}
-body[data-theme] #player-ui button:focus{backdrop-filter:blur(14px)!important;-webkit-backdrop-filter:blur(14px)!important;box-shadow:inset 0 1px 1px rgba(255,255,255,.25)!important;transform:none!important}
+body[data-theme] #player-ui button:focus{backdrop-filter:blur(14px)!important;-webkit-backdrop-filter:blur(14px)!important;box-shadow:0 0 0 2px #fff,0 0 0 4px rgba(0,0,0,.55)!important;outline:none!important;transform:none!important}
+body[data-theme] #red-sublist button:focus,body[data-theme] #red-sublist button:focus-visible{outline:none!important;box-shadow:0 0 0 2px #fff,0 0 0 4px rgba(0,0,0,.55)!important;transform:none!important}
 body.no-glass #player-ui:before,body.no-glass #player-ui button,body.no-glass #player-ui #red-sublist:not([hidden]){
 background:linear-gradient(#30323b,#181a22)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 body.no-glass #player-ui button:focus{background:var(--accent)!important;color:var(--on-accent)!important}
