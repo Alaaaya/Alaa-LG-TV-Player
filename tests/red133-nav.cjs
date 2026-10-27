@@ -70,7 +70,7 @@ await p.evaluate(()=>document.querySelector('#red-sublist div button').focus());
 assert.deepStrictEqual(await tr(),['disabled','disabled'],'OFF');assert.ok(await foc());
 await key('Escape');
 // switch to Apple
-await key('Escape');await p.waitForTimeout(300);if(!await p.evaluate(()=>document.getElementById('player').hidden)){await key('Escape');await p.waitForTimeout(300);}assert.ok(await p.evaluate(()=>document.getElementById('player').hidden),'real Back closes player');assert.ok(await p.evaluate(()=>document.activeElement&&document.activeElement.classList.contains('episode-row')),'focus returns to episode row');
+await key('Escape');await p.waitForTimeout(300);if(!await p.evaluate(()=>document.getElementById('player').hidden)){await key('Escape');await p.waitForTimeout(300);}assert.ok(await p.evaluate(()=>document.getElementById('player').hidden),'real Back closes player');const fa=await p.evaluate(()=>{const a=document.activeElement;return a.tagName+'#'+a.id+'.'+a.className});assert.ok(/episode-row/.test(fa),'focus returns to episode row, got '+fa);
 await p.evaluate(()=>document.getElementById('theme-apple').click());await p.waitForTimeout(300);
 const ap=await p.evaluate(()=>({cls:document.body.className,fs:document.body.classList.contains('red-inline')||document.body.classList.contains('red-fs'),first:document.querySelector('.episode-row').getBoundingClientRect().top,tops:[...document.querySelectorAll('.episode-row')].slice(0,6).map(e=>Math.round(e.getBoundingClientRect().left))}));
 assert.ok(!ap.fs,'red classes cleared');assert.strictEqual(new Set(ap.tops.slice(0,5)).size,5,'apple 5 cols '+ap.tops);

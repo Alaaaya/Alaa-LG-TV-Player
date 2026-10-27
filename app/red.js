@@ -122,7 +122,7 @@ document.querySelector('nav').addEventListener('click',function(){setTimeout(upd
 var wasHidden=player.hidden;
 new MutationObserver(function(){
  if(player.hidden&&!wasHidden&&isRed()&&!detail.hidden){list.hidden=true;
-  setTimeout(function(){if(document.activeElement===document.body||!document.activeElement.offsetParent){var r=$('episode-list').querySelector('.episode-row.playing')||$('episode-list').querySelector('.episode-row');if(r)r.focus();}},0);}
+  setTimeout(function(){var ae=document.activeElement;if(ae===document.body||!ae.offsetParent||ae.id==='series-back'){var r=$('episode-list').querySelector('.episode-row.playing')||$('episode-list').querySelector('.episode-row');if(r)r.focus();}},0);}
  wasHidden=player.hidden;
 }).observe(player,{attributes:true,attributeFilter:['hidden']});
 /* keys (capture phase, red only): flyout, fullscreen exit, episodes to player, bar rows */
