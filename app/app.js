@@ -535,8 +535,11 @@ shelf.hidden=true;
 $('latest-heading').textContent='جميع الأفلام'+(state.group==='All'?'':' · '+(state.group==='@favorites'?'المفضلة':state.group));
 }
 var focusDetailTimer;
+function redLayout(){return document.body.dataset.theme==='red'&&window.APRed?window.APRed.layout():null;}
+function gridSpec(){var L=state.kind!=='live'&&!state.episodes?redLayout():null;return L?L.grid:{cols:6,row:236,page:24};}
+function episodeCols(){var L=redLayout();return L?L.episodes.cols:5;}
 function renderWindow(start){
-var el=$('items'),rowHeight=state.kind==='live'?93:158;var cols=state.kind!=='live'&&!state.episodes?6:1;if(cols===6&&document.body.dataset.theme==='red'&&window.APRed){cols=5;}start=Math.floor(start/cols)*cols;var ps=cols===5?25:pageSize;rowHeight=cols===6?236:cols===5?378:rowHeight;state.virtualStart=start;el.replaceChildren();
+var el=$('items'),rowHeight=state.kind==='live'?93:158;var G=state.kind!=='live'&&!state.episodes?gridSpec():null,cols=G?G.cols:1;start=Math.floor(start/cols)*cols;var ps=G?G.page:pageSize;rowHeight=G?G.row:rowHeight;state.virtualStart=start;el.replaceChildren();
 function spacer(height){var d=document.createElement('div');d.className='virtual-space';d.style.height=height+'px';el.appendChild(d);}
 spacer(start/cols*rowHeight);
 state.filtered.slice(start,start+ps).forEach(function(item,index){
@@ -555,7 +558,7 @@ spacer(Math.ceil(Math.max(0,state.filtered.length-start-ps)/cols)*rowHeight);
 if(!state.filtered.length){var empty=document.createElement('p');empty.className='catalog-empty';empty.textContent=!state.provider?'اربط جهازك أو أضف قائمة من الإعدادات':state.provider.type==='m3u'&&state.kind!=='live'?'تظهر عناصر M3U ضمن البث المباشر. استخدم Xtream للأفلام والمسلسلات.':state.filter==='favorites'?'لم تضف عناصر للمفضلة بعد':state.filter==='recent'?'لم تشاهد أي عناصر بعد':$('search').value?'لا توجد نتائج مطابقة للبحث':'لا توجد عناصر في هذه القائمة';el.appendChild(empty);}
 }
 var scrollFrame=false;
-$('items').addEventListener('scroll',function(){if(scrollFrame)return;scrollFrame=true;requestAnimationFrame(function(){scrollFrame=false;var cols=state.kind!=='live'&&!state.episodes?6:1;if(cols===6&&document.body.dataset.theme==='red'&&window.APRed)cols=5;var rowHeight=cols===6?236:cols===5?378:state.kind==='live'?93:158,start=Math.max(0,Math.floor($('items').scrollTop/rowHeight)-1)*cols;if(start!==state.virtualStart){var focused=$('items').contains(document.activeElement)?document.activeElement.dataset.index:null;if(focused!=null&&Number(focused)>=state.virtualStart&&Number(focused)<state.virtualStart+(cols===5?25:pageSize))return;renderWindow(start);}});});
+$('items').addEventListener('scroll',function(){if(scrollFrame)return;scrollFrame=true;requestAnimationFrame(function(){scrollFrame=false;var G=state.kind!=='live'&&!state.episodes?gridSpec():null,cols=G?G.cols:1;var rowHeight=G?G.row:state.kind==='live'?93:158,start=Math.max(0,Math.floor($('items').scrollTop/rowHeight)-1)*cols;if(start!==state.virtualStart){var focused=$('items').contains(document.activeElement)?document.activeElement.dataset.index:null;if(focused!=null&&Number(focused)>=state.virtualStart&&Number(focused)<state.virtualStart+(G?G.page:pageSize))return;renderWindow(start);}});});
 function livePages(){$('pagination').replaceChildren();}
 function hero(item){
 $('hero').hidden=false;$('hero-name').textContent=item.name;$('hero-meta').textContent=metadata(item)||item.group;
@@ -1054,9 +1057,9 @@ if(top[mi])top[mi].focus();return;
 }
 if($('player').hidden&&active.dataset.episodeIndex!=null&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].indexOf(key)>=0){
 e.preventDefault();var ix=Number(active.dataset.episodeIndex);
-if(key==='ArrowLeft'&&ix%((document.body.dataset.theme==='red'&&window.APRed)?1:5)===0){(nav.querySelector('button.selected')||$('nav-home')).focus();return;}
-if(key==='ArrowUp'&&ix<((document.body.dataset.theme==='red'&&window.APRed)?1:5)){($('season-tabs').querySelector('button.selected')||$('series-back')).focus();return;}
-var target=ix+(key==='ArrowDown'?(document.body.dataset.theme==='red'&&window.APRed)?1:5:key==='ArrowUp'?(document.body.dataset.theme==='red'&&window.APRed)?-1:-5:key==='ArrowRight'?1:-1);
+if(key==='ArrowLeft'&&ix%episodeCols()===0){(nav.querySelector('button.selected')||$('nav-home')).focus();return;}
+if(key==='ArrowUp'&&ix<episodeCols()){($('season-tabs').querySelector('button.selected')||$('series-back')).focus();return;}
+var target=ix+(key==='ArrowDown'?episodeCols():key==='ArrowUp'?-episodeCols():key==='ArrowRight'?1:-1);
 if(target>=0&&target<episodeWindow.items.length){var eb=$('episode-list').querySelector('[data-episode-index="'+target+'"]');if(!eb){paintEpisodes(Math.max(0,target-5));eb=$('episode-list').querySelector('[data-episode-index="'+target+'"]');}if(eb){eb.focus();eb.scrollIntoView({block:'nearest'});}}return;
 }
 if($('season-tabs').contains(active)&&key==='ArrowDown'){e.preventDefault();var first=$('episode-list').querySelector('button');if(first)first.focus();return;}
@@ -1074,7 +1077,7 @@ var vodBase=state.view!=='home'&&state.kind!=='live'&&!state.episodes&&$('player
 if(vodBase&&(key==='ArrowLeft'||key==='ArrowRight')){
 var inCats=$('categories').contains(active)||active===$('providers'),inNav=nav.contains(active);
 function focusCategory(){var ci=categoryWindow.nodes.findIndex(function(b){return b.classList.contains('selected');});ci=Math.max(0,ci);if(categoryWindow.nodes[ci]){if(!categoryWindow.nodes[ci].isConnected)paintCategoryWindow(Math.max(0,ci-3));categoryWindow.nodes[ci].focus();}}
-if(key==='ArrowLeft'&&active.dataset.index!=null&&Number(active.dataset.index)%((document.body.dataset.theme==='red'&&window.APRed)?5:6)===0){e.preventDefault();focusCategory();return;}
+if(key==='ArrowLeft'&&active.dataset.index!=null&&Number(active.dataset.index)%gridSpec().cols===0){e.preventDefault();focusCategory();return;}
 if(key==='ArrowLeft'&&inCats){e.preventDefault();(nav.querySelector('button.selected')||$('nav-home')).focus();return;}
 if(key==='ArrowRight'&&inNav){e.preventDefault();focusCategory();return;}
 if(key==='ArrowRight'&&inCats){e.preventDefault();focusFirst(true);return;}
@@ -1138,7 +1141,7 @@ e.preventDefault();var selected=nav.querySelector('button.selected')||$('nav-hom
 if(key==='Enter'&&active.tagName==='BUTTON'){e.preventDefault();if(!e.repeat)active.click();return;}
 if(/^Arrow/.test(key)){
 if(state.kind!=='live'&&!state.episodes&&document.activeElement.dataset.index!=null&&(key==='ArrowLeft'||key==='ArrowRight')){var n=Number(document.activeElement.dataset.index)+(key==='ArrowRight'?1:-1);if(n>=0&&n<state.filtered.length){e.preventDefault();var t=$('items').scrollTop;if(!$('items').querySelector('[data-index="'+n+'"]'))renderWindow(Math.max(0,n-6));$('items').scrollTop=t;var target=$('items').querySelector('[data-index="'+n+'"]');if(target){target.focus();target.scrollIntoView({block:'nearest'});}return;}}
-var current=document.activeElement;if(current&&current.dataset.index!=null&&(key==='ArrowDown'||key==='ArrowUp')){var step=state.kind!=='live'&&!state.episodes?((document.body.dataset.theme==='red'&&window.APRed)?5:6):1;var index=Number(current.dataset.index)+(key==='ArrowDown'?step:-step);if(state.kind==='live'&&state.filtered.length)index=(index+state.filtered.length)%state.filtered.length;if(index>=0&&index<state.filtered.length){e.preventDefault();var top=$('items').scrollTop;if(!$('items').querySelector('[data-index="'+index+'"]'))renderWindow(Math.max(0,index-2));$('items').scrollTop=top;var next=$('items').querySelector('[data-index="'+index+'"]');if(next){next.focus();next.scrollIntoView({block:'nearest'});}return;}}
+var current=document.activeElement;if(current&&current.dataset.index!=null&&(key==='ArrowDown'||key==='ArrowUp')){var step=state.kind!=='live'&&!state.episodes?gridSpec().cols:1;var index=Number(current.dataset.index)+(key==='ArrowDown'?step:-step);if(state.kind==='live'&&state.filtered.length)index=(index+state.filtered.length)%state.filtered.length;if(index>=0&&index<state.filtered.length){e.preventDefault();var top=$('items').scrollTop;if(!$('items').querySelector('[data-index="'+index+'"]'))renderWindow(Math.max(0,index-2));$('items').scrollTop=top;var next=$('items').querySelector('[data-index="'+index+'"]');if(next){next.focus();next.scrollIntoView({block:'nearest'});}return;}}
 if(document.activeElement.tagName==='SELECT')return;if(document.activeElement.tagName==='INPUT'&&(key==='ArrowLeft'||key==='ArrowRight'))return;e.preventDefault();move(key);}
 });
 document.addEventListener('visibilitychange',function(){if(document.hidden){stopPreview();if(state.playing)stop(false);}});

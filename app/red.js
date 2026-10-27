@@ -8,7 +8,7 @@ if(!body||!video||!player||!detail||!ui)return;
 var fs=false;
 function isRed(){return body.dataset.theme==='red';}
 window.APRed={
- layout:function(){return {grid:{cols:5,row:378},episodes:{cols:1,size:30,row:64}};},
+ layout:function(){return {grid:{cols:5,row:378,page:25},episodes:{cols:1,size:30,row:64}};},
  inlineFree:function(){return body.classList.contains('red-inline')&&!player.contains(document.activeElement);}
 };
 function el(tag,id,cls,text){var e=document.createElement(tag);if(id)e.id=id;if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
