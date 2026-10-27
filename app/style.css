@@ -700,7 +700,7 @@ body[data-theme=red] #categories .category-symbol{grid-area:s;justify-self:end;d
 body[data-theme=red] #categories .category-symbol svg{width:28px;height:28px;stroke:currentColor;fill:none;stroke-width:1.7}
 body[data-theme=red] #categories .category-label{grid-area:l;font-size:20px;font-weight:700;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 body[data-theme=red] #categories small{grid-area:c;font-size:15px;color:#a8a8a8!important;text-align:left}
-body[data-theme=red] #categories small:before{content:"Total: "}
+body[data-theme=red] #categories small:before{content:"Total: "}html[lang=de] body[data-theme=red] #categories small:before{content:"Gesamt: "}html[lang=ar] body[data-theme=red] #categories small:before{content:"المجموع: "}
 body[data-theme=red] #categories button.selected,body[data-theme=red] #categories button:focus{background:var(--accent)!important;color:#fff!important}
 body[data-theme=red] #categories button.selected small,body[data-theme=red] #categories button:focus small{color:#fff!important}
 body[data-theme=red] #browser.poster-view .section-title{height:62px;min-height:62px;flex:0 0 62px}
