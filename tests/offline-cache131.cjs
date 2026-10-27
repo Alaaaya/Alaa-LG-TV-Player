@@ -70,8 +70,8 @@ async function visit(){
   await db(db=>new Promise((resolve,reject)=>{const tx=db.transaction('catalog','readwrite');for(let i=0;i<170;i++)tx.objectStore('catalog').put({time:Date.now(),data:[]},'sentinel-'+i);tx.oncomplete=resolve;tx.onabort=reject;}));
   const stored=await count();assert(stored>180);
   await context.close();calls=[];maxActive=0;await launch();await ready();await visit();await page.waitForTimeout(2500);
-  assert.equal(calls.length,0,'Fresh cache must make zero provider API calls');
-  checks.push('Real Chromium 87 browser-process restart, fresh 12h cache makes zero catalog/info requests');
+  assert(await page.locator('#home-series button').count()>0,'cached UI shown on restart');assert(calls.length>0,'silent background refresh every app open');assert(maxActive<=1);
+  checks.push('Real Chromium 87 browser-process restart, cached UI first then silent serialized refresh every open');
   await context.close();offline=true;await launch();await ready();await visit();
   await page.evaluate(()=>document.querySelector('nav [data-kind="live"]').click());
   await page.evaluate(()=>document.querySelector('#categories button').click());
