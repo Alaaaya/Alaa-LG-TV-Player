@@ -785,10 +785,17 @@ $('filter-4k').onclick=function(){state.filter='4k';state.page=0;renderItems();}
 $('filter-favorites').onclick=function(){state.filter='favorites';renderItems();};
 $('filter-recent').onclick=function(){state.filter='recent';renderItems();};
 document.querySelectorAll('[data-home-kind]').forEach(function(b){b.onclick=function(){navigate(b.dataset.homeKind);};});
-// Owner-final 1.3.1: Apple is the sole visual system.
-document.body.classList.remove('blue');
-document.body.classList.add('apple');
-document.body.dataset.theme='apple';
+// Latest owner choice: four persistent palettes, Apple only as an unset default.
+function theme(value,persist){
+if(['apple','navy','red','blue'].indexOf(value)<0)value='apple';
+document.body.dataset.theme=value;
+document.body.classList.toggle('apple',value==='apple');
+document.body.classList.toggle('blue',value==='blue');
+['apple','navy','red','blue'].forEach(function(t){var b=$('theme-'+t);b.classList.toggle('selected',value===t);b.setAttribute('aria-pressed',value===t?'true':'false');});
+if(persist!==false)storeWrite('ap-theme',value);
+}
+['apple','navy','red','blue'].forEach(function(t){$('theme-'+t).onclick=function(){theme(t);};});
+theme(storeRead('ap-theme')||'apple',false);
 var quickItems=[],quickIndex=0;
 function quickChannelLabel(item){
 var normalized=String(item.name||'').normalize('NFKC'),parts=[];

@@ -39,6 +39,6 @@ if(id==='settings-open')await p.screenshot({path:'artifacts/perf131/settings-fin
 result.pages.push({id,sidebarReturn:'PASS',singleSelected:'PASS'});
 await p.keyboard.press('ArrowDown');
 }
-assert.equal(await p.locator('#theme-picker').count(),0);
+assert.equal(await p.locator('#theme-picker button').count(),4);
 result.requests=requests;fs.writeFileSync(process.argv[3],JSON.stringify(result,null,2));console.log(JSON.stringify(result.runs));await b.close();
 })().catch(e=>{console.error(e);process.exit(1)});
