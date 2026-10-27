@@ -672,3 +672,5 @@ body[data-theme] button:focus,body[data-theme] #items button:focus{box-shadow:no
 #browser.live-view>aside{width:420px}
 #browser.live-view #categories button{padding-left:6px;padding-right:6px;gap:8px}
 #browser.live-view .category-label{font-size:19px}
+
+#movie-related{grid-auto-rows:auto}
