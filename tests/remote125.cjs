@@ -34,7 +34,7 @@ await page.locator('#settings-open').click();await page.locator('#theme-red').cl
 
 async function remote(code){await page.evaluate(code=>{document.activeElement.dispatchEvent(new KeyboardEvent('keydown',{bubbles:true,key:'Unidentified',keyCode:code,which:code}));document.activeElement.dispatchEvent(new KeyboardEvent('keyup',{bubbles:true,key:'Unidentified',keyCode:code,which:code}));},code);await page.waitForTimeout(100);}
 await page.locator('#nav-home').focus();
-check(await page.evaluate(()=>getComputedStyle(document.activeElement).outlineStyle),'none');
+check(await page.evaluate(()=>getComputedStyle(document.activeElement).outlineStyle),'solid');
 check(await page.evaluate(()=>getComputedStyle(document.querySelector('nav')).backgroundImage),'none');
 await page.screenshot({path:art+'/focus-home-1.2.5.png'});
 await remote(40);check(await page.evaluate(()=>document.activeElement.dataset.kind),'live');
