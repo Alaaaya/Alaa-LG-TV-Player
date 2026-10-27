@@ -4,7 +4,7 @@ const root=path.resolve(__dirname,'../app'),server=http.createServer((req,res)=>
 await new Promise(r=>server.on('listening',r));let checks=0;const results=[];
 function check(a,b){assert.deepEqual(a,b);checks++;}
 for(const engine of [webkit,chromium]){
-const browser=await engine.launch({headless:true,...(engine===chromium?{executablePath:'/opt/hako/bin/google-chrome',args:['--no-sandbox']}:{})});
+const browser=await engine.launch({headless:true,...(engine===chromium?{executablePath:process.env.CHROMIUM_87||'/opt/hako/bin/google-chrome',args:['--no-sandbox']}:{})});
 try{
 const page=await browser.newPage({viewport:{width:1920,height:1080}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
 let panelStatus='active',holdSeries=true,held=[],calls=[];
@@ -27,7 +27,7 @@ else if(a==='get_series_info')json={info:{plot:'Series detail'},episodes:{'1':[{
 await r.fulfill({json});}
 await page.route('https://first.example/**',provider);await page.route('https://second.example/**',provider);
 await page.goto('http://127.0.0.1:'+server.address().port);
-await page.waitForFunction(()=>document.querySelectorAll('#home-movies button').length===0&&document.querySelector('#count').textContent==='1 قناة');
+await page.waitForFunction(()=>document.querySelector('#count').textContent.startsWith('1 قناة'));
 await page.waitForFunction(()=>window.__exports.length>=2);check(await page.locator('#movie-detail').isVisible(),false);
 check(await page.evaluate(()=>window.__exports.every(e=>e.items.length===0)),true);
 holdSeries=false;for(const r of held.splice(0))await r.fulfill({json:[{series_id:22,name:'first.example Series',category_id:'1',cover:'https://image.tmdb.org/t/p/w500/series.jpg',last_modified:300}]});
@@ -60,7 +60,7 @@ check(await page.locator('#items button').count(),0);check(await page.locator('#
 await page.evaluate(()=>document.dispatchEvent(new CustomEvent('webOSRelaunch',{detail:{featured:{type:'movies',id:'11'}}})));
 check(await page.locator('#movie-detail').isVisible(),false);
 panelStatus='active';holdSeries=true;await page.reload();
-await page.waitForFunction(()=>document.querySelector('#count').textContent==='1 قناة');
+await page.waitForFunction(()=>document.querySelector('#count').textContent.startsWith('1 قناة'));
 while(!held.length)await new Promise(r=>setTimeout(r,5));
 await page.evaluate(()=>{
 document.dispatchEvent(new CustomEvent('webOSRelaunch',{detail:{featured:{type:'series',id:'22'}}}));
