@@ -448,3 +448,7 @@ display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
 font-size:19px;line-height:30px;max-height:60px;overflow:hidden;
 margin:12px 0 0;direction:rtl;unicode-bidi:plaintext;
 }
+.home-reference nav{background:#0c1220!important}
+.home-reference nav button{color:#dce3ee!important;background:transparent!important}
+.home-reference nav button .nav-icon{opacity:1}
+.home-reference nav button.selected{color:white!important;background:#c82f43!important}
