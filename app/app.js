@@ -586,19 +586,10 @@ $('filter-4k').onclick=function(){state.filter='4k';state.page=0;renderItems();}
 $('filter-favorites').onclick=function(){state.filter='favorites';renderItems();};
 $('filter-recent').onclick=function(){state.filter='recent';renderItems();};
 document.querySelectorAll('[data-home-kind]').forEach(function(b){b.onclick=function(){navigate(b.dataset.homeKind);};});
-function theme(value){
-if(['apple','red','blue','navy'].indexOf(value)<0)value='navy';
-document.body.dataset.theme=value;
-document.body.classList.toggle('blue',value==='blue');
-document.body.classList.toggle('apple',value==='apple');
-['apple','red','blue','navy'].forEach(function(t){$('theme-'+t).classList.toggle('selected',value===t);});
-storeWrite('ap-theme',value);
-}
-$('theme-apple').onclick=function(){theme('apple');};
-$('theme-red').onclick=function(){theme('red');};
-$('theme-blue').onclick=function(){theme('blue');};
-$('theme-navy').onclick=function(){theme('navy');};
-theme(storeRead('ap-theme')||'navy');
+// Owner-final 1.3.1: Apple is the sole visual system.
+document.body.classList.remove('blue');
+document.body.classList.add('apple');
+document.body.dataset.theme='apple';
 var quickItems=[],quickIndex=0;
 function quickChannelLabel(item){
 var normalized=String(item.name||'').normalize('NFKC'),parts=[];
