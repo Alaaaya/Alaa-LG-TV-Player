@@ -945,8 +945,8 @@ body:not([data-theme=red]) #red-sub b{margin-right:10px}
 #player.quick-open #player-ui{visibility:hidden!important;pointer-events:none}
 
 #glass-row{margin-top:14px}#glass-row button{min-width:180px}#glass-row button[aria-pressed=true]{background:var(--accent)}
-body.no-glass #quick-channels,body.no-glass.apple #quick-channels,body.no-glass[data-theme] #quick-channels{background:linear-gradient(rgba(30,31,36,.98),rgba(18,19,23,.98))!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
-@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){#quick-channels,body[data-theme] #quick-channels{background:linear-gradient(rgba(30,31,36,.98),rgba(18,19,23,.98))!important}}
+body.no-glass #quick-channels,body.no-glass.apple #quick-channels,body.no-glass[data-theme] #quick-channels{background:rgba(24,26,32,.96)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){#quick-channels,body[data-theme] #quick-channels{background:rgba(24,26,32,.96)!important}}
 
 /* Universal frosted-glass video controls: consistent across every theme */
 #player{background:#020306!important;color:#f7f7fa!important}
@@ -1119,10 +1119,10 @@ body:not([data-theme=red]) #player-ui #red-aspect,body:not([data-theme=red]) #pl
 body[data-theme] #player-ui button:focus{backdrop-filter:blur(14px)!important;-webkit-backdrop-filter:blur(14px)!important;box-shadow:0 0 0 2px #fff,0 0 0 4px rgba(0,0,0,.55)!important;outline:none!important;transform:none!important}
 body[data-theme] #red-sublist button:focus,body[data-theme] #red-sublist button:focus-visible{outline:none!important;box-shadow:0 0 0 2px #fff,0 0 0 4px rgba(0,0,0,.55)!important;transform:none!important}
 body.no-glass #player-ui:before,body.no-glass #player-ui button,body.no-glass #player-ui #red-sublist:not([hidden]){
-background:linear-gradient(#30323b,#181a22)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+background:rgba(28,30,38,.96)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 body.no-glass #player-ui button:focus{background:var(--accent)!important;color:var(--on-accent)!important}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
-#player-ui:before,#player-ui button,#player-ui #red-sublist:not([hidden]){background:linear-gradient(#30323b,#181a22)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}}
+#player-ui:before,#player-ui button,#player-ui #red-sublist:not([hidden]){background:rgba(28,30,38,.96)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}}
 body[data-theme] #player-ui{background:linear-gradient(180deg,rgba(10,12,20,.28),transparent 22%,transparent 62%,rgba(0,0,0,.18) 78%,rgba(0,0,0,.48))!important}
 body.no-glass[data-theme] #player-ui button:focus,body.no-glass[data-theme] #player-ui button:focus-visible{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:var(--accent)!important}
 
@@ -1154,3 +1154,19 @@ body[data-theme=blue] #player #live-now{background:#0e213b}
 #seek-feedback-time{font-variant-numeric:tabular-nums}
 #seek-feedback-track{flex-basis:100%;height:4px;border-radius:3px;background:rgba(255,255,255,.35);overflow:hidden}
 #seek-feedback-fill{height:100%;background:var(--accent,#ed3549);width:0}
+
+/* OFF means no compositor backdrop work, including descendants and pseudo-elements.
+   The Live bar/controls never blur; its separate channel overlay obeys the toggle. */
+body.no-glass[data-theme] #player,body.no-glass[data-theme] #player *,
+body.no-glass[data-theme] #player *:before,body.no-glass[data-theme] #player *:after,
+body[data-theme] #player[data-playback-kind=live] #player-ui,
+body[data-theme] #player[data-playback-kind=live] #player-ui *,
+body[data-theme] #player[data-playback-kind=live] #player-ui:before,
+body[data-theme] #player[data-playback-kind=live] #player-ui *:before,
+body[data-theme] #player[data-playback-kind=live] #player-ui *:after{
+  -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+}
+body.no-glass[data-theme] #red-sublist:not([hidden]),
+body.no-glass[data-theme] #red-sublist button{
+  background:rgba(28,30,38,.96)!important;
+}
