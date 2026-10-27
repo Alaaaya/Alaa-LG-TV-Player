@@ -52,6 +52,13 @@ assert.ok(await p.evaluate(()=>!!document.querySelector('[data-episode-index="79
 await p.evaluate(()=>{const v=document.getElementById('video');v.play=function(){return Promise.resolve()};v.pause=function(){};const t1=v.addTextTrack('subtitles','English','en'),t2=v.addTextTrack('subtitles','Arabic','ar');t1.mode='disabled';t2.mode='disabled';document.querySelector('[data-episode-index="79"]').focus()});
 await key('Enter');await p.waitForTimeout(500);
 assert.ok(await p.evaluate(()=>!document.getElementById('player').hidden),'player open');
+assert.ok(await p.evaluate(()=>document.body.classList.contains('red-inline')),'inline mode');
+await p.evaluate(()=>document.querySelector('.episode-row.playing,.episode-row').focus());
+await key('ArrowRight');assert.ok(await p.evaluate(()=>document.activeElement.id==='pause'||document.getElementById('player-ui').contains(document.activeElement)),'ArrowRight goes to player controls, got '+await p.evaluate(()=>document.activeElement.id||document.activeElement.className));
+await p.evaluate(()=>document.getElementById('red-fs').click());await p.waitForTimeout(200);
+assert.ok(await p.evaluate(()=>document.body.classList.contains('red-fs')),'fullscreen on');
+await key('Escape');await p.waitForTimeout(200);
+assert.ok(await p.evaluate(()=>!document.body.classList.contains('red-fs')&&!document.getElementById('player').hidden),'Back leaves fullscreen, player stays');
 await p.evaluate(()=>document.getElementById('red-sub').click());await p.waitForTimeout(200);
 const tr=()=>p.evaluate(()=>[...document.getElementById('video').textTracks].map(t=>t.mode));
 const foc=()=>p.evaluate(()=>{const a=document.activeElement;return !!(a&&a!==document.body&&a.offsetParent&&document.querySelector('#red-sublist').contains(a))});
