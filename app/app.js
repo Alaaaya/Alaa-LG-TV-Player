@@ -261,7 +261,9 @@ else{list=await xcCatalog(p,state.kind);}
 if(version!==state.request)return;list=uniqueTitles(list);if(state.kind==='live'&&p.type==='xtream'&&list.length)state.group=list[0].group;state.items=list;homeCatalog[state.kind]=list;if(state.kind!=='live')homeLoadState[state.kind]='ready';render();saveHomeSnapshot(p);loadHomeCatalog(p);status('تم تحميل '+list.length+' عنوان'+(p.type==='m3u'&&state.kind!=='live'?' · عناصر M3U متاحة ضمن البث المباشر':''));focusFirst();flushFeatured();
 }catch(e){if(version!==state.request)return;if(!state.items.length&&state.kind!=='live')homeLoadState[state.kind]='error';render();status(errorMessage(e));}}
 function button(text,fn){var b=document.createElement('button');b.textContent=text;b.onclick=fn;return b;}
+function displayLabel(name){return String(name||'').normalize('NFKC').replace(/\s+/g,' ').trim();}
 function categoryIcon(name){
+name=displayLabel(name);
 var type=name==='All'?'grid':name==='@favorites'?'heart':
 /أخبار|اخبار|news|nachricht/i.test(name)?'news':
 /رياض|sport|football|كرة/i.test(name)?'sports':
@@ -303,7 +305,7 @@ $('search').placeholder='ابحث في '+(state.episodes?'الحلقات':state.
 document.querySelectorAll('[data-kind]').forEach(function(b){b.classList.toggle('selected',state.view!=='home'&&state.filter==='all'&&b.dataset.kind===state.kind);});
 $('nav-favorites').classList.toggle('selected',state.view!=='home'&&state.filter==='favorites');$('nav-recent').classList.toggle('selected',state.view!=='home'&&state.filter==='recent');
 var groups={All:state.items.length};if(state.provider&&state.provider.type==='xtream')(state.kind==='live'?liveCategories:vodCategories[state.kind]).forEach(function(c){groups[c.category_name]='';});state.items.forEach(function(i){groups[i.group]=(Number(groups[i.group])||0)+1;});var cat=$('categories');cat.replaceChildren();
-var categoryNodes=[];orderedGroups(Object.keys(groups)).forEach(function(g){var b=button((g==='All'?(state.episodes?'كل المواسم':'جميع التصنيفات'):g==='@favorites'?'المفضلة':g.replace(/^Season /,'الموسم ')),function(){if(state.provider&&state.provider.type==='xtream'&&(state.kind==='live'||g!=='All')){loadVodCategory(g);return;}state.group=g;state.page=0;render();if(state.kind==='live'){var chosen=$('categories').querySelector('button.selected');if(chosen)chosen.focus();}else focusFirst();});if(state.kind==='live')b.dataset.organizeGroup=g;var n=document.createElement('small');n.textContent=g==='@favorites'?state.items.filter(isFavorite).length:groups[g];b.appendChild(n);b.classList.toggle('selected',g===state.group);var icon=document.createElement('span');icon.className='category-symbol';icon.appendChild(categoryIcon(g));b.prepend(icon);categoryNodes.push(b);});
+var categoryNodes=[];orderedGroups(Object.keys(groups)).forEach(function(g){var b=button((g==='All'?(state.episodes?'كل المواسم':'جميع التصنيفات'):g==='@favorites'?'المفضلة':g.replace(/^Season /,'الموسم ')),function(){if(state.provider&&state.provider.type==='xtream'&&(state.kind==='live'||g!=='All')){loadVodCategory(g);return;}state.group=g;state.page=0;render();if(state.kind==='live'){var chosen=$('categories').querySelector('button.selected');if(chosen)chosen.focus();}else focusFirst();});var label=document.createElement('span');label.className='category-label';label.textContent=displayLabel(b.textContent);b.textContent='';b.appendChild(label);if(state.kind==='live')b.dataset.organizeGroup=g;var n=document.createElement('small');n.textContent=g==='@favorites'?state.items.filter(isFavorite).length:groups[g];b.appendChild(n);b.classList.toggle('selected',g===state.group);var icon=document.createElement('span');icon.className='category-symbol';icon.appendChild(categoryIcon(g));var providerCategory=(state.kind==='live'?liveCategories:vodCategories[state.kind]).find(function(c){return c.category_name===g;});var providerIcon=providerCategory&&(providerCategory.category_icon||providerCategory.icon||providerCategory.image||providerCategory.stream_icon);if(providerIcon&&A.safeURL(providerIcon)){var im=document.createElement('img');im.src=providerIcon;im.alt='';im.loading='lazy';im.referrerPolicy='no-referrer';im.onload=function(){icon.querySelector('svg').style.display='none';};im.onerror=function(){im.remove();};icon.appendChild(im);}b.prepend(icon);categoryNodes.push(b);});
 installCategoryWindow(categoryNodes);
 renderItems();homeContent();}
 
@@ -450,7 +452,7 @@ state.filtered.slice(start,start+pageSize).forEach(function(item,index){
 var b=button('',function(){select(item);open(item);});b.dataset.index=start+index;if(item.kind==='live')b.dataset.organizeChannel=key(item);b.setAttribute('role','listitem');
 var num=document.createElement('span');num.className='number';num.textContent=String(start+index+1).padStart(2,'0');b.appendChild(num);
 if(item.kind==='live')b.appendChild(channelLogo(item));else b.appendChild(image(item.logo,null,item.name));
-var stack=document.createElement('div');stack.className='title-stack';var text=document.createElement('div');text.className='item-name';text.textContent=item.name;stack.appendChild(text);
+var stack=document.createElement('div');stack.className='title-stack';var text=document.createElement('div');text.className='item-name';text.textContent=item.kind==='live'?displayLabel(item.name):item.name;stack.appendChild(text);
 if(item.program){var program=document.createElement('small');program.textContent=item.program;stack.appendChild(program);}
 b.appendChild(stack);
 if(item.kind==='series'&&(item.quality||(item.added>0&&Date.now()/1000-item.added>=0&&Date.now()/1000-item.added<2592000))){var badge=document.createElement('b');badge.className='poster-badge';badge.textContent=item.quality||'جديد';b.appendChild(badge);}
@@ -470,10 +472,8 @@ var previous=$('hero').querySelector('img');if(previous)previous.remove();if(ite
 $('hero-play').onclick=function(){open(item);};
 }
 function select(item){
-if(state.selected===item)return;stopPreview();state.selected=item;$('detail-quality').textContent=item?item.quality||'':'';$('detail-quality').hidden=!(item&&item.quality);$('detail-name').textContent=item?item.name:'Alaa IPTV';$('detail-group').textContent=item?item.group:'اختر قناة للمشاهدة';
-$('detail-kind').textContent=item?(item.program||''):'';$('play-selected').disabled=!item;$('favorite-selected').disabled=!item;$('preview-selected').disabled=!item||item.kind!=='live';
-$('play-selected').textContent=item&&item.kind==='series'?'المواسم والحلقات':'شاهد الآن ▶';
-$('favorite-selected').textContent=item&&saved(favorites,item)?'♥ إزالة من المفضلة':'♡ أضف للمفضلة';
+if(state.selected===item)return;stopPreview();state.selected=item;$('detail-quality').textContent=item?item.quality||'':'';$('detail-quality').hidden=!(item&&item.quality);$('detail-name').textContent=item?displayLabel(item.name):'Alaa IPTV';$('detail-group').textContent=item?displayLabel(item.group):'اختر قناة للمشاهدة';
+$('detail-kind').textContent=item?(item.program||''):'';
 var cover=$('cover'),old=cover.querySelector('img');if(old)old.remove();var mark=cover.querySelector('span');mark.hidden=!!(item&&item.logo);
 if(item&&item.logo)cover.prepend(image(item.logo));
 }
@@ -736,7 +736,6 @@ $('episode-list').addEventListener('scroll',function(){if(this.contains(document
 function selectEpisode(e){seriesSelected=e;}
 $('series-back').onclick=function(){if(homeInline.origin){returnHomeInline();return;}$('series-detail').hidden=true;render();focusFirst();};
 var video=$('video'),playTimeout;
-$('preview-selected').onclick=function(){if(!state.selected||state.selected.kind!=='live')return;var url=A.safeURL(state.selected.url);if(!url)return;var v=$('preview');stopPreview();var source=document.createElement('source');source.src=url;if(/\.m3u8(?:$|\?)/i.test(url))source.type='application/vnd.apple.mpegurl';else if(/\.ts(?:$|\?)/i.test(url))source.type='video/mp2t';v.appendChild(source);v.hidden=false;v.load();v.play().catch(function(){status('تعذّر تشغيل المعاينة. تحقق من صيغة البث أو المزوّد.');});};
 function play(item){stopPreview();var id=key(item);recent=recent.filter(function(k){return k!==id;});recent.unshift(id);setSaved('ap-recent',recent);var url=A.safeURL(item.url);if(!url){status('رابط البث غير مدعوم');return;}stop(false);state.playing=item;$('player').hidden=false;$('quick-channels').hidden=true;quickList();$('playing-name').textContent=item.name;$('play-state').textContent='جارٍ فتح البث…';var source=document.createElement('source');source.src=url;
 if(/\.m3u8(?:$|\?)/i.test(url))source.type='application/vnd.apple.mpegurl';else if(/\.ts(?:$|\?)/i.test(url))source.type='video/mp2t';
 video.appendChild(source);video.load();video.play().catch(function(){$('play-state').textContent='اضغط تشغيل للمحاولة مجدداً أو جرّب قناة أخرى.';});showControls();$('stop').focus();
@@ -773,8 +772,6 @@ $('manual-toggle').onclick=function(){$('manual').hidden=!$('manual').hidden;if(
 $('manual-type').onchange=function(){$('credentials').hidden=this.value!=='xtream';};
 $('manual').onsubmit=async function(e){e.preventDefault();var type=$('manual-type').value,url=A.safeURL($('manual-url').value.trim());if(!url){$('activation').textContent='أدخل رابط HTTP أو HTTPS صالحاً';return;}if(type==='xtream'&&(!$('manual-user').value||!$('manual-pass').value)){$('activation').textContent='أدخل اسم المستخدم وكلمة المرور';return;}
 var p={id:'manual',manual:true,type:type,name:'قائمة مباشرة',url:url,server:url,username:$('manual-user').value,password:$('manual-pass').value};state.providers=state.providers.filter(function(p){return !p.manual;}).concat([p]);state.kind='live';providers();await selectProvider('manual');$('providers').value='manual';$('manual-pass').value='';connection(false);};
-$('play-selected').onclick=function(){if(state.selected)open(state.selected);};
-$('favorite-selected').onclick=function(){if(!state.selected)return;var k=key(state.selected);if(saved(favorites,state.selected))favorites=favorites.filter(function(x){return x!==k;});else favorites.push(k);setSaved('ap-favorites',favorites);select(state.selected);if(state.filter==='favorites')renderItems();};
 $('nav-home').onclick=function(){dismissPanels();stopPreview();state.view='home';state.filter='all';render();document.querySelectorAll('nav button').forEach(function(b){b.classList.remove('selected');});this.classList.add('selected');$('home-play').focus();};
 $('nav-favorites').onclick=function(){navigate(state.kind,'favorites');};
 $('nav-recent').onclick=function(){navigate(state.kind,'recent');};
