@@ -406,3 +406,6 @@ body:not(.apple):not(.blue) #screen{background:#0b1320!important}
 body:not(.apple):not(.blue) button:focus,body:not(.apple):not(.blue) #items button:focus{background:#a51e35!important;color:white!important;outline:2px solid #ef354e;outline-offset:-2px;transform:none;box-shadow:none}
 body:not(.apple):not(.blue) nav button.selected{background:#c12237!important}
 #zap-banner{position:absolute;left:55px;top:45px;z-index:12;max-width:900px;padding:16px 25px;background:#101b2deb;border-left:5px solid #ed3549;border-radius:8px;color:white;font-size:27px;direction:ltr;text-align:left;pointer-events:none}
+#quick-channels{left:40px;right:auto;top:40px;bottom:40px;width:520px;z-index:14;background:#101b2df5;direction:ltr}
+#quick-list button{text-align:left}
+#quick-list button:focus{background:#bc2039!important;color:white!important;outline:2px solid #fa536a}
