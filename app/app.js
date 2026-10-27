@@ -1070,7 +1070,7 @@ var status=document.createElement('div');status.className='live-status';status.i
 var text=document.createElement('div');text.className='live-channel-text';
 var badge=document.createElement('span');badge.className='live-badge';badge.textContent=tr('Live');text.appendChild(badge);
 var name=document.createElement('strong');name.textContent=(item.name||'').replace(/^\s*\d+\s*[-|·:]\s*/,'');text.appendChild(name);
-var channel=document.createElement('span');channel.className='live-channel-name';var normT=function(v){return String(v||'').replace(/\s+/g,' ').trim().toLowerCase();},titleText=(item.name||'').replace(/^\s*\d+\s*[-|·:]\s*/,''),subText=normT(item.group)&&normT(item.group)!=='other'&&normT(item.group)!==normT(titleText)&&normT(item.group)!==normT(item.name)?String(item.group).replace(/\s+/g,' ').trim():'';channel.textContent=subText;channel.hidden=!subText;if(subText)text.appendChild(channel);
+var channel=document.createElement('span');channel.className='live-channel-name';var normT=function(v){return String(v||'').replace(/\s+/g,' ').trim().toLowerCase();},titleText=(item.name||'').replace(/^\s*\d+\s*[-|·:]\s*/,''),subText=normT(item.group)&&!item.groupMissing&&normT(item.group)!==normT(titleText)&&normT(item.group)!==normT(item.name)?String(item.group).replace(/\s+/g,' ').trim():'';channel.textContent=subText;channel.hidden=!subText;if(subText)text.appendChild(channel);
 var elapsed=document.createElement('time');elapsed.id='live-elapsed';elapsed.hidden=true;text.appendChild(elapsed);b.appendChild(text);
 var controls=document.createElement('div');controls.className='live-transport';
 controls.appendChild(liveButton('live-prev',tr('القناة السابقة'),'prev',function(){zapChannel(-1);}));

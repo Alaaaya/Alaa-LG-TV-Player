@@ -1,7 +1,7 @@
 const {chromium}=require('/home/kit/tmp/player124/node_modules/playwright'),fs=require('fs'),assert=require('assert/strict');
 const EXE=process.env.CHROMIUM_87||'/home/kit/tmp/player124/chrome-linux/chrome';
 (async()=>{const video=fs.readFileSync('/home/kit/tmp/ovfix/clip4.webm');const b=await chromium.launch({executablePath:EXE,headless:true,args:['--no-sandbox','--autoplay-policy=no-user-gesture-required']});const res=[];
-const m3u=(g1,g2,g3)=>'#EXTM3U\n#EXTINF:-1 group-title="'+g1+'",Alpha News\nhttps://f.example/c.webm\n#EXTINF:-1 group-title="'+g2+'",Beta Sport\nhttps://f.example/c.webm\n#EXTINF:-1 group-title="'+g3+'",Gamma Docs\nhttps://f.example/c.webm\n';
+const m3u=(g1,g2,g3)=>'#EXTM3U\n#EXTINF:-1 group-title="'+g1+'",Alpha News\nhttps://f.example/c.webm\n#EXTINF:-1 group-title="'+g2+'",Beta Sport\nhttps://f.example/c.webm\n#EXTINF:-1 group-title="'+g3+'",Gamma Docs\nhttps://f.example/c.webm\n#EXTINF:-1 group-title="Other",Delta Mix\nhttps://f.example/c.webm\n';
 const h={'access-control-allow-origin':'*','access-control-allow-headers':'*','access-control-allow-methods':'GET,POST,OPTIONS'};
 for(const lang of ['ar','de','en'])for(const theme of ['apple','navy','red','blue']){
  const c=await b.newContext({viewport:{width:1920,height:1080}}),p=await c.newPage();
@@ -10,7 +10,7 @@ for(const lang of ['ar','de','en'])for(const theme of ['apple','navy','red','blu
  await p.goto('file:///home/kit/player135/dist/index.html');await p.waitForSelector('#home-tiles button',{timeout:15000});
  await p.locator('nav [data-kind=live]').click();await p.waitForSelector('#items button');
  const out={lang,theme,cases:[]};
- for(const [i,name,want] of [[0,'equal(case/space)',false],[1,'empty',false],[2,'distinct',true]]){
+ for(const [i,name,want] of [[0,'equal(case/space)',false],[1,'empty',false],[2,'distinct',true],[3,'legit Other',true]]){
   await p.locator('#items button').nth(i).click();await p.waitForFunction(()=>!document.getElementById('player').hidden);await p.waitForSelector('#live-now',{timeout:5000}).catch(()=>{});
   await p.waitForTimeout(400);
   const s=await p.evaluate(()=>{const v=e=>!!e&&!e.hidden&&getComputedStyle(e).display!=='none'&&e.getBoundingClientRect().width>0;const sub=document.querySelector('.live-channel-name'),el=document.getElementById('live-elapsed');return {sub:v(sub),subText:sub&&sub.textContent,el0:v(el),elText:el&&el.textContent,title:document.querySelector('.live-channel-text strong')?.textContent,badge:document.querySelector('.live-badge')?.textContent}});
