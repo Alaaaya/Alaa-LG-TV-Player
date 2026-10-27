@@ -23,6 +23,8 @@ await p.waitForFunction(()=>document.querySelector('#home-tiles button')&&docume
 for(const kind of ['movies','series']){
 await p.evaluate(k=>document.querySelector('nav [data-kind="'+k+'"]').click(),kind);
 await p.waitForFunction(()=>document.querySelector('#browser').classList.contains('poster-view')&&document.querySelector('#items button .item-name')&&document.querySelector('#items button .item-name').textContent.startsWith('Title'));
+// Cached posters can precede completion of the route load, which rebuilds the nodes.
+await p.waitForFunction(()=>!document.querySelector('#status').textContent.startsWith('جارٍ تحميل'));
 await p.waitForTimeout(350);
 await p.evaluate(()=>document.querySelector('#items button').focus());
 await p.keyboard.press('ArrowLeft');
