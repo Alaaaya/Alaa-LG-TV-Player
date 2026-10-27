@@ -64,13 +64,24 @@ check(await page.evaluate(()=>document.querySelector('#zap-banner').hidden),fals
 await remote(38);check(await page.locator('#playing-name').textContent(),beforeZap);
 for(const pair of [[33,34],[427,428]]){await remote(pair[0]);check(await page.locator('#playing-name').textContent()!==beforeZap,true);await remote(pair[1]);check(await page.locator('#playing-name').textContent(),beforeZap);}
 await page.screenshot({path:art+'/zap-banner-1.2.5.png'});
-await remote(39);check(await page.evaluate(()=>document.querySelector('#player-ui').classList.contains('dim')),true);
-await remote(13);check(await page.evaluate(()=>document.querySelector('#player-ui').classList.contains('dim')),false);
+
+await remote(13);
+check(await page.evaluate(()=>document.querySelector('#quick-channels').hidden),false);
+check(await page.evaluate(()=>document.activeElement.classList.contains('selected')),true);
+check(await page.evaluate(()=>document.querySelector('#player-ui').classList.contains('dim')),true);
+const selectedText=await page.evaluate(()=>document.activeElement.textContent);
+await remote(40);check(await page.evaluate(()=>document.activeElement.textContent)!==selectedText,true);
+check(await page.locator('#playing-name').textContent(),beforeZap);
+await page.screenshot({path:art+'/channel-overlay-1.2.5.png'});
+await remote(13);check(await page.evaluate(()=>document.querySelector('#quick-channels').hidden),true);
+check(await page.locator('#playing-name').textContent()!==beforeZap,true);
+await remote(13);check(await page.evaluate(()=>document.activeElement.classList.contains('selected')),true);
+await remote(461);check(await page.evaluate(()=>document.querySelector('#quick-channels').hidden),true);
+check(await page.evaluate(()=>document.querySelector('#player').hidden),false);
+await remote(39);check(await page.evaluate(()=>document.querySelector('#player-ui').classList.contains('dim')),false);
 const focused=await page.evaluate(()=>document.activeElement.id);await remote(39);
 check(await page.evaluate(()=>document.activeElement.id)!==focused,true);
-check(await page.locator('#playing-name').textContent(),beforeZap);
 await page.screenshot({path:art+'/player-controls-1.2.5.png'});
-await remote(13);check(await page.evaluate(()=>document.querySelector('#player-ui').classList.contains('dim')),true);
 await remote(461);check(await page.evaluate(()=>document.querySelector('#player').hidden),true);
 
 check(await page.evaluate(()=>document.querySelector('#items').contains(document.activeElement)),true);
