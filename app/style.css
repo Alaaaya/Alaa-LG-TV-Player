@@ -1129,14 +1129,25 @@ body.no-glass[data-theme] #player-ui button:focus,body.no-glass[data-theme] #pla
 /* Playback kind comes from the actual item, including cached and M3U streams. */
 #live-now{display:none}
 #player[data-playback-kind=live] #player-ui{display:none!important}
-#player[data-playback-kind=live] #live-now{display:flex;position:absolute;left:36px;bottom:30px;align-items:center;gap:18px;max-width:80%;padding:14px 22px;border-radius:12px;background:rgba(15,18,24,.92);color:#fff;direction:ltr;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;pointer-events:none}
-#player[data-playback-kind=live] #live-now strong{font-size:26px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#live-now .channel-logo{position:relative;display:flex;align-items:center;justify-content:center;width:62px;min-width:62px;height:52px;border-radius:7px;background:#fff;color:#20232b;overflow:hidden}
-#live-now .channel-logo img{position:static;width:100%;height:100%;object-fit:contain;padding:4px;filter:none}
-#live-now .logo-initials{font-size:22px;font-weight:bold}
+/* Cheap opaque broadcast bar, no blur, no layout animation or EPG. */
+#player[data-playback-kind=live] #live-now{display:flex;position:absolute;z-index:11;left:0;right:0;bottom:0;height:151.2px;max-width:none;box-sizing:border-box;align-items:center;gap:30.72px;padding:17.28px 48.0px;border-radius:0;border-top:2px solid var(--accent,#ed3549);background:#15171c;color:#fff;direction:ltr;pointer-events:none;backdrop-filter:none;-webkit-backdrop-filter:none}
+body[data-theme=navy] #player #live-now{background:#101b30}
+body[data-theme=red] #player #live-now{background:#1e1014;border-top-color:#ef3548}
+body[data-theme=blue] #player #live-now{background:#0e213b}
+#live-now .channel-logo{position:relative;display:flex;align-items:center;justify-content:center;flex:0 0 134.4px;width:134.4px;height:102.6px;border-radius:9px;background:#fff;color:#20232b;overflow:hidden}
+#live-now .channel-logo img{position:static;width:100%;height:100%;object-fit:contain;padding:8px;filter:none;box-sizing:border-box}
+#live-now .logo-initials{font-size:38.4px;font-weight:bold}
+#live-now .live-channel-text{flex:1;min-width:0;text-align:left}
+#live-now .live-channel-title{display:flex;align-items:center;gap:21.12px;min-width:0;direction:ltr}
+#live-now .live-channel-number{font-size:39.36px;font-weight:600;color:#bcc3cf;flex-shrink:0}
+#player #live-now strong{font-size:45.12px;font-weight:650;line-height:1.22;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#live-now .live-category{display:block;color:#b9c1ce;font-size:24.0px;margin-top:.64.8px}
+#live-now .live-broadcast-info{display:flex;align-items:center;gap:21.12px;flex-shrink:0}
+#live-now .live-badge{background:#dc213c;color:white;border-radius:5px;font-size:21.12px;letter-spacing:.09em;font-weight:700;padding:.64.8px .115.2px}
+#live-now .live-quality{border:1px solid #aeb6c4;border-radius:4px;padding:.43.2px .864.0px;font-size:20.16px;font-weight:700}
+#live-now .live-clock{font-size:31.68px;font-variant-numeric:tabular-nums;margin-left:.153.6px}
 #player.quick-open #live-now{visibility:hidden}
 #player[data-playback-kind=live] #player-ui:before,#player[data-playback-kind=live] #player-ui button{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
-@media(max-width:1300px){#player[data-playback-kind=live] #live-now{left:24px;bottom:22px;padding:10px 16px}#player[data-playback-kind=live] #live-now strong{font-size:22px}}
 
 /* Lightweight, non-focusable VOD seek feedback. Full controls stay hidden. */
 #seek-feedback{position:absolute;left:22%;right:22%;bottom:7%;z-index:12;direction:ltr;pointer-events:none;background:rgba(12,14,19,.88);border-radius:12px;padding:14px 20px;color:#fff;font-size:clamp(16px,1.5vw,25px);display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;backdrop-filter:none}
