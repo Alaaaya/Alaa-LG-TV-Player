@@ -645,7 +645,7 @@ paintRelatedMovies(0);
 var relatedStart=0;
 function paintRelatedMovies(start){
 var grid=$('movie-related'),top=grid.scrollTop;relatedStart=Math.max(0,Math.floor(start/6)*6);grid.replaceChildren();
-function pad(n){var d=document.createElement('div');d.className='related-spacer';d.style.height=n+'px';grid.appendChild(d);}
+function pad(n){if(!n)return;var d=document.createElement('div');d.className='related-spacer';d.style.height=Math.max(0,n-12)+'px';grid.appendChild(d);}
 pad(relatedStart/6*242);
 movieRelated.slice(relatedStart,relatedStart+24).forEach(function(i,offset){var n=relatedStart+offset;
 var card=button('',function(){open(i);});card.dataset.relatedIndex=n;card.setAttribute('role','listitem');
