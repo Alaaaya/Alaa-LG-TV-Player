@@ -101,8 +101,9 @@ function markPlaying(){
  for(var i=0;i<rows.length;i++){var s=rows[i].querySelector('strong');rows[i].classList.toggle('playing',on&&!!s&&name.indexOf(txt(s))>=0);}
 }
 /* observers: attribute/child changes only, no layout reads */
-function all(){sync();updateCrumb();updateMeta();markPlaying();paintPills();}
-var mo=new MutationObserver(function(){all();});
+function all(){sync();if(!isRed())return;updateCrumb();updateMeta();markPlaying();paintPills();}
+var queued=false;
+var mo=new MutationObserver(function(){if(queued)return;queued=true;setTimeout(function(){queued=false;all();},0);});
 mo.observe(detail,{attributes:true,attributeFilter:['hidden']});
 mo.observe(player,{attributes:true,attributeFilter:['hidden']});
 mo.observe(body,{attributes:true,attributeFilter:['data-theme']});
@@ -143,14 +144,14 @@ document.addEventListener('keydown',function(e){
  if(!list.hidden&&player.contains(a)){
   var bs=Array.prototype.slice.call(list.querySelectorAll('button')).filter(visible);var i=bs.indexOf(a);
   if(k==='ArrowUp'||k==='ArrowDown'){e.preventDefault();e.stopImmediatePropagation();var n=bs[i+(k==='ArrowDown'?1:-1)];if(n)n.focus();return;}
-  if(k==='Enter'){e.preventDefault();e.stopImmediatePropagation();if(a.click)a.click();return;}
+  if(k==='Enter'){e.preventDefault();e.stopImmediatePropagation();if(!e.repeat&&a.click)a.click();return;}
   if(k==='ArrowLeft'||k==='ArrowRight'){e.preventDefault();e.stopImmediatePropagation();return;}
  }
  if(!player.hidden&&!detail.hidden&&!player.contains(a)&&a.classList&&a.classList.contains('episode-row')&&k==='ArrowRight'&&!fs){
   e.preventDefault();e.stopImmediatePropagation();var p=$('pause');if(p&&visible(p))p.focus();return;
  }
  if(!player.hidden&&ui.contains(a)&&!ui.classList.contains('dim')){
-  if(k==='Enter'&&a.tagName==='BUTTON'){e.preventDefault();e.stopImmediatePropagation();a.click();return;}
+  if(k==='Enter'&&a.tagName==='BUTTON'){e.preventDefault();e.stopImmediatePropagation();if(!e.repeat)a.click();return;}
   if((k==='ArrowUp'||k==='ArrowDown')&&!$('seek-back').hidden){
    var r=rows(),ri=r[0].indexOf(a)>=0?0:1,to=r[k==='ArrowDown'?1:0];
    if(ri===(k==='ArrowDown'?0:1)&&to.length){e.preventDefault();e.stopImmediatePropagation();to[Math.min(to.length-1,r[ri].indexOf(a))].focus();return;}
