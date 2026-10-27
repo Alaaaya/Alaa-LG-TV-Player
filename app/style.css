@@ -1291,3 +1291,5 @@ body[data-theme] .home-reference #home-hero #hero-dots{position:absolute;bottom:
 body[data-theme] #home-shelves .home-posters button{height:360px!important;min-height:360px!important}
 body[data-theme] #home-shelves .home-posters small{height:26px;flex:0 0 26px;line-height:26px;padding-bottom:2px!important;color:#bdc5d3!important;overflow:visible}
 body[data-theme] #home-shelves .home-posters button:focus small{color:#f0f3fa!important;text-shadow:0 1px 2px #000}
+
+#live-elapsed[hidden],.live-channel-name[hidden]{display:none!important}

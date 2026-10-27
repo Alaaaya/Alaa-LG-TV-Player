@@ -1041,7 +1041,7 @@ return '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentC
 function liveButton(id,label,icon,fn){var b=button('',fn);b.id=id;b.setAttribute('aria-label',label);b.title=label;b.innerHTML=liveIcon(icon);return b;}
 function paintLiveTick(){
 var clock=$('live-clock');if(clock)clock.textContent=new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:false});
-var elapsed=$('live-elapsed');if(elapsed){var n=Math.floor((Date.now()-liveStarted)/1000);elapsed.textContent=[Math.floor(n/3600),Math.floor(n/60)%60,n%60].map(function(v){return String(v).padStart(2,'0');}).join(':');}
+var elapsed=$('live-elapsed');if(elapsed){var n=Math.floor((Date.now()-liveStarted)/1000);elapsed.textContent=[Math.floor(n/3600),Math.floor(n/60)%60,n%60].map(function(v){return String(v).padStart(2,'0');}).join(':');elapsed.hidden=n<1;}
 var weather=$('live-weather'),w=liveWeather&&Date.now()-liveWeather.at<1800000?liveWeather:null;if(weather){weather.hidden=!w;if(w){weather.innerHTML=liveIcon(w.code===0?'sun':w.code>=51?'rain':'cloud');weather.appendChild(document.createTextNode(Math.round(w.temp)+'°'));weather.title='Mülheim · Open-Meteo';}}
 var pause=$('live-pause');if(pause){pause.innerHTML=liveIcon(video.paused?'play':'pause');pause.setAttribute('aria-label',video.paused?tr('تشغيل'):tr('إيقاف مؤقت'));}
 }
@@ -1070,8 +1070,8 @@ var status=document.createElement('div');status.className='live-status';status.i
 var text=document.createElement('div');text.className='live-channel-text';
 var badge=document.createElement('span');badge.className='live-badge';badge.textContent=tr('Live');text.appendChild(badge);
 var name=document.createElement('strong');name.textContent=(item.name||'').replace(/^\s*\d+\s*[-|·:]\s*/,'');text.appendChild(name);
-var channel=document.createElement('span');channel.className='live-channel-name';channel.textContent=(item.name||'').replace(/^\s*\d+\s*[-|·:]\s*/,'');text.appendChild(channel);
-var elapsed=document.createElement('time');elapsed.id='live-elapsed';text.appendChild(elapsed);b.appendChild(text);
+var channel=document.createElement('span');channel.className='live-channel-name';var normT=function(v){return String(v||'').replace(/\s+/g,' ').trim().toLowerCase();},titleText=(item.name||'').replace(/^\s*\d+\s*[-|·:]\s*/,''),subText=normT(item.group)&&normT(item.group)!=='other'&&normT(item.group)!==normT(titleText)&&normT(item.group)!==normT(item.name)?String(item.group).replace(/\s+/g,' ').trim():'';channel.textContent=subText;channel.hidden=!subText;if(subText)text.appendChild(channel);
+var elapsed=document.createElement('time');elapsed.id='live-elapsed';elapsed.hidden=true;text.appendChild(elapsed);b.appendChild(text);
 var controls=document.createElement('div');controls.className='live-transport';
 controls.appendChild(liveButton('live-prev',tr('القناة السابقة'),'prev',function(){zapChannel(-1);}));
 controls.appendChild(liveButton('live-pause',tr('إيقاف مؤقت'),'pause',toggle));
