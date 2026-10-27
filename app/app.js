@@ -306,7 +306,7 @@ $('hero-play').onclick=function(){open(item);};
 }
 function select(item){
 if(state.selected!==item)stopPreview();state.selected=item;$('detail-quality').textContent=item?item.quality||'':'';$('detail-quality').hidden=!(item&&item.quality);$('detail-name').textContent=item?item.name:'Alaa IPTV';$('detail-group').textContent=item?item.group:'اختر قناة للمشاهدة';
-$('detail-kind').textContent=item?(item.program||'من مكتبتك'):'';$('play-selected').disabled=!item;$('favorite-selected').disabled=!item;$('preview-selected').disabled=!item||item.kind!=='live';
+$('detail-kind').textContent=item?(item.program||''):'';$('play-selected').disabled=!item;$('favorite-selected').disabled=!item;$('preview-selected').disabled=!item||item.kind!=='live';
 $('play-selected').textContent=item&&item.kind==='series'?'المواسم والحلقات':'شاهد الآن ▶';
 $('favorite-selected').textContent=item&&saved(favorites,item)?'♥ إزالة من المفضلة':'♡ أضف للمفضلة';
 var cover=$('cover'),old=cover.querySelector('img');if(old)old.remove();var mark=cover.querySelector('span');mark.hidden=!!(item&&item.logo);
@@ -520,6 +520,7 @@ $('filter-favorites').onclick=function(){state.filter='favorites';renderItems();
 $('filter-recent').onclick=function(){state.filter='recent';renderItems();};
 document.querySelectorAll('[data-home-kind]').forEach(function(b){b.onclick=function(){navigate(b.dataset.homeKind);};});
 function theme(value){
+value='red';
 if(['apple','red','blue'].indexOf(value)<0)value='apple';
 document.body.classList.toggle('blue',value==='blue');
 document.body.classList.toggle('apple',value==='apple');

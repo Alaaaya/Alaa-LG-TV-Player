@@ -454,3 +454,22 @@ margin:12px 0 0;direction:rtl;unicode-bidi:plaintext;
 .home-reference nav button.selected{color:white!important;background:#c82f43!important}
 /* Catalog pages show one title grid, without repeated promotional shelves. */
 #browser.vod-view #hero,#browser.vod-view #movie-discovery{display:none!important}
+/* One Home-derived navy/red visual system across every app route. */
+body,body.apple,body.blue{--accent:#ed3549;--tint:#351c2c;--bg:#0b1320;--panel:#111b2d;--raised:#19253b;--muted:#929db2;color:#eff2fa;background:#070d17}
+#screen,body.apple #screen,#screen.home-reference{background:radial-gradient(ellipse at 76% 28%,#142234 0%,#0b1320 48%,#070d17 100%)!important}
+header,.home-reference header{height:100px;background:transparent!important;border:none}
+nav,.home-reference nav,body.apple nav{background:#0c1220!important;border:none}
+nav button,.home-reference nav button{color:#dce3ee!important;background:transparent!important;border-radius:8px}
+nav button .nav-icon,.home-reference nav button .nav-icon{opacity:1;color:#a5afc2}
+nav button.selected,.home-reference nav button.selected{background:#c82f43!important;color:#fff!important}
+nav button.selected .nav-icon{color:#fff!important}
+button,body.apple button{background:#19253b;color:#eff2fa;border-radius:8px}
+#items button,#categories,#subcategories,#detail,aside,#series-detail,#movie-detail,#connection{background:#111b2d!important;color:#eff2fa}
+#connection,#movie-detail,#series-detail{background:#0b1320!important}
+#categories button,#subcategories button{background:transparent!important;color:#dce3ee}
+button.selected,#categories button.selected,#subcategories button.selected,#season-tabs button.selected{background:#c82f43!important;color:#fff!important}
+button:focus,#items button:focus,body.apple button:focus,.home-reference button:focus{outline:3px solid #ed3549!important;outline-offset:-3px;box-shadow:inset 0 0 0 4px #681227!important}
+#items button:focus{background:#351c2c!important;color:#fff!important}
+#home-play,#home-info,#movie-play,#movie-resume,#series-start,#series-continue,#episode-play,#play-selected,#preview-selected,#sync{background:#c82f43!important;color:#fff!important;border-radius:8px}
+input,select,body.apple input,body.apple select{background:#101929!important;border-color:#26344b!important;color:#eff2fa!important}
+#theme-apple,#theme-blue{display:none!important}
