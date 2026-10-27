@@ -440,3 +440,6 @@ body:not(.apple):not(.blue) button:focus{outline:3px solid #ff7888!important;out
 .episode-row{background:linear-gradient(115deg,#223248,#151f2e)}
 .episode-row .episode-art{width:92px;height:64px;object-fit:cover;border-radius:7px;float:left;margin-right:14px}
 img[data-fallback=true]{background:linear-gradient(135deg,#64273f,#253952,#152332);object-fit:cover}
+header .brand,.home-reference header .brand{opacity:1;pointer-events:auto;left:25px;right:auto;top:24px;width:249px;gap:5px;z-index:2;background:#0c1220}
+.brand .ap-brand-mark{width:66px;height:66px;object-fit:contain;flex-shrink:0}
+header .brand strong,.home-reference header .brand strong{font-size:25px;color:#f3f2ef;font-weight:700;letter-spacing:-.5px}
