@@ -141,3 +141,21 @@ No HTTPS rewrite/proxy or security bypass is used. Real Chromium87 file origin
 tests cover HTTP logo success and HTTP404 initials fallback. A provider that
 blocks its own images may still fall back; actual LG logo availability needs
 a TV retest. Total Chromium87 suite is now 103 checks.
+
+## Real-provider LG large-catalog fix (1.2.6)
+
+Movies and series now fetch their Xtream category index, then fetch titles
+only with category_id. Selecting a category replaces the previous title
+window rather than merging the entire provider library. Home previews load
+one category per media kind sequentially, avoiding concurrent huge JSON
+responses on low-memory TVs. Home preview counts are loaded samples, not
+provider-wide totals. Live uses only get_live_streams. M3U /movie/ and /series/
+URL paths are classified into their corresponding sections instead of Live.
+
+Tested the application with the owner-provided real provider in Chromium87
+file origin, with --disable-web-security ONLY in the private diagnostic
+harness. Movies: 438 categories, tested first populated category 113 titles.
+Series: 370 categories, tested first populated category 8 titles. App Home,
+Movies and Series rendered real catalog entries; screenshots real-provider-
+{home,movies,series}-126.png. No credentials in source or committed fixtures.
+Production security is unchanged. Physical LG retest remains required.
