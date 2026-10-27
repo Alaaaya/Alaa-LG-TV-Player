@@ -68,10 +68,12 @@ function paintList(){
  if(none){var p=el('p',null,null,'\u0644\u0627 \u062a\u0648\u062c\u062f \u062a\u0631\u062c\u0645\u0627\u062a \u0645\u062a\u0627\u062d\u0629');items.appendChild(p);}
 }
 function pick(btn){
+ var idx=btn.dataset.track!=null?btn.dataset.track:null;
  var tracks=video.textTracks||[];
  for(var i=0;i<tracks.length;i++)tracks[i].mode='disabled';
  if(btn.dataset.track!=null&&tracks[btn.dataset.track])tracks[btn.dataset.track].mode='showing';
  paintList();paintPills();
+ var nb=idx!=null?items.querySelector('button[data-track="'+idx+'"]'):items.querySelector('button');if(nb)nb.focus();
 }
 function openList(){paintList();list.hidden=false;var b=items.querySelector('button.selected')||items.querySelector('button');if(b)b.focus();}
 function closeList(){if(list.hidden)return false;list.hidden=true;bSub.focus();return true;}

@@ -830,8 +830,9 @@ $('series-info').onclick=function(){$('series-description').classList.toggle('ex
 $('series-back').focus();
 }
 var episodeWindow={items:[],start:0};
+function epLayout(){var L=redLayout();return L?L.episodes:{cols:5,size:30,row:220};}
 function paintEpisodes(start){
-var list=$('episode-list'),top=list.scrollTop,cols=5,size=30,row=220;
+var list=$('episode-list'),top=list.scrollTop,EL=epLayout(),cols=EL.cols,size=EL.size,row=EL.row;
 start=Math.max(0,Math.floor(Math.min(start,Math.max(0,episodeWindow.items.length-size))/cols)*cols);episodeWindow.start=start;list.replaceChildren();
 function pad(height){var d=document.createElement('div');d.className='episode-spacer';d.style.height=height+'px';list.appendChild(d);}
 pad(start/cols*row);
@@ -845,7 +846,7 @@ b.onfocus=function(){seriesSelected=e;};b.dataset.episodeIndex=start+i;list.appe
 });
 pad(Math.ceil(Math.max(0,episodeWindow.items.length-start-size)/cols)*row);list.scrollTop=top;
 }
-$('episode-list').addEventListener('scroll',function(){if(this.contains(document.activeElement))return;var start=Math.max(0,(Math.floor(this.scrollTop/220)-1)*5);if(start!==episodeWindow.start)paintEpisodes(start);});
+$('episode-list').addEventListener('scroll',function(){if(this.contains(document.activeElement))return;var EL=epLayout(),start=Math.max(0,(Math.floor(this.scrollTop/EL.row)-1)*EL.cols);if(start!==episodeWindow.start)paintEpisodes(start);});
 function selectEpisode(e){seriesSelected=e;}
 $('series-back').onclick=function(){if(homeInline.origin){returnHomeInline();return;}$('series-detail').hidden=true;render();focusFirst();};
 var video=$('video'),playTimeout;
@@ -922,6 +923,7 @@ document.body.classList.toggle('apple',value==='apple');
 document.body.classList.toggle('blue',value==='blue');
 ['apple','navy','red','blue'].forEach(function(t){var b=$('theme-'+t);b.classList.toggle('selected',value===t);b.setAttribute('aria-pressed',value===t?'true':'false');});
 if(persist!==false)storeWrite('ap-theme',value);
+if(typeof episodeWindow!=='undefined'&&episodeWindow.items.length&&!$('series-detail').hidden)paintEpisodes(episodeWindow.start);
 }
 ['apple','navy','red','blue'].forEach(function(t){$('theme-'+t).onclick=function(){theme(t);};});
 theme(storeRead('ap-theme')||'apple',false);
@@ -1060,7 +1062,7 @@ e.preventDefault();var ix=Number(active.dataset.episodeIndex);
 if(key==='ArrowLeft'&&ix%episodeCols()===0){(nav.querySelector('button.selected')||$('nav-home')).focus();return;}
 if(key==='ArrowUp'&&ix<episodeCols()){($('season-tabs').querySelector('button.selected')||$('series-back')).focus();return;}
 var target=ix+(key==='ArrowDown'?episodeCols():key==='ArrowUp'?-episodeCols():key==='ArrowRight'?1:-1);
-if(target>=0&&target<episodeWindow.items.length){var eb=$('episode-list').querySelector('[data-episode-index="'+target+'"]');if(!eb){paintEpisodes(Math.max(0,target-5));eb=$('episode-list').querySelector('[data-episode-index="'+target+'"]');}if(eb){eb.focus();eb.scrollIntoView({block:'nearest'});}}return;
+if(target>=0&&target<episodeWindow.items.length){var eb=$('episode-list').querySelector('[data-episode-index="'+target+'"]');if(!eb){paintEpisodes(Math.max(0,target-2*episodeCols()));eb=$('episode-list').querySelector('[data-episode-index="'+target+'"]');}if(eb){eb.focus();eb.scrollIntoView({block:'nearest'});}}return;
 }
 if($('season-tabs').contains(active)&&key==='ArrowDown'){e.preventDefault();var first=$('episode-list').querySelector('button');if(first)first.focus();return;}
 if($('player').hidden&&!nav.contains(active)&&key==='ArrowLeft'&&(!$('connection').hidden||!$('movie-detail').hidden||!$('series-detail').hidden)){
