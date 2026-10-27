@@ -78,6 +78,18 @@ async function visit(){
   await page.waitForFunction(()=>document.querySelector('#count').textContent.startsWith('120 '));
   assert(await page.locator('#items button').count()>0);
   checks.push('Whole-network offline process restart restores home hero/rows, all categories and live All=120');
+  await page.evaluate(()=>document.querySelector('#nav-home').click());
+  for(const tile of ['live','movies','series']){
+   await page.locator('[data-home-tile="'+tile+'"]').focus();await page.keyboard.press('Enter');
+   await page.waitForFunction(()=>document.querySelector('#home-inline-items button'));
+   assert(await page.locator('#home').isVisible());assert(await page.locator('#home-hero').isVisible());
+   assert.equal(await page.locator('#home-tiles button.selected').getAttribute('data-home-tile'),tile);
+   await page.keyboard.press('ArrowDown');assert(await page.evaluate(()=>document.querySelector('#home-inline-categories').contains(document.activeElement)));
+   await page.keyboard.press('ArrowDown');assert(await page.evaluate(()=>document.querySelector('#home-inline-items').contains(document.activeElement)));
+   await page.keyboard.press('Escape');assert.equal(await page.evaluate(()=>document.activeElement.dataset.homeTile),tile);
+  }
+  checks.push('Cold network-offline Home inline Live/Movies/Series cached rows, hero retained, Dpad tiles/categories/content/Back');
+
   for(const id of ['nav-favorites','nav-recent','nav-search','settings-open']){
    await page.evaluate(id=>document.getElementById(id).click(),id);
    assert(await page.locator('nav button.selected').count()===1);
