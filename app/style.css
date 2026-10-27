@@ -664,3 +664,11 @@ body[data-theme] #organize-panel button:focus{background:var(--accent)!important
 body[data-theme] #home-play,body[data-theme] #movie-play,body[data-theme] #series-start,body[data-theme] #hero-dots button.selected{background:var(--accent)!important;color:var(--on-accent)!important}
 body[data-theme] #home-tiles button:focus{transform:none!important;outline-color:var(--accent)!important}
 body[data-theme] #home-tiles button:focus small,body[data-theme] #home-tiles button:focus strong{color:var(--on-accent)!important}
+
+/* Low-power TV focus must not rasterize glows/filters or animate layout. */
+body[data-theme] button:focus,body[data-theme] #items button:focus{box-shadow:none!important;filter:none!important;backdrop-filter:none!important;transform:none!important}
+.related-spacer{grid-column:1/-1;pointer-events:none;min-height:0}
+/* Wider category names, funded by the channel column, never the 30% preview. */
+#browser.live-view>aside{width:420px}
+#browser.live-view #categories button{padding-left:6px;padding-right:6px;gap:8px}
+#browser.live-view .category-label{font-size:19px}
