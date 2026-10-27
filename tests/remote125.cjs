@@ -125,7 +125,7 @@ check(await page.evaluate(()=>document.querySelector('#connection').hidden),fals
 await remote(40);await remote(38);await remote(461);
 check(await page.evaluate(()=>document.querySelector('#connection').hidden),true);
 check(await page.evaluate(()=>document.body.className.includes('apple')),false);
-check(await page.evaluate(()=>document.querySelectorAll('#header-tools button svg').length),4);
+check(await page.evaluate(()=>document.querySelectorAll('#header-tools button svg').length),0);
 await page.screenshot({path:art+'/home-categories-1.2.5.png'});
 await page.screenshot({path:art+'/home-1.2.5-file87.png'});await page.locator('nav [data-kind="live"]').click();await page.waitForTimeout(200);await page.screenshot({path:art+'/live-1.2.5-file87.png'});
 
