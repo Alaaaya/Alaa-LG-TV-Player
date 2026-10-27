@@ -602,3 +602,17 @@ body.apple #movie-related button:focus small{color:#45454b}
 #movie-related>.note{grid-column:1/-1}
 /* Neutral fallback for secondary controls on every Apple-only page. */
 body.apple button{background:#353538;color:#f5f5f7}
+
+#home-inline{margin-top:22px;direction:ltr}
+#home-inline h2{font-size:26px;margin:12px 0}
+#home-inline-categories{display:flex;gap:12px;overflow:auto;padding:4px;margin-bottom:14px}
+#home-inline-categories button{flex-shrink:0;font-size:20px;padding:12px 22px}
+#home-inline-items{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px;max-height:550px;overflow:auto;padding:4px}
+#home-inline-items button{display:flex;flex-direction:column;gap:8px;min-width:0;padding:8px;transform:none!important}
+#home-inline-items img{width:100%;height:220px;object-fit:cover;border-radius:6px}
+#home-inline-items strong{font-size:20px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;max-width:100%}
+#home-inline-items.inline-live{display:flex;flex-direction:column}
+#home-inline-items.inline-live button{flex-direction:row;align-items:center;min-height:78px}
+#home-inline-items.inline-live img{width:60px;height:60px;object-fit:contain}
+body.apple #home-tiles button.selected{outline:3px solid #eeeef0;outline-offset:-3px;background:#eeeef0!important;color:#17171b!important}
+body.apple #home-tiles button.selected strong,body.apple #home-tiles button.selected small{color:#17171b!important}
