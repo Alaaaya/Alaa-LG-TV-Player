@@ -400,3 +400,8 @@ nav button:focus{background:#d5243e!important;color:#fff!important;outline:none!
 .home-reference #home-tiles small{position:absolute;left:14px;right:8px;bottom:7px;height:29px;line-height:29px;display:block;margin:0!important;padding:0;white-space:nowrap;font-size:16px;text-align:left}
 .home-reference #home-tiles button:focus{outline:3px solid #ed3549;outline-offset:-3px}
 .catalog-retry{font-size:20px;height:60px}
+#header-tools button svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2}
+body:not(.apple):not(.blue){--bg:#0b1320;--panel:#111b2d;--raised:#19253b;--accent:#ed3549;--tint:#421f31}
+body:not(.apple):not(.blue) #screen{background:#0b1320!important}
+body:not(.apple):not(.blue) button:focus,body:not(.apple):not(.blue) #items button:focus{background:#a51e35!important;color:white!important;outline:2px solid #ef354e;outline-offset:-2px;transform:none;box-shadow:none}
+body:not(.apple):not(.blue) nav button.selected{background:#c12237!important}
