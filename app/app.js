@@ -80,6 +80,32 @@ else{list=await xcCatalog(p,state.kind);}
 if(version!==state.request)return;state.items=list;homeCatalog[state.kind]=list;if(state.kind!=='live')homeLoadState[state.kind]='ready';render();loadHomeCatalog(p);status('تم تحميل '+list.length+' عنوان'+(p.type==='m3u'&&state.kind!=='live'?' · عناصر M3U متاحة ضمن البث المباشر':''));focusFirst();flushFeatured();
 }catch(e){if(version!==state.request)return;state.items=[];if(state.kind!=='live')homeLoadState[state.kind]='error';render();status(errorMessage(e));}}
 function button(text,fn){var b=document.createElement('button');b.textContent=text;b.onclick=fn;return b;}
+function categoryIcon(name){
+var type=name==='All'?'grid':name==='@favorites'?'heart':
+/أخبار|اخبار|news|nachricht/i.test(name)?'news':
+/رياض|sport|football|كرة/i.test(name)?'sports':
+/موسيق|اغاني|أغاني|music|hits/i.test(name)?'music':
+/دين|اسلام|إسلام|قرآن|قران|religio|islam|quran/i.test(name)?'religion':
+/أفلام|افلام|سينما|movie|film|cinema/i.test(name)?'movies':
+/طفل|اطفال|أطفال|kids|child|cartoon/i.test(name)?'kids':
+/وثائق|document|nature|طبيع/i.test(name)?'documentary':
+/تعليم|مدرس|education|learn|school/i.test(name)?'education':
+/اقتصاد|اعمال|أعمال|business|finance/i.test(name)?'business':'tv';
+var shapes={
+grid:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+news:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M6 8h12M6 12h5M6 16h5M15 12h3M15 16h3"/>',
+sports:'<circle cx="12" cy="12" r="9"/><path d="M12 7l5 4-2 6H9l-2-6zM12 3v4M21 10l-4 1M18 20l-3-3M6 20l3-3M3 10l4 1"/>',
+music:'<path d="M10 17V5l10-2v12M10 8l10-2"/><ellipse cx="7" cy="18" rx="3" ry="2"/><ellipse cx="17" cy="16" rx="3" ry="2"/>',
+religion:'<path d="M20 15A9 9 0 0 1 9 3a9 9 0 1 0 11 12z"/><path d="M17 3v5M14.5 5.5h5"/>',
+movies:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 3v18M17 3v18M3 8h4M3 16h4M17 8h4M17 16h4M10 8l5 4-5 4z"/>',
+kids:'<circle cx="12" cy="12" r="9"/><path d="M8 14q4 5 8 0M8 8v2M16 8v2"/>',
+documentary:'<circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18M5 6h14M5 18h14"/>',
+education:'<path d="M12 5Q7 2 2 5v15q5-3 10 0q5-3 10 0V5q-5-3-10 0v15"/>',
+business:'<rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V3h8v4M3 12q9 6 18 0M12 12v5"/>',
+heart:'<path d="M12 20L4 12C-2 5 7 0 12 6C17 0 26 5 20 12z"/>',
+tv:'<rect x="2" y="6" width="20" height="15" rx="3"/><path d="M7 2l5 4 5-4M8 17h8"/>'};
+var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('aria-hidden','true');svg.setAttribute('data-icon',type);svg.innerHTML=shapes[type];return svg;
+}
 function render(){
 $('screen').classList.toggle('home-reference',state.view==='home');
 $('nav-home').classList.toggle('selected',state.view==='home');
@@ -91,7 +117,7 @@ $('heading').textContent=state.episodes?'الحلقات':({live:'البث الم
 $('search').placeholder='ابحث في '+(state.episodes?'الحلقات':state.kind==='live'?'القنوات':state.kind==='movies'?'الأفلام':'المسلسلات');
 document.querySelectorAll('[data-kind]').forEach(function(b){b.classList.toggle('selected',state.view!=='home'&&b.dataset.kind===state.kind);});
 var groups={All:state.items.length};state.items.forEach(function(i){groups[i.group]=(groups[i.group]||0)+1;});var cat=$('categories');cat.replaceChildren();
-orderedGroups(Object.keys(groups)).forEach(function(g){var b=button((g==='All'?(state.episodes?'كل المواسم':'جميع التصنيفات'):g==='@favorites'?'المفضلة':g.replace(/^Season /,'الموسم ')),function(){state.group=g;state.page=0;render();if(state.kind==='live'){var chosen=$('categories').querySelector('button.selected');if(chosen)chosen.focus();}else focusFirst();});if(state.kind==='live')b.dataset.organizeGroup=g;var n=document.createElement('small');n.textContent=g==='@favorites'?state.items.filter(isFavorite).length:groups[g];b.appendChild(n);b.classList.toggle('selected',g===state.group);var icon=document.createElement('span');icon.className='category-symbol';icon.textContent=g==='All'?'▦':/رياض|sport/i.test(g)?'◉':/أخبار|news/i.test(g)?'◎':'▣';b.prepend(icon);cat.appendChild(b);});
+orderedGroups(Object.keys(groups)).forEach(function(g){var b=button((g==='All'?(state.episodes?'كل المواسم':'جميع التصنيفات'):g==='@favorites'?'المفضلة':g.replace(/^Season /,'الموسم ')),function(){state.group=g;state.page=0;render();if(state.kind==='live'){var chosen=$('categories').querySelector('button.selected');if(chosen)chosen.focus();}else focusFirst();});if(state.kind==='live')b.dataset.organizeGroup=g;var n=document.createElement('small');n.textContent=g==='@favorites'?state.items.filter(isFavorite).length:groups[g];b.appendChild(n);b.classList.toggle('selected',g===state.group);var icon=document.createElement('span');icon.className='category-symbol';icon.appendChild(categoryIcon(g));b.prepend(icon);cat.appendChild(b);});
 renderItems();homeContent();}
 
 function safeList(k){try{var list=JSON.parse(storeRead(k)||'[]');return Array.isArray(list)?list.filter(function(x){return typeof x==='string';}).slice(0,300):[];}catch(e){return [];}}
