@@ -69,6 +69,10 @@ finally{state.panelBusy=false;$('sync').disabled=false;}}
 function providers(){var select=$('providers'),old=state.provider&&state.provider.id;select.replaceChildren();state.providers.forEach(function(p){var o=document.createElement('option');o.value=p.id;o.textContent=p.name||'Playlist';select.appendChild(o);});if(old&&state.providers.some(function(p){return p.id===old;}))select.value=old;}
 async function xc(p,action,id){return JSON.parse(await request(A.xcAPI(p,action,id),null,/get_vod_streams|get_series$/.test(action)?96*1024*1024:24*1024*1024));}
 var vodCategories={movies:[],series:[]};
+function uniqueTitles(items){
+var seen=new Set();
+return items.filter(function(i){var id=i.kind+':'+i.id;if(seen.has(id))return false;seen.add(id);return true;});
+}
 async function xcCatalog(p,kind,category){
 var mode=kind==='movies'?'vod':kind==='live'?'live':'series';
 if(kind==='live'){
@@ -94,7 +98,7 @@ var cat=vodCategories[state.kind].find(function(c){return c.category_name===name
 if(!cat)return;
 var kind=state.kind,token=++state.request;status('جارٍ تحميل القسم…');
 try{var rows=await xcCatalog(state.provider,kind,cat.category_id);
-if(token!==state.request)return;state.items=rows;state.group=name;render();focusFirst();status('');
+if(token!==state.request)return;state.items=uniqueTitles(rows);state.group=name;render();focusFirst();status('');
 }catch(e){if(token===state.request)status(errorMessage(e));}
 }
 async function selectProvider(id){
@@ -108,7 +112,7 @@ async function load(){
 var p=state.provider,version=++state.request;state.items=[];state.selected=null;state.group='All';state.page=0;$('search').value='';render();if(!p)return;status('جارٍ تحميل '+(p.name||'القائمة')+'…');
 try{var list=[];if(p.type==='m3u'){list=A.parseM3U(await request(p.url,null,24*1024*1024),p.url).filter(function(i){return i.kind===state.kind;});}
 else{list=await xcCatalog(p,state.kind);}
-if(version!==state.request)return;state.items=list;homeCatalog[state.kind]=list;if(state.kind!=='live')homeLoadState[state.kind]='ready';render();loadHomeCatalog(p);status('تم تحميل '+list.length+' عنوان'+(p.type==='m3u'&&state.kind!=='live'?' · عناصر M3U متاحة ضمن البث المباشر':''));focusFirst();flushFeatured();
+if(version!==state.request)return;list=uniqueTitles(list);state.items=list;homeCatalog[state.kind]=list;if(state.kind!=='live')homeLoadState[state.kind]='ready';render();loadHomeCatalog(p);status('تم تحميل '+list.length+' عنوان'+(p.type==='m3u'&&state.kind!=='live'?' · عناصر M3U متاحة ضمن البث المباشر':''));focusFirst();flushFeatured();
 }catch(e){if(version!==state.request)return;state.items=[];if(state.kind!=='live')homeLoadState[state.kind]='error';render();status(errorMessage(e));}}
 function button(text,fn){var b=document.createElement('button');b.textContent=text;b.onclick=fn;return b;}
 function categoryIcon(name){
@@ -144,7 +148,7 @@ else{document.querySelector('.section-title').appendChild(search);}
 
 $('screen').classList.toggle('home-reference',state.view==='home');
 $('nav-home').classList.toggle('selected',state.view==='home');
-var movieNav=document.querySelector('nav [data-kind="movies"]');movieNav.lastChild.textContent=state.view==='home'?'الأفلام والمسلسلات':'الأفلام';
+var movieNav=document.querySelector('nav [data-kind="movies"]');movieNav.lastChild.textContent='الأفلام';
 $('series-detail').hidden=true;$('movie-detail').hidden=true;
 $('home').hidden=state.view!=='home';$('browser').hidden=state.view==='home';$('browser').className=state.kind==='live'?'live-view':state.episodes?'vod-view episodes-view':'vod-view poster-view';
 $('categories').setAttribute('aria-label',state.episodes?'المواسم':'التصنيفات');
@@ -270,10 +274,7 @@ var b=button('',function(){state.group=g;render();focusFirst();});
 var item=groups[g].item;if(item.backdrop)b.appendChild(image(item.backdrop));
 var t=document.createElement('span');t.textContent=g;var n=document.createElement('small');n.textContent=groups[g].count+' فيلم';b.appendChild(t);b.appendChild(n);b.classList.toggle('selected',state.group===g);genres.appendChild(b);
 });
-state.filtered.slice(0,6).forEach(function(item){
-var b=button('',function(){open(item);});b.appendChild(image(item.logo,null,item.name));
-var t=document.createElement('span');t.textContent=item.name;b.appendChild(t);var m=document.createElement('small');m.textContent=metadata(item);b.appendChild(m);shelf.appendChild(b);
-});
+shelf.hidden=true;
 $('latest-heading').textContent='جميع الأفلام'+(state.group==='All'?'':' · '+(state.group==='@favorites'?'المفضلة':state.group));
 }
 function renderWindow(start){
@@ -323,7 +324,7 @@ homeLoadState[kind]='loading';homeContent();
 try{
 var list=await xcCatalog(p,kind);
 if(state.provider!==p||epoch!==catalogEpoch)return;
-homeCatalog[kind]=list;homeLoadState[kind]='ready';
+homeCatalog[kind]=uniqueTitles(list);homeLoadState[kind]='ready';
 }catch(e){
 if(state.provider!==p||epoch!==catalogEpoch)return;
 homeLoadState[kind]='error';
@@ -381,7 +382,7 @@ var pattern={kids:/kids|child|أطفال|اطفال/i,news:/news|أخبار|اخ
 var tile=button('',function(){var kind=pattern?'live':t[0];navigate(kind);if(pattern){var match=homeCatalog.live.find(function(i){return pattern.test(i.group);});state.group=match?match.group:'All';$('search').value=match?'':'__no_matching_category__';renderItems();}});
 var art=document.createElement('span');art.className='tile-art';var im=image('assets/reference-category-'+n+'.jpg');art.appendChild(im);tile.appendChild(art);var label=document.createElement('strong');label.textContent=t[1];tile.appendChild(label);var count=document.createElement('small');count.textContent=homeLoadState[t[0]]==='loading'?'جارٍ التحميل…':homeLoadState[t[0]]==='error'?'تعذّر التحميل':homeLoadState[t[0]]==='unsupported'?'غير متاح لقائمة M3U':list.length+' '+(t[0]==='movies'?'فيلم':t[0]==='series'?'مسلسل':'قناة');tile.appendChild(count);tiles.appendChild(tile);
 });
-['movies','series'].forEach(function(kind){var el=$('home-'+kind);el.replaceChildren();var list=homeCatalog[kind].slice().sort(function(a,b){return b.added-a.added;}).slice(0,kind==='movies'?6:5);
+['movies','series'].forEach(function(kind){var el=$('home-'+kind);el.replaceChildren();var list=uniqueTitles(homeCatalog[kind]).slice().sort(function(a,b){return b.added-a.added;}).slice(0,kind==='movies'?6:5);
 list.forEach(function(i){var card=button('',function(){open(i);});card.appendChild(image(i.logo,null,i.name));
 var title=document.createElement('span');title.textContent=i.name;card.appendChild(title);
 var meta=document.createElement('small');meta.textContent=kind==='series'&&i.seasons?i.seasons+' مواسم':i.year;card.appendChild(meta);
