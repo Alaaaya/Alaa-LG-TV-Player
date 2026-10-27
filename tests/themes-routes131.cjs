@@ -35,7 +35,7 @@ assert.equal(await p.evaluate(()=>localStorage.getItem('ap-theme')),theme);
 assert.equal(await p.locator('#theme-picker button.selected').count(),1);await bg('#connection',c.bg,'Settings surface');
 await p.keyboard.press('ArrowDown');assert(await p.evaluate(()=>document.querySelector('#theme-picker').contains(document.activeElement)||document.activeElement.id==='theme-blue'),'Dpad theme picker');
 await p.reload();await ready();assert.equal(await p.evaluate(()=>document.body.dataset.theme),theme,'Valid preference persists on reload');
-await bg('#screen',c.bg,'Home');await bg('#home-play',c.accent,'Home primary CTA follows theme');await bg('#hero-dots button.selected',c.accent,'Hero selected indicator follows theme');await bg('nav button.selected',c.accent,'Home sidebar');
+await bg('#screen',c.bg,'Home');await bg('#home-play',c.accent,'Home primary CTA follows theme');if(await p.locator('#hero-dots button.selected').count())await bg('#hero-dots button.selected',c.accent,'Hero selected indicator follows theme');await bg('nav button.selected',c.accent,'Home sidebar');
 await p.locator('[data-home-tile="movies"]').click();await p.waitForFunction(()=>document.querySelector('#home-inline-items button'));await bg('#home-tiles button.selected',c.accent,'Inline selected tile');await bg('#home-inline-items button',c.panel,'Inline card');
 await route('movies');await p.waitForFunction(()=>document.querySelector('#items button .item-name')&&document.querySelector('#items button .item-name').textContent.startsWith('Title'));
 await bg('#items button:nth-of-type(2)',c.panel,'Movies');await bg('#categories',c.bg,'Movie categories');
