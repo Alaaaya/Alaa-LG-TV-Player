@@ -1122,3 +1122,15 @@ body.no-glass #player-ui button:focus{background:var(--accent)!important;color:v
 #player-ui:before,#player-ui button,#player-ui #red-sublist:not([hidden]){background:linear-gradient(#30323b,#181a22)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}}
 body[data-theme] #player-ui{background:linear-gradient(180deg,rgba(10,12,20,.28),transparent 22%,transparent 62%,rgba(0,0,0,.18) 78%,rgba(0,0,0,.48))!important}
 body.no-glass[data-theme] #player-ui button:focus,body.no-glass[data-theme] #player-ui button:focus-visible{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:var(--accent)!important}
+
+/* Playback kind comes from the actual item, including cached and M3U streams. */
+#live-now{display:none}
+#player[data-playback-kind=live] #player-ui{display:none!important}
+#player[data-playback-kind=live] #live-now{display:flex;position:absolute;left:36px;bottom:30px;align-items:center;gap:18px;max-width:80%;padding:14px 22px;border-radius:12px;background:rgba(15,18,24,.92);color:#fff;direction:ltr;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;pointer-events:none}
+#player[data-playback-kind=live] #live-now strong{font-size:26px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#live-now .channel-logo{position:relative;display:flex;align-items:center;justify-content:center;width:62px;min-width:62px;height:52px;border-radius:7px;background:#fff;color:#20232b;overflow:hidden}
+#live-now .channel-logo img{position:static;width:100%;height:100%;object-fit:contain;padding:4px;filter:none}
+#live-now .logo-initials{font-size:22px;font-weight:bold}
+#player.quick-open #live-now{visibility:hidden}
+#player[data-playback-kind=live] #player-ui:before,#player[data-playback-kind=live] #player-ui button{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+@media(max-width:1300px){#player[data-playback-kind=live] #live-now{left:24px;bottom:22px;padding:10px 16px}#player[data-playback-kind=live] #live-now strong{font-size:22px}}
