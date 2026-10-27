@@ -534,3 +534,4 @@ body.apple input,body.apple select{background:#353538!important;border-color:#56
 body.apple #home-info,body.apple #movie-resume,body.apple #series-continue,body.apple #preview-selected,body.apple #sync,body.apple #season-tabs button.selected{background:#eeeef0!important;color:#17171b!important}
 #browser.poster-view #items{grid-auto-rows:auto}
 #browser.poster-view #items button{align-self:start}
+#browser.poster-view #items button:focus{transform:none!important}
