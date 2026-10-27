@@ -489,3 +489,18 @@ button:focus,#items button:focus,.home-reference button:focus,body.apple button:
 #quick-list .quick-name{font-size:24px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #quick-list .quick-quality{font-size:20px;color:#b5b5b8;flex:0 0 auto;max-width:32%;text-align:right;direction:ltr}
 body #quick-list button:focus,body.apple #quick-list button:focus,body:not(.apple):not(.blue) #quick-list button:focus{background:linear-gradient(90deg,rgba(151,19,30,.86),rgba(69,16,21,.85))!important;border-color:#fa293c;outline:none!important;box-shadow:0 0 10px rgba(239,29,48,.6)!important;transform:none!important}
+/* Explicit theme tokens shared by every route. No preference migrations. */
+body[data-theme=red]{--bg:#101010;--panel:#1e1e1e;--raised:#303030;--accent:#ed3549;--tint:#492027}
+body[data-theme=blue]{--bg:#0a1526;--panel:#11243d;--raised:#1b3352;--accent:#318bea;--tint:#142e50}
+body[data-theme=navy]{--bg:#0b1320;--panel:#111b2d;--raised:#19253b;--accent:#ed3549;--tint:#421f31}
+body[data-theme=apple]{--bg:#151517;--panel:#242426;--raised:#353538;--accent:#eeeef0;--tint:#404044}
+body[data-theme] #screen,body[data-theme] #screen.home-reference{background:var(--bg)!important}
+body[data-theme] nav,body[data-theme] .home-reference nav,body[data-theme] #connection{background:var(--bg)!important}
+body[data-theme] aside,body[data-theme] #detail,body[data-theme] #subcategories,body[data-theme] #items button,body[data-theme] #home-tiles button,body[data-theme] #home-shelves button,body[data-theme] .episode-row{background:var(--panel)!important}
+body[data-theme] #hero,body[data-theme] #home-hero{background:var(--panel)!important}
+body[data-theme] #hero:after,body[data-theme] #home-hero:after{background:linear-gradient(90deg,transparent,var(--bg))!important}
+body[data-theme] button.selected,body[data-theme] nav button.selected,body[data-theme] .home-reference nav button.selected,body[data-theme] .home-reference nav button:focus,body[data-theme] nav button:focus,body[data-theme] #home-copy button,body[data-theme] #hero-play,body[data-theme] #movie-play,body[data-theme] #series-start,body[data-theme] #episode-play,body[data-theme] #play-selected{background:var(--accent)!important;color:#fff!important}
+body[data-theme] button:focus,body[data-theme] #items button:focus{outline:3px solid var(--accent)!important;background:var(--tint)!important;color:#fff!important}
+body[data-theme=apple] button.selected,body[data-theme=apple] nav button.selected,body[data-theme=apple] .home-reference nav button.selected,body[data-theme=apple] .home-reference nav button:focus,body[data-theme=apple] nav button:focus,body[data-theme=apple] #home-copy button,body[data-theme=apple] #hero-play,body[data-theme=apple] #movie-play,body[data-theme=apple] #series-start,body[data-theme=apple] #episode-play,body[data-theme=apple] #play-selected{background:#eeeef0!important;color:#17171b!important}
+body[data-theme=apple] button:focus,body[data-theme=apple] #items button:focus{background:#eeeef0!important;color:#17171b!important;outline-color:#fff!important}
+body[data-theme=apple] .live,body[data-theme=apple] .eyebrow{color:#c2c2c7!important}
