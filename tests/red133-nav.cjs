@@ -48,6 +48,7 @@ await p.evaluate(()=>{document.activeElement.blur();document.querySelector('#epi
 g=await geo();assert.strictEqual(g.st,0);assert.ok((await p.evaluate(()=>document.querySelector('[data-episode-index="0"]')))!==null,'top painted');
 await p.evaluate(()=>{const l=document.querySelector('#episode-list');l.scrollTop=l.scrollHeight});await p.waitForTimeout(300);
 assert.ok(await p.evaluate(()=>!!document.querySelector('[data-episode-index="79"]')),'bottom painted');g=await geo();ok('after scrollaway bottom',g);assert.ok(g.st+g.ch>=g.sh-2,'bottom reached');await p.screenshot({path:out+'/episodes-bottom-'+W+'.png'});
+{const c=await p.evaluate(()=>{const e=document.querySelector('.episode-row');e.focus();const b=e.querySelector('.episode-code'),cs=getComputedStyle(b);const pr=x=>(x.match(/[\d.]+/g)||[]).slice(0,3).map(Number);const L=a=>{const f=v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)};return .2126*f(a[0])+.7152*f(a[1])+.0722*f(a[2])};const fg=pr(cs.color),bg=pr(cs.backgroundColor),l1=L(fg),l2=L(bg);return {fg:cs.color,bg:cs.backgroundColor,ratio:(Math.max(l1,l2)+.05)/(Math.min(l1,l2)+.05)}});ok('focused badge contrast',c);assert.ok(c.ratio>=4.5,'badge contrast '+JSON.stringify(c));await p.screenshot({path:out+'/badge-focus-'+W+'.png'});}
 // inline playback + subtitles
 await p.evaluate(()=>{const v=document.getElementById('video');v.play=function(){return Promise.resolve()};v.pause=function(){};const t1=v.addTextTrack('subtitles','English','en'),t2=v.addTextTrack('subtitles','Arabic','ar');t1.mode='disabled';t2.mode='disabled';document.querySelector('[data-episode-index="79"]').focus()});
 await key('Enter');await p.waitForTimeout(500);
@@ -69,7 +70,7 @@ await p.evaluate(()=>document.querySelector('#red-sublist div button').focus());
 assert.deepStrictEqual(await tr(),['disabled','disabled'],'OFF');assert.ok(await foc());
 await key('Escape');
 // switch to Apple
-await p.evaluate(()=>{document.getElementById('player').hidden=true;});
+await key('Escape');await p.waitForTimeout(300);if(!await p.evaluate(()=>document.getElementById('player').hidden)){await key('Escape');await p.waitForTimeout(300);}assert.ok(await p.evaluate(()=>document.getElementById('player').hidden),'real Back closes player');assert.ok(await p.evaluate(()=>document.activeElement&&document.activeElement.classList.contains('episode-row')),'focus returns to episode row');
 await p.evaluate(()=>document.getElementById('theme-apple').click());await p.waitForTimeout(300);
 const ap=await p.evaluate(()=>({cls:document.body.className,fs:document.body.classList.contains('red-inline')||document.body.classList.contains('red-fs'),first:document.querySelector('.episode-row').getBoundingClientRect().top,tops:[...document.querySelectorAll('.episode-row')].slice(0,6).map(e=>Math.round(e.getBoundingClientRect().left))}));
 assert.ok(!ap.fs,'red classes cleared');assert.strictEqual(new Set(ap.tops.slice(0,5)).size,5,'apple 5 cols '+ap.tops);

@@ -643,7 +643,7 @@ body[data-theme] #player-ui{background:linear-gradient(transparent,var(--bg) 30%
 body[data-theme] #progress{accent-color:var(--accent)}
 body[data-theme] #series-detail .episode-row{background:var(--panel)!important}
 body[data-theme] #series-detail .episode-row:focus{background:var(--accent)!important;color:var(--on-accent)!important}
-body[data-theme] #movie-related button:focus small,body[data-theme] #series-detail .episode-row:focus small,body[data-theme] #series-detail .episode-row:focus .episode-code{color:var(--on-accent)!important}
+body[data-theme] #movie-related button:focus small,body[data-theme] #series-detail .episode-row:focus small,body[data-theme]:not([data-theme=red]) #series-detail .episode-row:focus .episode-code{color:var(--on-accent)!important}
 body[data-theme] #quick-channels #quick-list button:focus{background:var(--accent)!important;color:var(--on-accent)!important;border-color:var(--accent)!important;box-shadow:none!important;outline:none!important}
 body[data-theme][data-theme] #screen,body[data-theme][data-theme] #screen.home-reference{background:var(--bg)!important}
 
@@ -761,7 +761,7 @@ body[data-theme=red] #series-detail .episode-row progress{position:absolute;left
 body[data-theme=red] #series-detail .episode-row progress::-webkit-progress-bar{background:transparent}
 body[data-theme=red] #series-detail .episode-row progress::-webkit-progress-value{background:var(--accent)}
 body[data-theme=red] #series-detail .episode-row:focus{background:var(--accent)!important;color:#fff!important;outline:3px solid #fff;outline-offset:-3px}
-body[data-theme=red] #series-detail .episode-row:focus .episode-code{background:#fff;color:var(--accent)}
+body[data-theme=red] #series-detail .episode-row:focus .episode-code{background:#fff;color:#c8102e}
 body[data-theme=red] #series-detail .episode-row:focus small{color:#fff!important}
 body[data-theme=red] #series-detail .episode-row.playing{background:var(--tint)!important}
 body[data-theme=red] #series-detail .episode-spacer{display:block}
