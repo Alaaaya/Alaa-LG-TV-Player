@@ -19,7 +19,7 @@ if(u.hostname==='images.fixture')return r.fulfill({headers:cors,contentType:'ima
 
 
 const assert=require('assert/strict'),result={checks:[]},errors=[];p.on('pageerror',e=>errors.push(e.message));
-const colors={apple:{bg:'rgb(21, 21, 23)',panel:'rgb(36, 36, 38)',accent:'rgb(238, 238, 240)'},navy:{bg:'rgb(11, 19, 32)',panel:'rgb(17, 27, 45)',accent:'rgb(237, 53, 73)'},red:{bg:'rgb(16, 16, 16)',panel:'rgb(30, 30, 30)',accent:'rgb(237, 53, 73)'},blue:{bg:'rgb(10, 21, 38)',panel:'rgb(17, 36, 61)',accent:'rgb(49, 139, 234)'}};
+const colors={apple:{bg:'rgb(21, 21, 23)',panel:'rgb(36, 36, 38)',accent:'rgb(238, 238, 240)'},navy:{bg:'rgb(11, 19, 32)',panel:'rgb(17, 27, 45)',accent:'rgb(237, 53, 73)'},red:{bg:'rgb(16, 16, 16)',panel:'rgb(30, 30, 30)',movieCard:'rgb(26, 26, 26)',catBg:'rgba(0, 0, 0, 0)',episode:'rgb(21, 21, 21)',accent:'rgb(237, 53, 73)'},blue:{bg:'rgb(10, 21, 38)',panel:'rgb(17, 36, 61)',accent:'rgb(49, 139, 234)'}};
 const entry='file://'+path.resolve(process.argv[2]||'dist')+'/index.html';
 async function ready(){await p.waitForFunction(()=>document.querySelector('#home-movies button')&&document.querySelector('#home-series button')&&document.querySelector('#connection').hidden);await p.waitForTimeout(350);}
 async function bg(selector,color,label){assert.equal(await p.locator(selector).first().evaluate(el=>getComputedStyle(el).backgroundColor),color,label);}
@@ -38,17 +38,17 @@ await p.reload();await ready();assert.equal(await p.evaluate(()=>document.body.d
 await bg('#screen',c.bg,'Home');await bg('#home-play',c.accent,'Home primary CTA follows theme');await bg('#hero-dots button.selected',c.accent,'Hero selected indicator follows theme');await bg('nav button.selected',c.accent,'Home sidebar');
 await p.locator('[data-home-tile="movies"]').click();await p.waitForFunction(()=>document.querySelector('#home-inline-items button'));await bg('#home-tiles button.selected',c.accent,'Inline selected tile');await bg('#home-inline-items button',c.panel,'Inline card');
 await route('movies');await p.waitForFunction(()=>document.querySelector('#items button .item-name')&&document.querySelector('#items button .item-name').textContent.startsWith('Title'));
-await bg('#items button:nth-of-type(2)',c.panel,'Movies');await bg('#categories',c.bg,'Movie categories');
+await bg('#items button:nth-of-type(2)',c.movieCard||c.panel,'Movies');await bg('#categories',c.catBg||c.bg,'Movie categories');
 await p.locator('#items button').first().click();await p.waitForFunction(()=>!document.querySelector('#movie-detail').hidden&&document.querySelector('#movie-related button'));
 await bg('#movie-detail',c.bg,'Movie detail');await bg('#movie-related button',c.panel,'Related movies');
 const rect=await p.locator('#movie-detail').boundingBox();assert(rect.x>=0&&rect.x+rect.width<=width+1,'Movie layout preserved');
 await route('series');await p.waitForFunction(()=>document.querySelector('#items button .item-name')&&document.querySelector('#items button .item-name').textContent.startsWith('Title'));
 await p.locator('#items button').first().click();await p.waitForFunction(()=>document.querySelector('#episode-list button'));
-await bg('#series-detail',c.bg,'Series detail');await bg('#episode-list button',c.panel,'Episode grid');
-await p.locator('#episode-list button').first().focus();await p.keyboard.press('ArrowDown');assert.equal(await p.evaluate(()=>document.activeElement.dataset.episodeIndex),'5');await p.keyboard.press('Enter');assert(await p.locator('#player').isVisible());await p.keyboard.press('Escape');
+await bg('#series-detail',c.bg,'Series detail');await bg('#episode-list button',c.episode||c.panel,'Episode grid');
+await p.locator('#episode-list button').first().focus();await p.keyboard.press('ArrowDown');assert.equal(await p.evaluate(()=>document.activeElement.dataset.episodeIndex),c===colors.red?'1':'5');await p.keyboard.press('Enter');assert(await p.locator('#player').isVisible());await p.keyboard.press('Escape');
 for(const id of ['nav-favorites','nav-recent','nav-search','settings-open']){await route(id);await bg('#screen',c.bg,id);assert.equal(await p.locator('nav button.selected').count(),1);}
 await route('live');await p.waitForFunction(()=>document.querySelector('#items .item-name')&&document.querySelector('#items .item-name').textContent.startsWith('Channel'));
-await bg('#detail',c.panel,'Live preview');await p.locator('#items button').first().click();await p.keyboard.press('Enter');assert(await p.locator('#quick-channels').isVisible());await bg('#quick-channels',c.bg,'OK channel overlay');await bg('#quick-list button:focus',c.accent,'Overlay focus');await p.keyboard.press('Escape');await p.keyboard.press('Escape');
+await bg('#detail',c.panel,'Live preview');await p.locator('#items button').first().click();await p.waitForTimeout(600);await p.keyboard.press('Enter');assert(await p.locator('#quick-channels').isVisible());await bg('#quick-channels',c.bg,'OK channel overlay');await bg('#quick-list button:focus',c.accent,'Overlay focus');await p.keyboard.press('Escape');await p.keyboard.press('Escape');
 await route('nav-home');await p.screenshot({path:'artifacts/cache131/theme-'+theme+'-'+width+'.png'});
 result.checks.push({width,theme,status:'PASS',routes:'Home,inline,live,movies,movie detail,series episode grid,favorites,recent,search,settings,player OK overlay',persistence:true});
 }

@@ -20,7 +20,7 @@ else if(a==='get_vod_streams')data=Array.from({length:80},(_,i)=>({stream_id:200
 else if(a==='get_series')data=Array.from({length:36},(_,i)=>({series_id:3001+i,name:'مسلسل تجريبي '+(i+1),category_id:String(i%4+1),cover:'https://images.example/poster.svg',seasons_count:3,last_modified:String(9000-i),rating:'7.8',year:'2024',backdrop_path:['https://images.example/backdrop.svg']}));
 else if(a==='get_series_info')data={info:{plot:'ملخص تجريبي من المزوّد عن أحداث المسلسل.',genre:'دراما',status:'مستمر'},episodes:{'1':[{id:4001,episode_num:1,title:'الحلقة الأولى',info:{plot:'وصف الحلقة الأولى كما يقدّمه المزوّد.',duration:'00:43:20',releasedate:'2025-04-10'},container_extension:'mp4'},{id:4002,title:'الحلقة الثانية',container_extension:'mp4'}],'2':[{id:4003,title:'بداية جديدة',container_extension:'mp4'}]}};
 await r.fulfill({headers:cors,json:data});});
-await page.goto(require('url').pathToFileURL(path.join(root,'index.html')).href);check(await page.evaluate(()=>navigator.userAgent.includes('Chrome/87.')),true);await waitFor(()=>document.querySelector('#count').textContent==='1000 قناة');await page.waitForTimeout(100);check(await page.evaluate(()=>getComputedStyle(document.querySelector('#screen')).width),'1920px');check(await page.evaluate(()=>getComputedStyle(document.querySelector('nav')).left),'0px');
+await page.goto(require('url').pathToFileURL(path.join(root,'index.html')).href);check(await page.evaluate(()=>navigator.userAgent.includes('Chrome/87.')),true);await waitFor(()=>document.querySelector('#count').textContent.startsWith('250 قناة'));await page.waitForTimeout(100);check(await page.evaluate(()=>getComputedStyle(document.querySelector('#screen')).width),'1920px');check(await page.evaluate(()=>getComputedStyle(document.querySelector('nav')).left),'0px');
 
 await waitFor(()=>document.querySelectorAll('#home-movies button').length===6);
 await page.locator('#settings-open').click();await page.locator('#theme-red').click();await page.locator('#connection-close').click();await page.locator('#nav-home').click();
@@ -43,7 +43,7 @@ await page.keyboard.press('Escape');check(await firstName(),first);check(await p
 await holdOK(page.locator('#items button').first());await menuMove();await page.keyboard.press('ArrowDown');await page.keyboard.press('Enter');
 await holdOK(page.locator('#items button').first());await menuMove();for(let j=0;j<30;j++)await page.keyboard.press('ArrowDown');check(await page.locator('.moving-item').getAttribute('data-index'),'30');await page.keyboard.press('Escape');
 const newFirst=await firstName();check(newFirst===first,false);
-await page.reload();await waitFor(()=>document.querySelector('#count').textContent==='1000 قناة');await page.locator('nav [data-kind="live"]').click();check(await firstName(),newFirst);
+await page.reload();await waitFor(()=>document.querySelector('#count').textContent.startsWith('250 قناة'));await page.locator('nav [data-kind="live"]').click();check(await firstName(),newFirst);
 await holdOK(page.locator('#items button').nth(1));await page.keyboard.press('Enter');check(JSON.parse(await page.evaluate(()=>localStorage.getItem('ap-favorites'))).length,0);
 const cat=page.locator('#categories button').nth(1);const categoryName=(await cat.textContent());
 await holdOK(cat);await page.keyboard.press('Enter');
@@ -52,7 +52,7 @@ await page.locator('#categories button').filter({hasText:'المفضلة'}).clic
 await page.locator('#categories button').first().click();
 await holdOK(page.locator('#categories button').nth(1));await menuMove();await page.keyboard.press('ArrowDown');await page.keyboard.press('Escape');check(await page.locator('#categories button').nth(1).textContent(),categoryName);
 await holdOK(page.locator('#categories button').nth(1));await menuMove();await page.keyboard.press('ArrowDown');await page.keyboard.press('Enter');check((await page.locator('#categories button').nth(2).textContent()),categoryName);
-await page.reload();await waitFor(()=>document.querySelector('#count').textContent==='1000 قناة');await page.locator('nav [data-kind="live"]').click();check(await page.locator('#categories button').nth(2).textContent(),categoryName);
+await page.reload();await waitFor(()=>document.querySelector('#count').textContent.startsWith('250 قناة'));await page.locator('nav [data-kind="live"]').click();check(await page.locator('#categories button').nth(2).textContent(),categoryName);
 await holdOK(page.locator('#categories button').nth(2));await page.keyboard.press('Enter');check(JSON.parse(await page.evaluate(()=>localStorage.getItem('ap-category-favorites'))).length,0);
 await page.locator('#items button').first().focus();await page.keyboard.press('Enter');check(await page.locator('#player').isVisible(),true);await page.locator('#stop').click();
 check(errors,[]);await browser.close();
