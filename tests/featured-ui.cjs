@@ -14,7 +14,8 @@ window.__exports=[];window.__trace=[];window.PalmSystem={launchParams:JSON.strin
 window.PalmServiceBridge=function(){this.cancel=()=>{};this.call=(uri,raw)=>{const cmd=JSON.parse(raw).command,b64=cmd.match(/printf '%s' '([A-Za-z0-9+/=]+)'/)[1];window.__exports.push(JSON.parse(decodeURIComponent(escape(atob(b64)))));window.__trace.push('export');this.onservicecallback(JSON.stringify({returnValue:true,stdoutString:''}));};};
 HTMLMediaElement.prototype.load=function(){};HTMLMediaElement.prototype.play=function(){throw Error('Deep link must not autoplay');};HTMLMediaElement.prototype.pause=function(){};
 });
-await page.route('https://jytjcdlmygwqizgydeyp.supabase.co/**',r=>r.fulfill({json:r.request().url().includes('register_device')?{}:{status:panelStatus,playlists:[p1,p2]}}));
+const cors={'access-control-allow-origin':'*','access-control-allow-methods':'GET, POST, OPTIONS','access-control-allow-headers':'apikey, authorization, content-type'};
+await page.route('https://jytjcdlmygwqizgydeyp.supabase.co/**',r=>r.request().method()==='OPTIONS'?r.fulfill({status:204,headers:cors,body:''}):r.fulfill({headers:cors,json:r.request().url().includes('register_device')?{}:{status:panelStatus,playlists:[p1,p2]}}));
 await page.route('https://image.tmdb.org/**',r=>r.fulfill({contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg"/>'}));
 async function provider(r){const u=new URL(r.request().url()),a=u.searchParams.get('action');if(!a)return r.fulfill({body:''});calls.push(u.href);
 if(holdSeries&&u.hostname==='first.example'&&a==='get_series'){held.push(r);return;}
