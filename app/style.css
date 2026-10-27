@@ -443,3 +443,8 @@ img[data-fallback=true]{background:linear-gradient(135deg,#64273f,#253952,#15233
 header .brand,.home-reference header .brand{opacity:1;pointer-events:auto;left:25px;right:auto;top:24px;width:249px;gap:5px;z-index:2;background:#0c1220}
 .brand .ap-brand-mark{width:66px;height:66px;object-fit:contain;flex-shrink:0}
 header .brand strong,.home-reference header .brand strong{font-size:25px;color:#f3f2ef;font-weight:700;letter-spacing:-.5px}
+.home-reference #home-hero.provider-hero #home-description{
+display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+font-size:19px;line-height:30px;max-height:60px;overflow:hidden;
+margin:12px 0 0;direction:rtl;unicode-bidi:plaintext;
+}
