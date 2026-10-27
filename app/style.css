@@ -387,3 +387,16 @@ body.apple #movie-play,body.apple #movie-resume{background:#eee;color:#151515}
 #organize-panel.move-hint{left:520px;top:920px;width:1000px;padding:18px}
 #organize-panel.move-hint p{margin:0;text-align:center}
 #browser.live-view .moving-item{outline:3px solid #ffcc54!important;background:#493811!important}
+/* 1.2.5: reference pictures are artwork, never duplicate focusable text. */
+#screen.home-reference{background:#0b1320!important}
+.home-reference nav{background:#0b1320!important;top:100px;padding:16px 17px}
+.home-reference nav button{appearance:none;-webkit-appearance:none;position:relative;color:#a7afbf!important;background:transparent!important;outline:none!important;border:0!important;transform:none!important;box-shadow:none!important}
+.home-reference nav button .nav-icon{opacity:1}
+.home-reference nav button.selected,.home-reference nav button:focus{background:linear-gradient(100deg,#b31b2c,#e52d40)!important;color:#fff!important;outline:none!important;box-shadow:none!important}
+nav button:focus{background:#d5243e!important;color:#fff!important;outline:none!important;transform:none!important}
+.home-reference #home-tiles button{position:relative;height:137px;padding:0!important;overflow:hidden;display:block}
+.home-reference #home-tiles .tile-art{position:absolute;left:0;right:0;top:0;height:88px;overflow:hidden;display:block}
+.home-reference #home-tiles .tile-art img{position:absolute;left:0;top:0;width:100%;height:106px;object-fit:fill}
+.home-reference #home-tiles small{position:absolute;left:14px;right:8px;bottom:7px;height:29px;line-height:29px;display:block;margin:0!important;padding:0;white-space:nowrap;font-size:16px;text-align:left}
+.home-reference #home-tiles button:focus{outline:3px solid #ed3549;outline-offset:-3px}
+.catalog-retry{font-size:20px;height:60px}

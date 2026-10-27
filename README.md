@@ -93,3 +93,29 @@ Do not substitute a user-agent override for a real old engine. The older test
 driver avoids modern Playwright checkVisibility requirements. Mocks explicitly
 supply CORS preflight headers for the opaque file origin. Media playback and
 panel replies are fixtures, not a real-provider or physical-TV test.
+
+## 1.2.5 real-TV follow-up
+
+Owner confirmed 1.2.4 renders on the LG. Removed reference-nav/foundation
+pictures that contained duplicate labels, replacing the sidebar with real
+buttons and a red in-place focus state. Category artwork is clipped above its
+baked-in fake counts; real counts occupy their own bottom strip.
+
+Remote navigation handles LG numeric key codes explicitly (including when key
+is Unidentified). Sidebar OK opens the section, Right enters current content,
+Up/Down traverse sidebar, content Left returns to selected sidebar item, and
+461 returns a section to Home. Organization long-press handling is preserved.
+
+VOD/series fetch independently; category metadata failures no longer discard
+the stream list. Large VOD/series responses allow 96 MiB instead of 24 MiB.
+Failures now render an error/retry state, not a false empty-library message.
+M3U-only libraries explicitly explain their limitation. No public CORS proxy,
+credential forwarding or disabling web security was introduced. We cannot
+claim the owner's actual provider is fixed without another real-TV test or
+its diagnostic response; blocked provider access is reported truthfully.
+
+tests/remote125.cjs runs against real Chromium 87 file origin with mocked
+provider replies, numeric-only remote events and 57 checks. Covers movie
+HTTP failure while series succeeds, retry recovery despite failed movie
+categories, visible counts without overlap, sidebar/content navigation,
+favorites and move persistence. Screenshots are in artifacts/*1.2.5*.png.
