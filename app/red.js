@@ -137,6 +137,9 @@ function rows(){
  return [top,bot];
 }
 document.addEventListener('keydown',function(e){
+ // Live OK belongs to the app's channel overlay, never the focused Stop button.
+ // Let its bubbling handler open/select the virtualized channel list in every theme.
+ if(!player.hidden&&$('seek-back').hidden&&code(e)==='Enter')return;
  if(!player.hidden&&list.hidden&&document.activeElement===$('progress')){
   var seekKey=code(e);
   if(seekKey==='ArrowDown'||seekKey==='ArrowUp'){e.preventDefault();e.stopImmediatePropagation();$('pause').focus();return;}
