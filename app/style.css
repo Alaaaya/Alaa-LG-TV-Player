@@ -607,7 +607,7 @@ body.apple #home-tiles button.selected{outline:3px solid #eeeef0;outline-offset:
 body.apple #home-tiles button.selected strong,body.apple #home-tiles button.selected small{color:#17171b!important}
 
 /* Shared geometry is palette-independent. Every route reads the selected tokens. */
-#theme-picker{display:flex;flex-wrap:wrap;gap:12px;margin:8px 0}
+#theme-picker,#lang-picker{display:flex;flex-wrap:wrap;gap:12px;margin:8px 0}#lang-picker button{min-width:150px;font-size:22px}#lang-picker .selected{background:var(--accent);color:var(--on-accent,#fff)}
 #theme-picker button,#theme-apple,#theme-blue{display:block!important;min-width:190px;font-size:22px}
 body[data-theme]{background:var(--bg);--on-accent:#fff}
 body[data-theme=apple]{--on-accent:#17171b}

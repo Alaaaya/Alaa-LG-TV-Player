@@ -17,7 +17,7 @@ function el(tag,id,cls,text){var e=document.createElement(tag);if(id)e.id=id;if(
 var header=document.querySelector('header'),clockbox=$('clockbox');
 var crumb=el('div','red-crumb'),crumbMain=el('b'),crumbSub=el('span');crumb.appendChild(crumbMain);crumb.appendChild(crumbSub);
 var pills=el('div','red-pills-head'),pl=el('div'),pla=el('div');
-var plEm=el('em',null,null,'');pl.appendChild(document.createTextNode('Playlist: '));pl.appendChild(plEm);var plSmall=el('small',null,null,'Alaa Player');pl.appendChild(plSmall);
+var plEm=el('em',null,null,'');pl.appendChild(document.createTextNode(tr('Playlist: ')));pl.appendChild(plEm);var plSmall=el('small',null,null,'Alaa Player');pl.appendChild(plSmall);
 pla.appendChild(el('em',null,null,'Alaa Player'));pla.appendChild(el('small',null,null,'webOS'));
 pills.appendChild(pl);pills.appendChild(pla);
 header.insertBefore(crumb,clockbox);header.insertBefore(pills,clockbox);
@@ -42,7 +42,7 @@ function sync(){
 var meta=el('div','red-meta'),res=el('span','red-res');
 ui.insertBefore(meta,ui.firstChild.nextSibling);
 var bar=ui.querySelector('#time-progress');ui.insertBefore(res,bar.nextSibling);
-var wrap=el('div','red-pills'),bSub=el('button','red-sub'),bAudio=el('button','red-audio',null,'الصوت'),bAsp=el('button','red-aspect'),bFs=el('button','red-fs');
+var wrap=el('div','red-pills'),bSub=el('button','red-sub'),bAudio=el('button','red-audio',null,tr('الصوت')),bAsp=el('button','red-aspect'),bFs=el('button','red-fs');
 bSub.type=bAudio.type=bAsp.type=bFs.type='button';
 wrap.appendChild(bSub);wrap.appendChild(bAudio);wrap.appendChild(bAsp);wrap.appendChild(bFs);ui.appendChild(wrap);
 var list=el('div','red-sublist');list.hidden=true;
@@ -51,14 +51,14 @@ list.appendChild(el('h3',null,null,'\u0627\u0644\u062a\u0631\u062c\u0645\u0629 /
 var items=el('div','red-sublist-items');list.appendChild(items);player.appendChild(list);
 function pill(label,b){b.replaceChildren();var s=el('b',null,null,label[0]);b.appendChild(s);b.appendChild(document.createTextNode(label[1]));}
 var trackKind='text',trackOpenedAt=0;
-var aspects=[['contain','Original'],['cover','Zoom'],['fill','Stretch']],ai=0;
+var aspects=[['contain',tr('Original')],['cover',tr('Zoom')],['fill',tr('Stretch')]],ai=0;
 function paintPills(){
  var cur='OFF',tracks=video.textTracks||[];
  for(var i=0;i<tracks.length;i++)if(tracks[i].mode==='showing')cur=short(tracks[i],i);
- pill(['TT',cur],bSub);pill(['\u25A2',aspects[ai][1]],bAsp);pill(['\u26F6','Fullscreen'],bFs);
- bFs.lastChild.textContent=fs?'Exit':'Fullscreen';
+ pill(['TT',cur],bSub);pill(['\u25A2',aspects[ai][1]],bAsp);pill(['\u26F6',tr('Fullscreen')],bFs);
+ bFs.lastChild.textContent=fs?tr('Exit'):tr('Fullscreen');
 }
-function short(t,i){var lang=String(t.language||'').toLowerCase();return /^(ar|ara)$/.test(lang)?'العربية':/^(tr|tur)$/.test(lang)?'Türkçe':String(t.label||t.language||(trackKind==='audio'?'الصوت ':'ترجمة ')+(i+1));}
+function short(t,i){var lang=String(t.language||'').toLowerCase();return /^(ar|ara)$/.test(lang)?tr('العربية'):/^(tr|tur)$/.test(lang)?'Türkçe':String(t.label||t.language||(trackKind==='audio'?tr('الصوت '):tr('ترجمة '))+(i+1));}
 /* Experimental commercial-TV adapter. Community Lampa sequence, not a public TV API contract.
  * Never blocks playback, probes indices, reloads, stops or unloads the HTML pipeline. */
 var nativeTracks={audio:[],text:[],status:'off'},nativeGeneration=0,nativeHandles=[],nativeTimers=[],nativeSource='',nativeMediaId='',nativeAttempted=false;
@@ -83,8 +83,8 @@ function selectNative(track,off){var id=nativeMediaId,g=nativeGeneration;if(!id|
  if(kind==='audio'){choose();return;}
  nativeRequest('setSubtitleEnable',{mediaId:id,enable:!off},function(r){if(!nativeCurrent(g,id))return;if(r&&r.returnValue===false){failed();return;}if(off)commit();else nativeTimers.push(setTimeout(choose,500));},failed);
 }
-var nativeToggle=el('button','experimental-lg-tracks',null),nativeNote=el('p',null,'note','تجريبي على LG فقط. قد لا تعمل المسارات أو قد يتجمّد التشغيل حسب التلفزيون. أوقفه إذا واجهت مشكلة.');nativeToggle.type='button';
-function paintNativeToggle(){var enabled=nativeEnabled();nativeToggle.textContent='مسارات LG التجريبية: '+(enabled?'تشغيل':'إيقاف');nativeToggle.setAttribute('aria-pressed',String(enabled));}
+var nativeToggle=el('button','experimental-lg-tracks',null),nativeNote=el('p',null,'note',tr('تجريبي على LG فقط. قد لا تعمل المسارات أو قد يتجمّد التشغيل حسب التلفزيون. أوقفه إذا واجهت مشكلة.'));nativeToggle.type='button';
+function paintNativeToggle(){var enabled=nativeEnabled();nativeToggle.textContent=tr('مسارات LG التجريبية: ')+(enabled?tr('تشغيل'):tr('إيقاف'));nativeToggle.setAttribute('aria-pressed',String(enabled));}
 var settingsRow=$('glass-row');settingsRow.appendChild(nativeToggle);settingsRow.appendChild(nativeNote);paintNativeToggle();
 nativeToggle.onclick=function(){var enabled=!nativeEnabled();try{localStorage.setItem('ap-experimental-lg-tracks',enabled?'1':'0');}catch(e){return;}clearNative(enabled?'unknown':'off');nativeAttempted=false;paintNativeToggle();if(enabled)discoverNative();updateTracks();};
 ['loadedmetadata','loadeddata','canplay'].forEach(function(event){video.addEventListener(event,discoverNative);});
@@ -93,15 +93,15 @@ video.addEventListener('error',function(){clearNative('unavailable');updateTrack
 new MutationObserver(function(){if(player.hidden){clearNative(nativeEnabled()?'unknown':'off');nativeAttempted=false;nativeSource='';}else discoverNative();}).observe(player,{attributes:true,attributeFilter:['hidden']});
 function trackList(){var dom=trackKind==='audio'?video.audioTracks:video.textTracks;return dom&&dom.length?dom:nativeTracks[trackKind];}
 function paintList(){
- var focused=document.activeElement&&document.activeElement.dataset.track;items.replaceChildren();list.querySelector('h3').textContent=trackKind==='audio'?'الصوت':'الترجمة / Subtitles';var tracks=trackList()||[],none=true;
+ var focused=document.activeElement&&document.activeElement.dataset.track;items.replaceChildren();list.querySelector('h3').textContent=trackKind==='audio'?tr('الصوت'):tr('الترجمة / Subtitles');var tracks=trackList()||[],none=true;
  if(trackKind==='text'){var off=el('button',null,'sel','OFF');off.type='button';off.className='selected';items.appendChild(off);}
  for(var i=0;i<tracks.length;i++)(function(t,n){var b=el('button',null,null,short(t,n));b.type='button';b.dataset.track=n;items.appendChild(b);if(trackKind==='audio'?t.enabled:t.mode==='showing'){var off=items.querySelector('.selected');if(off)off.className='';b.className='selected';}none=false;})(tracks[i],i);
- if(none){items.appendChild(el('p',null,null,Date.now()-trackOpenedAt<1800?'جارٍ انتظار المسارات من التلفزيون…':'لم يتمكن التلفزيون من إظهار المسارات بعد. قد تكون داخل الملف لكن واجهة التشغيل لا تعرضها.'));}
+ if(none){items.appendChild(el('p',null,null,Date.now()-trackOpenedAt<1800?tr('جارٍ انتظار المسارات من التلفزيون…'):tr('لم يتمكن التلفزيون من إظهار المسارات بعد. قد تكون داخل الملف لكن واجهة التشغيل لا تعرضها.')));}
  if(focused!=null){var target=items.querySelector('[data-track="'+focused+'"]');if(target)target.focus();}
 }
 function pick(btn){var tracks=trackList()||[],idx=btn.dataset.track==null?null:Number(btn.dataset.track);if(idx!==null&&(!Number.isInteger(idx)||idx<0||idx>=tracks.length))return;
  if((idx!==null&&tracks[idx].native)||(idx===null&&tracks===nativeTracks.text&&tracks.length)){selectNative(idx===null?null:tracks[idx],idx===null);return;}
- try{for(var i=0;i<tracks.length;i++){if(trackKind==='audio')tracks[i].enabled=i===idx;else tracks[i].mode=i===idx?'showing':'disabled';}}catch(e){items.appendChild(el('p',null,null,'لم يتمكن التلفزيون من تغيير المسار.'));return;}
+ try{for(var i=0;i<tracks.length;i++){if(trackKind==='audio')tracks[i].enabled=i===idx;else tracks[i].mode=i===idx?'showing':'disabled';}}catch(e){items.appendChild(el('p',null,null,tr('لم يتمكن التلفزيون من تغيير المسار.')));return;}
  paintList();paintPills();var next=idx===null?items.querySelector('button'):items.querySelector('[data-track="'+idx+'"]');if(next)next.focus();
 }
 function openList(kind){trackKind=kind||'text';trackOpenedAt=Date.now();paintList();list.hidden=false;var b=items.querySelector('button.selected')||items.querySelector('button')||closeB;b.focus();}
