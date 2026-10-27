@@ -437,3 +437,6 @@ body:not(.apple):not(.blue) button:focus{outline:3px solid #ff7888!important;out
 .home-reference #home-hero.provider-hero #home-description{font-size:19px;line-height:1.5;max-height:86px;overflow:hidden}
 .home-reference #home-hero.provider-hero #home-copy .actions{left:0;bottom:20px}
 .home-reference #home-hero.provider-hero #home-play,.home-reference #home-hero.provider-hero #home-info,.home-reference #home-hero.provider-hero #hero-prev,.home-reference #home-hero.provider-hero #hero-next,.home-reference #home-hero.provider-hero #hero-dots{opacity:1;z-index:3}
+.episode-row{background:linear-gradient(115deg,#223248,#151f2e)}
+.episode-row .episode-art{width:92px;height:64px;object-fit:cover;border-radius:7px;float:left;margin-right:14px}
+img[data-fallback=true]{background:linear-gradient(135deg,#64273f,#253952,#152332);object-fit:cover}
