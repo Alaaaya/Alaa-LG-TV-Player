@@ -870,7 +870,7 @@ if(!list.length||!state.playing)return;
 var index=list.findIndex(function(i){return key(i)===key(state.playing);});
 var next=list[(Math.max(0,index)+delta+list.length)%list.length];
 play(next);hideControls();
-var banner=$('zap-banner');banner.textContent=(list.indexOf(next)+1)+' / '+list.length+' · '+next.name;banner.hidden=false;
+var banner=$('zap-banner');banner.textContent='';banner.hidden=true;
 clearTimeout(zapTimer);zapTimer=setTimeout(function(){banner.hidden=true;},3000);
 }
 function showControls(){clearTimeout(hideTimer);$('player-ui').classList.remove('dim');hideTimer=setTimeout(function(){if(!video.paused&&video.readyState>=3)$('player-ui').classList.add('dim');},6000);}
