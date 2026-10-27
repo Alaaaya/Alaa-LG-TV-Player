@@ -953,3 +953,7 @@ body[data-theme] #quick-channels #quick-list button:focus-visible{
 }
 
 #player.quick-open #player-ui{visibility:hidden!important;pointer-events:none}
+
+#glass-row{margin-top:14px}#glass-row button{min-width:180px}#glass-row button[aria-pressed=true]{background:var(--accent)}
+body.no-glass #quick-channels,body.no-glass.apple #quick-channels,body.no-glass[data-theme] #quick-channels{background:linear-gradient(rgba(30,31,36,.98),rgba(18,19,23,.98))!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){#quick-channels,body[data-theme] #quick-channels{background:linear-gradient(rgba(30,31,36,.98),rgba(18,19,23,.98))!important}}
