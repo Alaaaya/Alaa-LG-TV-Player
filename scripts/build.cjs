@@ -14,7 +14,7 @@ const hash = text => "'sha256-" + crypto.createHash('sha256').update(text).diges
     fs.cpSync(path.join(src,file), path.join(out,file), {recursive:true});
   let css = transform({
     filename:'style.css', code:fs.readFileSync(path.join(src,'style.css')),
-    targets:{chrome:79 << 16}, minify:false
+    targets:{chrome:79 << 16}, minify:true
   }).code.toString();
   // Font fetching in a local/opaque webOS origin differs from an HTTP dev server.
   css = css.replace(/url\(["']?(assets\/[^"')]+\.woff2)["']?\)/g, (_, file) =>
@@ -22,7 +22,7 @@ const hash = text => "'sha256-" + crypto.createHash('sha256').update(text).diges
   const scripts = [];
   for (const file of ['panel-public.js','core.js','featured.js','app.js']) {
     const result = await esbuild.transform(fs.readFileSync(path.join(src,file),'utf8'), {
-      sourcefile:file, target:'chrome79', charset:'utf8', minify:false, legalComments:'inline'
+      sourcefile:file, target:'chrome79', charset:'utf8', minify:true, legalComments:'inline'
     });
     scripts.push(result.code.replace(/<\/script/gi, '<\\/script'));
   }
