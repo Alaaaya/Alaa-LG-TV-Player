@@ -517,3 +517,20 @@ body.apple .home-reference #home-shelves h2{border-color:#d8d8de}
 body.apple #home-shelves b{background:#eeeef0!important;color:#202024!important}
 body.apple #home-tiles .tile-art{background:#343437}
 body.apple #filter-all,body.apple #filter-hd,body.apple #filter-4k{accent-color:#eeeef0}
+/* Explicit logical-screen geometry avoids old webOS flex/grid intrinsic sizing. */
+#browser.poster-view{height:894px;min-height:0;overflow:hidden}
+#browser.poster-view .library{height:838px;min-height:0;overflow:hidden;display:flex;flex-direction:column}
+#browser.poster-view .section-title{height:67px;min-height:67px;flex:0 0 67px}
+#browser.poster-view #series-chips{flex-shrink:0}
+#browser.poster-view #items{display:grid;height:751px;min-height:0;flex:1 1 0%;grid-template-columns:repeat(6,minmax(0,1fr));grid-auto-rows:236px;gap:0 17px;align-content:start;overflow-y:auto;overflow-x:hidden;padding:0 12px}
+#browser.poster-view #items .virtual-space{grid-column:1/-1;grid-row:auto;min-height:0}
+#browser.poster-view #items .virtual-space:empty{padding:0;margin:0}
+#browser.poster-view #items button{height:226px;margin:0 0 10px;padding:5px;min-height:0}
+#browser.poster-view #items img{height:165px;min-height:165px;width:100%;object-fit:cover}
+#browser.poster-view #items .item-name{font-size:17px;line-height:23px}
+#browser.poster-view #items .metadata{font-size:13px;line-height:17px}
+body.apple #categories,body.apple #series-detail,body.apple #movie-detail{background:var(--bg)!important}
+body.apple input,body.apple select{background:#353538!important;border-color:#56565c!important}
+body.apple #home-info,body.apple #movie-resume,body.apple #series-continue,body.apple #preview-selected,body.apple #sync,body.apple #season-tabs button.selected{background:#eeeef0!important;color:#17171b!important}
+#browser.poster-view #items{grid-auto-rows:auto}
+#browser.poster-view #items button{align-self:start}
