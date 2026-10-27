@@ -1162,3 +1162,8 @@ if(document.activeElement.tagName==='SELECT')return;if(document.activeElement.ta
 document.addEventListener('visibilitychange',function(){if(document.hidden){stopPreview();if(state.playing)stop(false);}});
 featuredWriter.clear();bootCatalog();setInterval(sync,30*60*1000);setInterval(function(){if(state.expires&&Date.parse(state.expires)<=Date.now()&&state.provider&&!state.provider.manual){stop();featuredQueue.clear();resetFeatured();state.items=[];state.provider=null;state.request++;render();$('activation').textContent='انتهى التفعيل. جدّد الجهاز من لوحة التحكم.';connection(true);}},60000);
 })();
+
+;(function(){var q=document.getElementById('quick-channels'),pl=document.getElementById('player');if(!q||!pl||!window.MutationObserver)return;function sync(){pl.classList.toggle('quick-open',!q.hidden);}new MutationObserver(sync).observe(q,{attributes:true,attributeFilter:['hidden']});sync();})();
+
+;(function(){var b=document.getElementById('glass-toggle');if(!b)return;var ok=!!(window.CSS&&CSS.supports&&(CSS.supports('backdrop-filter','blur(1px)')||CSS.supports('-webkit-backdrop-filter','blur(1px)')));function set(on,save){on=on&&ok;document.body.classList.toggle('no-glass',!on);b.setAttribute('aria-pressed',on?'true':'false');b.textContent='تأثير الزجاج: '+(on?'تشغيل':'إيقاف');if(save)try{localStorage.setItem('ap-glass',on?'1':'0');}catch(e){}}
+b.onclick=function(){set(document.body.classList.contains('no-glass'),true);};var v=null;try{v=localStorage.getItem('ap-glass');}catch(e){}set(v!=='0',false);})();
