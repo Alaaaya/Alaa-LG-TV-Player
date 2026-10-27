@@ -817,3 +817,137 @@ body[data-theme=red] #series-detail #series-copy{display:block}
 body[data-theme=red] #series-detail #series-description{display:-webkit-box;text-align:left;max-width:none}
 body[data-theme=red] #series-detail #series-copy>*{max-width:100%}
 body[data-theme=red] #series-detail #series-copy .actions{display:flex}
+
+
+/* Apple TV-style live channel picker */
+#quick-channels,
+body.apple #quick-channels,
+body:not(.apple) #quick-channels,
+body[data-theme] #quick-channels{
+  position:absolute!important;
+  left:5.5%!important;
+  right:auto!important;
+  top:5%!important;
+  bottom:5%!important;
+  width:55%!important;
+  max-width:920px;
+  padding:22px!important;
+  overflow:hidden!important;
+  direction:ltr;
+  color:#f5f5f7!important;
+  background:rgba(18,19,23,.78)!important;
+  border:1px solid rgba(255,255,255,.3)!important;
+  border-radius:26px!important;
+  box-shadow:0 22px 70px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.08)!important;
+  -webkit-backdrop-filter:blur(34px) saturate(145%);
+  backdrop-filter:blur(34px) saturate(145%);
+}
+#quick-channels h2{display:none!important}
+#quick-list{
+  height:100%!important;
+  max-height:100%!important;
+  overflow:hidden!important;
+  padding:2px 4px 2px 2px!important;
+}
+#quick-list button{
+  display:flex!important;
+  align-items:center!important;
+  gap:16px!important;
+  width:100%!important;
+  min-height:66px!important;
+  margin:5px 0!important;
+  padding:8px 15px!important;
+  color:rgba(255,255,255,.92)!important;
+  text-align:left!important;
+  background:rgba(255,255,255,.055)!important;
+  border:1px solid transparent!important;
+  border-radius:15px!important;
+  box-shadow:none!important;
+  font-size:19px!important;
+  transition:background .14s ease,border-color .14s ease,transform .14s ease!important;
+}
+#quick-list button:focus,
+#quick-list button:focus-visible{
+  color:#17181b!important;
+  background:rgba(255,255,255,.97)!important;
+  border:2px solid #fff!important;
+  outline:none!important;
+  box-shadow:0 0 0 1px rgba(255,255,255,.24),0 8px 26px rgba(0,0,0,.2)!important;
+  transform:scale(1.012);
+}
+#quick-list button.selected:not(:focus){
+  background:rgba(255,255,255,.13)!important;
+  border-color:rgba(255,255,255,.18)!important;
+}
+#quick-list .quick-number{
+  display:flex!important;
+  flex:0 0 34px!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:34px!important;
+  color:rgba(255,255,255,.58)!important;
+  font-size:15px!important;
+  font-weight:600!important;
+}
+#quick-list button:focus .quick-number,
+#quick-list button:focus-visible .quick-number{color:rgba(20,21,24,.6)!important}
+#quick-list .channel-logo{
+  display:flex!important;
+  flex:0 0 58px!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:58px!important;
+  min-width:58px!important;
+  height:46px!important;
+  overflow:hidden!important;
+  border-radius:9px!important;
+  background:#fff!important;
+}
+#quick-list .channel-logo img{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  object-fit:contain!important;
+  padding:4px!important;
+  background:#fff!important;
+}
+#quick-list .logo-initials{
+  color:#26272a!important;
+  font-size:16px!important;
+  font-weight:700!important;
+}
+#quick-list .quick-name{
+  flex:1 1 auto!important;
+  min-width:0!important;
+  overflow:hidden!important;
+  color:inherit!important;
+  font-size:19px!important;
+  font-weight:600!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+#quick-list .quick-quality{
+  flex:0 0 auto!important;
+  margin-left:auto!important;
+  color:rgba(255,255,255,.55)!important;
+  font-size:12px!important;
+  letter-spacing:.06em!important;
+}
+#quick-list button:focus .quick-quality,
+#quick-list button:focus-visible .quick-quality{color:rgba(20,21,24,.58)!important}
+body[data-theme] #quick-channels{color:#f5f5f7!important}
+body[data-theme] #quick-channels #quick-list button:focus,
+body[data-theme] #quick-channels #quick-list button:focus-visible{
+  background:rgba(255,255,255,.97)!important;
+  color:#17181b!important;
+  border-color:#fff!important;
+  box-shadow:0 0 0 1px rgba(255,255,255,.24),0 8px 26px rgba(0,0,0,.2)!important;
+}
+@media (max-width:900px){
+  #quick-channels,body.apple #quick-channels,body:not(.apple) #quick-channels,body[data-theme] #quick-channels{
+    left:3%!important;width:68%!important;padding:14px!important;border-radius:20px!important
+  }
+  #quick-list button{gap:10px!important;min-height:58px!important;padding:6px 10px!important}
+  #quick-list .channel-logo{flex-basis:48px!important;width:48px!important;min-width:48px!important;height:40px!important}
+  #quick-list .quick-name{font-size:16px!important}
+}
