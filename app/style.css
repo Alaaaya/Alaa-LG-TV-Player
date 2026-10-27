@@ -490,10 +490,10 @@ button:focus,#items button:focus,.home-reference button:focus,body.apple button:
 #quick-list .quick-quality{font-size:20px;color:#b5b5b8;flex:0 0 auto;max-width:32%;text-align:right;direction:ltr}
 body #quick-list button:focus,body.apple #quick-list button:focus,body:not(.apple):not(.blue) #quick-list button:focus{background:linear-gradient(90deg,rgba(151,19,30,.86),rgba(69,16,21,.85))!important;border-color:#fa293c;outline:none!important;box-shadow:0 0 10px rgba(239,29,48,.6)!important;transform:none!important}
 /* Explicit theme tokens shared by every route. No preference migrations. */
-body[data-theme=red]{--bg:#101010;--panel:#1e1e1e;--raised:#303030;--accent:#ed3549;--tint:#492027}
-body[data-theme=blue]{--bg:#0a1526;--panel:#11243d;--raised:#1b3352;--accent:#318bea;--tint:#142e50}
-body[data-theme=navy]{--bg:#0b1320;--panel:#111b2d;--raised:#19253b;--accent:#ed3549;--tint:#421f31}
-body[data-theme=apple]{--bg:#151517;--panel:#242426;--raised:#353538;--accent:#eeeef0;--tint:#404044}
+body[data-theme=red][data-theme]{--bg:#101010;--panel:#1e1e1e;--raised:#303030;--accent:#ed3549;--tint:#492027}
+body[data-theme=blue][data-theme]{--bg:#0a1526;--panel:#11243d;--raised:#1b3352;--accent:#318bea;--tint:#142e50}
+body[data-theme=navy][data-theme]{--bg:#0b1320;--panel:#111b2d;--raised:#19253b;--accent:#ed3549;--tint:#421f31}
+body[data-theme=apple][data-theme]{--bg:#151517;--panel:#242426;--raised:#353538;--accent:#eeeef0;--tint:#404044}
 body[data-theme] #screen,body[data-theme] #screen.home-reference{background:var(--bg)!important}
 body[data-theme] nav,body[data-theme] .home-reference nav,body[data-theme] #connection{background:var(--bg)!important}
 body[data-theme] aside,body[data-theme] #detail,body[data-theme] #subcategories,body[data-theme] #items button,body[data-theme] #home-tiles button,body[data-theme] #home-shelves button,body[data-theme] .episode-row{background:var(--panel)!important}
@@ -535,7 +535,7 @@ body.apple #home-info,body.apple #movie-resume,body.apple #series-continue,body.
 #browser.poster-view #items{grid-auto-rows:auto}
 #browser.poster-view #items button{align-self:start}
 #browser.poster-view #items button:focus{transform:none!important}
-body.apple #connection{left:250px;right:0;top:100px;bottom:60px;padding:36px 48px;direction:ltr;text-align:left;overflow:auto}
+body[data-theme] #connection{left:250px;right:0;top:100px;bottom:60px;padding:36px 48px;direction:ltr;text-align:left;overflow:auto}
 #connection .connect-wrap{width:850px;max-width:100%;margin:0;display:flex;flex-direction:column;align-items:stretch;gap:14px}
 #connection h1{font-size:36px;margin:4px 0}
 #connection p{margin:4px 0;line-height:1.5}
@@ -550,7 +550,7 @@ body.apple nav button.selected .nav-icon{color:#242429!important}
 body.apple #categories button.selected,body.apple #subcategories button.selected{background:#eeeef0!important;color:#17171b!important}
 body.apple #categories button.selected small{color:#343439!important}
 body.apple #preview-live{background:#eeeef0!important;color:#17171b!important}
-body.apple #series-detail{left:250px;right:0;top:100px;bottom:60px;padding:18px 28px;display:flex;flex-direction:column;overflow:hidden;direction:ltr}
+body[data-theme] #series-detail{left:250px;right:0;top:100px;bottom:60px;padding:18px 28px;display:flex;flex-direction:column;overflow:hidden;direction:ltr}
 #series-detail #series-back{align-self:flex-start;height:45px;padding:6px 18px;font-size:20px;flex-shrink:0}
 #series-detail #series-overview{height:170px;min-height:170px;display:flex;position:relative;overflow:hidden;margin:10px 0}
 #series-detail #series-poster{width:100px;height:150px;min-width:100px}
@@ -576,7 +576,7 @@ body.apple #series-detail .episode-row:focus{background:#eeeef0!important;color:
 body.apple #series-detail .episode-row:focus small,body.apple #series-detail .episode-row:focus .episode-code{color:#45454b}
 
 /* Movie details share the full-width Apple surface, not a separate side panel. */
-body.apple #movie-detail{position:absolute;left:250px;right:0;top:100px;bottom:60px;height:auto;padding:16px 28px 20px;display:flex;flex-direction:column;overflow:hidden;direction:ltr}
+body[data-theme] #movie-detail{position:absolute;left:250px;right:0;top:100px;bottom:60px;height:auto;padding:16px 28px 20px;display:flex;flex-direction:column;overflow:hidden;direction:ltr}
 #movie-detail #movie-back{align-self:flex-start;height:42px;flex-shrink:0;margin:0 0 10px;padding:6px 18px;font-size:20px}
 #movie-detail .movie-overview{position:relative;display:flex;align-items:center;gap:26px;height:300px;min-height:300px;padding:20px 24px;overflow:hidden;border-radius:12px;background:#2b2b2f}
 #movie-detail #movie-backdrop{position:absolute;inset:0;border-radius:0;opacity:.55;pointer-events:none}
@@ -616,3 +616,33 @@ body.apple button{background:#353538;color:#f5f5f7}
 #home-inline-items.inline-live img{width:60px;height:60px;object-fit:contain}
 body.apple #home-tiles button.selected{outline:3px solid #eeeef0;outline-offset:-3px;background:#eeeef0!important;color:#17171b!important}
 body.apple #home-tiles button.selected strong,body.apple #home-tiles button.selected small{color:#17171b!important}
+
+/* Shared geometry is palette-independent. Every route reads the selected tokens. */
+#theme-picker{display:flex;flex-wrap:wrap;gap:12px;margin:8px 0}
+#theme-picker button,#theme-apple,#theme-blue{display:block!important;min-width:190px;font-size:22px}
+body[data-theme]{background:var(--bg);--on-accent:#fff}
+body[data-theme=apple]{--on-accent:#17171b}
+body[data-theme] button{background:var(--raised);color:#f5f5f7}
+body[data-theme] #categories,body[data-theme] #movie-detail,body[data-theme] #series-detail,body[data-theme] #connection{background:var(--bg)!important}
+body[data-theme] input,body[data-theme] select{background:var(--raised)!important;border-color:var(--tint)!important;color:#f5f5f7!important}
+body[data-theme] #movie-related button,body[data-theme] #home-inline-items button,body[data-theme] .episode-row,body[data-theme] .activation-card,body[data-theme] .movie-overview{background:var(--panel)!important}
+body[data-theme] .movie-overview:after{background:linear-gradient(90deg,var(--panel) 5%,transparent 100%)}
+body[data-theme] #home-info,body[data-theme] #movie-resume,body[data-theme] #series-continue,body[data-theme] #sync,body[data-theme] #preview-live,body[data-theme] #preview-selected{background:var(--accent)!important;color:var(--on-accent)!important}
+body[data-theme] #home-tiles button.selected,body[data-theme] #home-inline-categories button.selected,body[data-theme] #theme-picker button.selected,body[data-theme] #categories button.selected,body[data-theme] #subcategories button.selected,body[data-theme] #season-tabs button.selected{background:var(--accent)!important;color:var(--on-accent)!important;outline-color:var(--accent)!important}
+body[data-theme] #home-tiles button.selected strong,body[data-theme] #home-tiles button.selected small,body[data-theme] #categories button.selected small{color:var(--on-accent)!important}
+body[data-theme] #movie-related button:focus,body[data-theme] #home-inline-items button:focus,body[data-theme] .episode-row:focus{background:var(--accent)!important;color:var(--on-accent)!important;outline-color:var(--accent)!important}
+body[data-theme] .episode-row progress{accent-color:var(--accent)}
+body[data-theme] #home-tiles .tile-art{background:var(--raised)}
+body[data-theme] #quick-channels{background:var(--bg)!important;border-color:var(--accent)!important;box-shadow:none!important}
+body[data-theme] #quick-list button,body[data-theme] #quick-list button.selected{background:var(--panel)!important;color:#f5f5f7!important}
+body[data-theme] #quick-list button:focus{background:var(--accent)!important;color:var(--on-accent)!important;border-color:var(--accent)!important;box-shadow:none!important;outline:none!important}
+body[data-theme] #quick-list button:focus .quick-name,body[data-theme] #quick-list button:focus .quick-quality{color:var(--on-accent)!important}
+body[data-theme] #quick-list button:focus .quick-number{background:var(--tint);color:var(--on-accent)}
+body[data-theme] #zap-banner{background:var(--panel);border-color:var(--accent)}
+body[data-theme] #player-ui{background:linear-gradient(transparent,var(--bg) 30%)}
+body[data-theme] #progress{accent-color:var(--accent)}
+body[data-theme] #series-detail .episode-row{background:var(--panel)!important}
+body[data-theme] #series-detail .episode-row:focus{background:var(--accent)!important;color:var(--on-accent)!important}
+body[data-theme] #movie-related button:focus small,body[data-theme] #series-detail .episode-row:focus small,body[data-theme] #series-detail .episode-row:focus .episode-code{color:var(--on-accent)!important}
+body[data-theme] #quick-channels #quick-list button:focus{background:var(--accent)!important;color:var(--on-accent)!important;border-color:var(--accent)!important;box-shadow:none!important;outline:none!important}
+body[data-theme][data-theme] #screen,body[data-theme][data-theme] #screen.home-reference{background:var(--bg)!important}
