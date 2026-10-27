@@ -43,6 +43,7 @@ const hash = text => "'sha256-" + crypto.createHash('sha256').update(text).diges
   fs.writeFileSync(path.join(out,'index.html'), html);
   fs.writeFileSync(path.join(out,'build-info.json'), JSON.stringify({
     version:JSON.parse(fs.readFileSync(path.join(src,'appinfo.json'))).version,
+    commit:require('child_process').execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),
     jsTarget:'chrome79',cssTarget:'chrome79',entrySHA256:crypto.createHash('sha256').update(html).digest('hex'),
     scriptHashes:scripts.map(hash),styleHash:hash(css)
   },null,2)+'\n');
