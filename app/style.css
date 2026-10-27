@@ -417,3 +417,6 @@ body:not(.apple):not(.blue) nav button.selected{background:#c12237!important}
 #items .channel-logo img,#quick-list .channel-logo img{position:absolute;inset:0;width:40px;height:40px;object-fit:contain;background:#24354c}
 #quick-list button{height:68px;margin:0 0 8px;display:flex;align-items:center;gap:14px;direction:ltr;padding:8px 13px}
 #quick-list button>span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.category-symbol{display:inline-flex;width:26px;height:26px;flex-shrink:0;align-items:center}
+.category-symbol svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+#categories button.selected .category-symbol,#categories button:focus .category-symbol{color:white}
