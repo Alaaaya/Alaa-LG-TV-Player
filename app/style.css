@@ -1207,3 +1207,82 @@ body[data-theme] #live-now button:focus{outline:.16vw solid var(--accent,#fff);o
 #live-panel button{display:block;width:100%;padding:.8vw;font-size:1.3vw;text-align:left;margin:.3vw 0}
 #live-panel p{font-size:1.3vw}
 #live-panel button:focus{outline:3px solid var(--accent);outline-offset:1px}
+/* 1.3.4 owner reference: permanent expanded Red navigation, scoped only to Red. */
+body[data-theme=red] #screen{padding-left:274px!important}
+body[data-theme=red] nav{width:274px;padding:110px 9px 22px;align-items:stretch;gap:12px;background:#101725;border:0}
+body[data-theme=red] nav button{width:256px;height:64px;min-height:64px;border-radius:7px;padding:0 16px;margin:0;gap:15px;justify-content:flex-start;direction:ltr;font-size:23px;color:#f4f5f8!important;background:transparent!important;text-align:left}
+body[data-theme=red] nav button .nav-icon{width:29px;height:29px;flex:0 0 29px;color:#f4f5f8!important}
+body[data-theme=red] nav button.selected{background:#e9364c!important}
+body[data-theme=red] nav button:focus{outline-offset:-3px}
+body[data-theme=red] nav:not(.custom-order) #settings-open{margin-top:auto}
+body[data-theme=red] nav.custom-order #settings-open{margin-top:0}
+body[data-theme=red] .brand{left:296px}
+body[data-theme=red] header{padding-left:340px}
+body[data-theme=red] main#browser,body[data-theme=red] #series-detail,body[data-theme=red] #movie-detail{left:274px!important}
+body[data-theme=red] #connection{left:274px!important;right:0!important}
+body[data-theme=red] #red-pills-head{display:none}
+body[data-theme=red] #browser.live-view>aside{width:340px}
+/* The same video instance is presented inline or fullscreen without changing src. */
+body.episode-inline #player{inset:auto!important;left:1080px!important;top:170px!important;width:800px!important;height:450px!important;z-index:6;overflow:hidden;border-radius:10px}
+body[data-theme=red].episode-inline #player{left:1060px!important;top:162px!important;width:840px!important;height:472px!important}
+body.episode-inline #player-ui{padding:28px 15px 12px}
+body.episode-inline #player-ui h1{font-size:18px}
+body.episode-inline #player-ui button{font-size:15px;padding:8px}
+body.episode-fullscreen #player{inset:0!important;width:auto!important;height:auto!important;border-radius:0!important}
+/* Clean poster artwork; caption and actual metadata always occupy their own rows. */
+body[data-theme] #browser.poster-view #items{grid-auto-rows:350px!important}
+body[data-theme=red] #browser.poster-view #items{grid-auto-rows:398px!important}
+body[data-theme] #browser.poster-view #items button{display:flex!important;flex-direction:column;align-items:stretch;height:338px!important;margin:0 0 12px!important;padding:5px!important;gap:5px!important;overflow:hidden;background:transparent!important}
+body[data-theme=red] #browser.poster-view #items button{height:386px!important}
+body[data-theme] #browser.poster-view #items img{position:static!important;inset:auto!important;width:100%!important;height:276px!important;min-height:0!important;object-fit:contain!important;border-radius:6px!important;flex:0 0 276px;background:transparent!important}
+body[data-theme=red] #browser.poster-view #items img{height:324px!important;flex-basis:324px}
+body[data-theme] #browser.poster-view #items .title-stack{position:static!important;inset:auto!important;padding:0!important;background:transparent!important;width:100%;flex:0 0 27px!important;overflow:hidden}
+body[data-theme] #browser.poster-view #items .item-name{font-size:19px!important;line-height:27px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:inherit!important;text-align:left}
+body[data-theme] #browser.poster-view #items .metadata{position:static!important;inset:auto!important;display:block!important;height:22px;min-width:0;padding:0!important;background:transparent!important;font-size:15px!important;line-height:22px;color:var(--muted)!important;text-align:left}
+body[data-theme] .home-posters button,body[data-theme] #movie-related button{display:flex!important;flex-direction:column;align-items:stretch;position:relative;height:350px!important;min-height:350px;padding:4px!important;gap:5px!important;background:transparent!important;overflow:hidden}
+body[data-theme] .home-posters img,body[data-theme] #movie-related img{position:static!important;width:100%!important;height:276px!important;min-height:276px;object-fit:contain!important;border-radius:6px}
+body[data-theme] .home-posters span,body[data-theme] #movie-related strong{position:static!important;display:block!important;inset:auto!important;width:100%;padding:0!important;line-height:27px;font-size:19px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:transparent!important;text-align:left}
+body[data-theme] .home-posters small,body[data-theme] #movie-related small{position:static!important;inset:auto!important;padding:0!important;display:block;line-height:22px;font-size:15px;background:transparent!important;color:var(--muted)!important;text-align:left}
+body[data-theme] #movie-related{grid-auto-rows:362px!important}
+body[data-theme] #home-inline-items:not(.inline-live) button{display:flex;flex-direction:column;align-items:stretch;height:350px;padding:4px;gap:5px}
+body[data-theme] #home-inline-items:not(.inline-live) img{width:100%;height:276px;object-fit:contain;flex:0 0 276px}
+body[data-theme] #home-inline-items:not(.inline-live) strong{font-size:19px;line-height:27px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body[data-theme] #home-inline-items:not(.inline-live) small{font-size:15px;line-height:22px;color:var(--muted)}
+
+/* Home repair: old reference pass hid <strong> and relied on text baked into JPGs.
+   Real semantic labels + inline SVGs remove that brittle dependency. */
+body[data-theme] .home-reference #home{overflow-y:auto;overflow-x:hidden}
+body[data-theme] .home-reference #home-tiles{width:100%;display:flex;gap:16px}
+body[data-theme] .home-reference #home-tiles button{flex:1 1 0;min-width:0;height:137px;position:relative;padding:12px 16px!important;overflow:hidden}
+body[data-theme] .home-reference #home-tiles .tile-art{position:static;display:block;width:40px;height:40px;background:transparent;overflow:visible}
+body[data-theme] .home-reference #home-tiles .tile-art svg{display:block;width:38px;height:38px;color:var(--accent);fill:none;stroke:currentColor}
+body[data-theme] .home-reference #home-tiles strong{display:block;position:static;font-size:22px;line-height:30px;height:30px;margin-top:3px;text-align:left;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;text-shadow:none}
+body[data-theme] .home-reference #home-tiles small{position:static;display:block;margin:2px 0 0!important;height:24px;line-height:24px;font-size:15px;text-align:left;white-space:nowrap}
+/* Fixed 2:3 art area works on Chromium 87 without aspect-ratio. All captions outside. */
+body[data-theme] #home-shelves{display:block}
+body[data-theme] #home-shelves>section{margin-bottom:26px}
+body[data-theme] #home-shelves .home-posters{display:flex;gap:14px;overflow-x:auto;overflow-y:hidden;padding:4px 4px 10px;direction:ltr}
+body[data-theme] #home-shelves .home-posters button{flex:0 0 192px!important;width:192px!important;min-width:192px!important;height:350px!important;min-height:350px!important}
+body[data-theme] #home-shelves .home-posters img{width:184px!important;height:276px!important;min-height:276px!important;flex:0 0 276px!important;object-fit:cover!important}
+body[data-theme] #home-shelves .home-posters span{margin:0!important;height:27px;flex:0 0 27px;min-width:0;unicode-bidi:plaintext}
+body[data-theme] #home-shelves .home-posters small{margin:0!important;height:22px;flex:0 0 22px}
+body[data-theme] #browser.poster-view #items .item-name{display:block;unicode-bidi:plaintext}
+body[data-theme] #browser.poster-view #items img,body[data-theme] #movie-related img,body[data-theme] #home-inline-items:not(.inline-live) img{object-fit:cover!important}
+
+/* Reference hero, real provider art only. Static dark extension, no live blur. */
+body[data-theme] .home-reference #home-hero{isolation:isolate;position:relative;height:350px;overflow:hidden;background:#101724!important}
+body[data-theme] .home-reference #home-hero .hero-static-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;opacity:.18;pointer-events:none}
+body[data-theme] .home-reference #home-hero .reference-hero-art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;opacity:1}
+body[data-theme] .home-reference #home-hero.hero-poster-fallback .reference-hero-art{left:auto;right:55px;top:0;bottom:0;width:43%;height:100%;object-fit:contain;object-position:right top}
+body[data-theme] .home-reference #home-hero:after{position:absolute;inset:0;content:'';display:block;background:linear-gradient(90deg,#080d18 0%,rgba(8,13,24,.92) 24%,rgba(8,13,24,.65) 49%,transparent 75%)!important;pointer-events:none;z-index:1}
+body[data-theme] .home-reference #home-hero #home-copy{position:absolute;left:65px;right:auto;top:30px;bottom:42px;width:52%;max-width:850px;z-index:2;direction:ltr}
+body[data-theme] .home-reference #home-hero #home-title{visibility:visible;font-size:34px;line-height:48px;max-height:96px;margin:0 0 6px;overflow:hidden;color:#f1eadc;text-align:left;unicode-bidi:plaintext;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+body[data-theme] .home-reference #home-hero #home-meta{visibility:visible;display:block;font-size:17px!important;line-height:24px;margin:0;color:#c8ccd3}
+body[data-theme] .home-reference #home-hero #home-meta[hidden],body[data-theme] .home-reference #home-hero #home-description[hidden]{display:none!important}
+body[data-theme] .home-reference #home-hero #home-description{visibility:visible;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-height:29px;max-height:58px;margin:8px 0 0;overflow:hidden}
+body[data-theme] .home-reference #home-hero #home-copy .actions{position:absolute;left:0;bottom:0;margin:0}
+body[data-theme] .home-reference #home-hero #home-play{position:static;opacity:1;z-index:3}
+body[data-theme] .home-reference #home-hero #hero-prev,body[data-theme] .home-reference #home-hero #hero-next{position:absolute;top:44%;width:36px;height:42px;opacity:1;z-index:4}
+body[data-theme] .home-reference #home-hero #hero-prev{left:8px}
+body[data-theme] .home-reference #home-hero #hero-next{right:8px}
+body[data-theme] .home-reference #home-hero #hero-dots{position:absolute;bottom:14px;left:45%;z-index:4;opacity:1}

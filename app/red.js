@@ -8,7 +8,8 @@ if(!body||!video||!player||!detail||!ui)return;
 var fs=false;
 function isRed(){return body.dataset.theme==='red';}
 window.APRed={
- layout:function(){return {grid:{cols:5,row:378,page:25},episodes:{cols:1,size:30,row:64}};},
+ layout:function(){return {grid:{cols:5,row:398,page:25},episodes:{cols:1,size:30,row:64}};},
+ episodeMode:function(full){fs=full;sync();paintPills();},
  inlineFree:function(){return body.classList.contains('red-inline')&&!player.contains(document.activeElement);}
 };
 function el(tag,id,cls,text){var e=document.createElement(tag);if(id)e.id=id;if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
@@ -41,14 +42,15 @@ function sync(){
 var meta=el('div','red-meta'),res=el('span','red-res');
 ui.insertBefore(meta,ui.firstChild.nextSibling);
 var bar=ui.querySelector('#time-progress');ui.insertBefore(res,bar.nextSibling);
-var wrap=el('div','red-pills'),bSub=el('button','red-sub'),bAsp=el('button','red-aspect'),bFs=el('button','red-fs');
-bSub.type=bAsp.type=bFs.type='button';
-wrap.appendChild(bSub);wrap.appendChild(bAsp);wrap.appendChild(bFs);ui.appendChild(wrap);
+var wrap=el('div','red-pills'),bSub=el('button','red-sub'),bAudio=el('button','red-audio',null,'الصوت'),bAsp=el('button','red-aspect'),bFs=el('button','red-fs');
+bSub.type=bAudio.type=bAsp.type=bFs.type='button';
+wrap.appendChild(bSub);wrap.appendChild(bAudio);wrap.appendChild(bAsp);wrap.appendChild(bFs);ui.appendChild(wrap);
 var list=el('div','red-sublist');list.hidden=true;
 var closeB=el('button','red-sub-close',null,'\u2715');closeB.type='button';closeB.setAttribute('aria-label','close');list.appendChild(closeB);
 list.appendChild(el('h3',null,null,'\u0627\u0644\u062a\u0631\u062c\u0645\u0629 / Subtitles'));
 var items=el('div','red-sublist-items');list.appendChild(items);player.appendChild(list);
 function pill(label,b){b.replaceChildren();var s=el('b',null,null,label[0]);b.appendChild(s);b.appendChild(document.createTextNode(label[1]));}
+var trackKind='text',trackOpenedAt=0;
 var aspects=[['contain','Original'],['cover','Zoom'],['fill','Stretch']],ai=0;
 function paintPills(){
  var cur='OFF',tracks=video.textTracks||[];
@@ -56,32 +58,64 @@ function paintPills(){
  pill(['TT',cur],bSub);pill(['\u25A2',aspects[ai][1]],bAsp);pill(['\u26F6','Fullscreen'],bFs);
  bFs.lastChild.textContent=fs?'Exit':'Fullscreen';
 }
-function short(t,i){return String(t.language||t.label||'Track '+(i+1)).slice(0,3).toUpperCase();}
+function short(t,i){var lang=String(t.language||'').toLowerCase();return /^(ar|ara)$/.test(lang)?'العربية':/^(tr|tur)$/.test(lang)?'Türkçe':String(t.label||t.language||(trackKind==='audio'?'الصوت ':'ترجمة ')+(i+1));}
+/* Experimental commercial-TV adapter. Community Lampa sequence, not a public TV API contract.
+ * Never blocks playback, probes indices, reloads, stops or unloads the HTML pipeline. */
+var nativeTracks={audio:[],text:[],status:'off'},nativeGeneration=0,nativeHandles=[],nativeTimers=[],nativeSource='',nativeMediaId='',nativeAttempted=false;
+function nativeEnabled(){try{return localStorage.getItem('ap-experimental-lg-tracks')==='1';}catch(e){return false;}}
+function actualLG(){return /web[o0]s|netcast/i.test(navigator.userAgent)&&!!(window.PalmSystem||window.webOS)&&!!(window.PalmServiceBridge||(window.webOS&&window.webOS.service&&window.webOS.service.request));}
+function clearNative(status){nativeGeneration++;nativeTimers.forEach(clearTimeout);nativeTimers=[];nativeHandles.forEach(function(h){try{if(h&&typeof h.cancel==='function')h.cancel();}catch(e){}});nativeHandles=[];nativeTracks={audio:[],text:[],status:status||'unknown'};nativeMediaId='';}
+function nativeCurrent(g,id){return g===nativeGeneration&&nativeEnabled()&&actualLG()&&!player.hidden&&String(video.currentSrc||video.src||'')===nativeSource&&String(video.mediaId||'')===id;}
+function nativeRequest(method,parameters,success,failure){try{var h;if(window.webOS&&window.webOS.service&&window.webOS.service.request){h=window.webOS.service.request('luna://com.webos.media',{method:method,parameters:parameters,onSuccess:function(r){try{success(r);}catch(e){failure();}},onFailure:failure});}else{h=new window.PalmServiceBridge();h.onservicecallback=function(raw){try{var r=JSON.parse(raw);if(r.returnValue===false||r.errorCode)failure();else success(r);}catch(e){failure();}};h.call('luna://com.webos.media/'+method,JSON.stringify(parameters));}nativeHandles.push(h);return h;}catch(e){failure();return null;}}
+function nativeFail(g){if(g!==nativeGeneration)return;clearNative('unavailable');updateTracks();}
+function discoverNative(){
+ var src=String(video.currentSrc||video.src||'');if(src!==nativeSource){clearNative('unknown');nativeSource=src;nativeAttempted=false;}
+ if(!nativeEnabled()||!actualLG()||player.hidden||!src||nativeAttempted)return;
+ nativeAttempted=true;nativeTracks.status='loading';var g=nativeGeneration,tries=0;
+ function seekId(){if(g!==nativeGeneration||!nativeEnabled()||player.hidden)return;var id=String(video.mediaId||'');if(!id){if(++tries<5)nativeTimers.push(setTimeout(seekId,300));else nativeFail(g);return;}nativeMediaId=id;
+ nativeRequest('subscribe',{mediaId:id,subscribe:true},function(r){if(!nativeCurrent(g,id))return;var programs=r&&r.sourceInfo&&r.sourceInfo.programInfo;if(!Array.isArray(programs)||programs.length!==1)return;var program=programs[0];['audio','text'].forEach(function(kind){var entries=program[kind==='audio'?'audioTrackInfo':'subtitleTrackInfo'];if(!Array.isArray(entries))return;nativeTracks[kind]=entries.map(function(t,index){if(!t||typeof t!=='object')return null;return{native:true,nativeIndex:index,mediaId:id,generation:g,language:String(t.language||''),label:'',enabled:kind==='audio'&&index===0,mode:'disabled'};}).filter(Boolean);});nativeTracks.status='ready';updateTracks();},function(){nativeFail(g);});
+ nativeTimers.push(setTimeout(function(){if(!nativeCurrent(g,id))return;if(nativeTracks.status!=='ready')nativeFail(g);else{nativeHandles.forEach(function(h){try{if(h&&h.cancel)h.cancel();}catch(e){}});nativeHandles=[];}},4000));
+ }seekId();
+}
+function selectNative(track,off){var id=nativeMediaId,g=nativeGeneration;if(!id||!nativeCurrent(g,id))return;var kind=trackKind;var selected=off?null:track;if(!off&&(!selected||selected.generation!==g||selected.mediaId!==id||nativeTracks[kind].indexOf(selected)<0))return;
+ var failed=function(){nativeFail(g);};function commit(){if(!nativeCurrent(g,id))return;nativeTracks[kind].forEach(function(t){if(kind==='audio')t.enabled=t===selected;else t.mode=t===selected?'showing':'disabled';});updateTracks();}
+ function choose(){if(!nativeCurrent(g,id))return;nativeRequest('selectTrack',{type:kind==='audio'?'audio':'text',mediaId:id,index:selected.nativeIndex},function(r){if(r&&r.returnValue===false)failed();else commit();},failed);}
+ if(kind==='audio'){choose();return;}
+ nativeRequest('setSubtitleEnable',{mediaId:id,enable:!off},function(r){if(!nativeCurrent(g,id))return;if(r&&r.returnValue===false){failed();return;}if(off)commit();else nativeTimers.push(setTimeout(choose,500));},failed);
+}
+var nativeToggle=el('button','experimental-lg-tracks',null),nativeNote=el('p',null,'note','تجريبي على LG فقط. قد لا تعمل المسارات أو قد يتجمّد التشغيل حسب التلفزيون. أوقفه إذا واجهت مشكلة.');nativeToggle.type='button';
+function paintNativeToggle(){var enabled=nativeEnabled();nativeToggle.textContent='مسارات LG التجريبية: '+(enabled?'تشغيل':'إيقاف');nativeToggle.setAttribute('aria-pressed',String(enabled));}
+var settingsRow=$('glass-row');settingsRow.appendChild(nativeToggle);settingsRow.appendChild(nativeNote);paintNativeToggle();
+nativeToggle.onclick=function(){var enabled=!nativeEnabled();try{localStorage.setItem('ap-experimental-lg-tracks',enabled?'1':'0');}catch(e){return;}clearNative(enabled?'unknown':'off');nativeAttempted=false;paintNativeToggle();if(enabled)discoverNative();updateTracks();};
+['loadedmetadata','loadeddata','canplay'].forEach(function(event){video.addEventListener(event,discoverNative);});
+video.addEventListener('emptied',function(){clearNative(nativeEnabled()?'unknown':'off');nativeAttempted=false;nativeSource='';updateTracks();});
+video.addEventListener('error',function(){clearNative('unavailable');updateTracks();});
+new MutationObserver(function(){if(player.hidden){clearNative(nativeEnabled()?'unknown':'off');nativeAttempted=false;nativeSource='';}else discoverNative();}).observe(player,{attributes:true,attributeFilter:['hidden']});
+function trackList(){var dom=trackKind==='audio'?video.audioTracks:video.textTracks;return dom&&dom.length?dom:nativeTracks[trackKind];}
 function paintList(){
- items.replaceChildren();var tracks=video.textTracks||[],none=true;
- var off=el('button',null,'sel','OFF');off.type='button';off.className='selected';
- items.appendChild(off);
- for(var i=0;i<tracks.length;i++)(function(t,n){
-  var b=el('button',null,null,short(t,n)+(t.label&&t.label!==short(t,n)?' \u00b7 '+t.label:''));b.type='button';b.dataset.track=n;items.appendChild(b);
-  if(t.mode==='showing'){off.className='';b.className='selected';}none=false;
- })(tracks[i],i);
- if(none){var p=el('p',null,null,'\u0644\u0627 \u062a\u0648\u062c\u062f \u062a\u0631\u062c\u0645\u0627\u062a \u0645\u062a\u0627\u062d\u0629');items.appendChild(p);}
+ var focused=document.activeElement&&document.activeElement.dataset.track;items.replaceChildren();list.querySelector('h3').textContent=trackKind==='audio'?'الصوت':'الترجمة / Subtitles';var tracks=trackList()||[],none=true;
+ if(trackKind==='text'){var off=el('button',null,'sel','OFF');off.type='button';off.className='selected';items.appendChild(off);}
+ for(var i=0;i<tracks.length;i++)(function(t,n){var b=el('button',null,null,short(t,n));b.type='button';b.dataset.track=n;items.appendChild(b);if(trackKind==='audio'?t.enabled:t.mode==='showing'){var off=items.querySelector('.selected');if(off)off.className='';b.className='selected';}none=false;})(tracks[i],i);
+ if(none){items.appendChild(el('p',null,null,Date.now()-trackOpenedAt<1800?'جارٍ انتظار المسارات من التلفزيون…':'لم يتمكن التلفزيون من إظهار المسارات بعد. قد تكون داخل الملف لكن واجهة التشغيل لا تعرضها.'));}
+ if(focused!=null){var target=items.querySelector('[data-track="'+focused+'"]');if(target)target.focus();}
 }
-function pick(btn){
- var idx=btn.dataset.track!=null?btn.dataset.track:null;
- var tracks=video.textTracks||[];
- for(var i=0;i<tracks.length;i++)tracks[i].mode='disabled';
- if(btn.dataset.track!=null&&tracks[btn.dataset.track])tracks[btn.dataset.track].mode='showing';
- paintList();paintPills();
- var nb=idx!=null?items.querySelector('button[data-track="'+idx+'"]'):items.querySelector('button');if(nb)nb.focus();
+function pick(btn){var tracks=trackList()||[],idx=btn.dataset.track==null?null:Number(btn.dataset.track);if(idx!==null&&(!Number.isInteger(idx)||idx<0||idx>=tracks.length))return;
+ if((idx!==null&&tracks[idx].native)||(idx===null&&tracks===nativeTracks.text&&tracks.length)){selectNative(idx===null?null:tracks[idx],idx===null);return;}
+ try{for(var i=0;i<tracks.length;i++){if(trackKind==='audio')tracks[i].enabled=i===idx;else tracks[i].mode=i===idx?'showing':'disabled';}}catch(e){items.appendChild(el('p',null,null,'لم يتمكن التلفزيون من تغيير المسار.'));return;}
+ paintList();paintPills();var next=idx===null?items.querySelector('button'):items.querySelector('[data-track="'+idx+'"]');if(next)next.focus();
 }
-function openList(){paintList();list.hidden=false;var b=items.querySelector('button.selected')||items.querySelector('button');if(b)b.focus();}
-function closeList(){if(list.hidden)return false;list.hidden=true;bSub.focus();return true;}
-bSub.onclick=function(){if(list.hidden)openList();else closeList();};
-closeB.onclick=closeList;
-items.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('button');if(b)pick(b);});
+function openList(kind){trackKind=kind||'text';trackOpenedAt=Date.now();paintList();list.hidden=false;var b=items.querySelector('button.selected')||items.querySelector('button')||closeB;b.focus();}
+function closeList(){if(list.hidden)return false;list.hidden=true;(trackKind==='audio'?bAudio:bSub).focus();return true;}
+bSub.onclick=function(){if(list.hidden||trackKind!=='text')openList('text');else closeList();};
+bAudio.onclick=function(){if(list.hidden||trackKind!=='audio')openList('audio');else closeList();};
+closeB.onclick=closeList;items.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('button');if(b)pick(b);});
+function updateTracks(){paintPills();if(!list.hidden)paintList();}
+['loadedmetadata','loadeddata','canplay','emptied'].forEach(function(event){video.addEventListener(event,updateTracks);});
+[video.audioTracks,video.textTracks].forEach(function(tracks){if(tracks&&tracks.addEventListener)['addtrack','removetrack','change'].forEach(function(event){tracks.addEventListener(event,updateTracks);});});
+// No URLs, provider names, media IDs, credentials or raw native payloads.
+window.APTrackDiagnostics=function(){var result={htmlAudioExposed:!!video.audioTracks,htmlTextExposed:!!video.textTracks,readyState:video.readyState,errorCode:video.error&&video.error.code||0,nativeRoute:nativeEnabled()?(actualLG()?nativeTracks.status:'not-LG'):'off',nativeAudioCount:nativeTracks.audio.length,nativeTextCount:nativeTracks.text.length};['audio','text'].forEach(function(kind){var list=kind==='audio'?video.audioTracks:video.textTracks;result[kind]=Array.from(list||[]).map(function(t,index){return{index:index,language:String(t.language||'').replace(/[^a-zA-Z-]/g,'').slice(0,12),selected:kind==='audio'?!!t.enabled:t.mode==='showing'};});});return result;};
 bAsp.onclick=function(){ai=(ai+1)%aspects.length;video.style.objectFit=aspects[ai][0];paintPills();};
-bFs.onclick=function(){fs=!fs;sync();paintPills();bFs.focus();};
+bFs.onclick=function(){if(player.dataset.playbackKind==='episode'&&window.APEpisodePresentation){window.APEpisodePresentation.fullscreen(!body.classList.contains('episode-fullscreen'));return;}fs=!fs;sync();paintPills();bFs.focus();};
 if(video.textTracks&&video.textTracks.addEventListener){video.textTracks.addEventListener('addtrack',function(){paintPills();if(!list.hidden)paintList();});video.textTracks.addEventListener('removetrack',paintPills);}
 /* metadata line, rating stars (from the series' own rating), resolution */
 function updateMeta(){
@@ -139,12 +173,15 @@ function rows(){
 // Deterministic VOD focus map shared by every palette. No spatial guessing.
 function vodRows(){
  var first=[$('seek-back'),$('pause'),$('progress'),$('seek-forward')].filter(visible);
- var order=['stop','red-sub','red-aspect','red-fs','quick-toggle','retry'];
+ var order=['stop','red-sub','red-audio','red-aspect','red-fs','quick-toggle','retry'];
  var second=order.map($).filter(visible);
  Array.prototype.slice.call(ui.querySelectorAll('button')).filter(visible).forEach(function(b){if(first.indexOf(b)<0&&second.indexOf(b)<0)second.push(b);});
  return [first,second];
 }
 window.addEventListener('keydown',function(e){
+ if(window.APOrganizationActive)return;
+ if(!detail.hidden&&body.classList.contains('episode-inline'))return;
+ if(isBack(e)&&list.hidden&&player.dataset.playbackKind==='episode'&&body.classList.contains('episode-fullscreen'))return;
  if(player.hidden||player.dataset.playbackKind==='live'||!list.hidden||!$('quick-channels').hidden||ui.classList.contains('dim'))return;
  var k=code(e),a=document.activeElement;
  if(!ui.contains(a))return;
@@ -161,6 +198,9 @@ window.addEventListener('keydown',function(e){
  if(target)target.focus({preventScroll:true});
 },true);
 window.addEventListener('keydown',function(e){
+ if(window.APOrganizationActive)return;
+ if(!detail.hidden&&body.classList.contains('episode-inline'))return;
+ if(isBack(e)&&list.hidden&&player.dataset.playbackKind==='episode'&&body.classList.contains('episode-fullscreen'))return;
  // Live OK belongs to the app's channel overlay, never the focused Stop button.
  // Let its bubbling handler open/select the virtualized channel list in every theme.
  if(!player.hidden&&$('seek-back').hidden&&code(e)==='Enter')return;

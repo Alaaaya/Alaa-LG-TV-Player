@@ -18,7 +18,7 @@ await p.waitForFunction(()=>document.querySelector('#home-tiles button')&&docume
 await p.locator('nav [data-kind="series"]').click();await p.waitForSelector('#items button');await p.locator('#items button').first().click();
 await p.waitForSelector('.episode-row');await p.locator('.episode-row').nth(1).click();
 await p.waitForFunction(()=>!document.getElementById('player').hidden);
-if(theme==='red'){await p.waitForTimeout(100);await p.locator('#red-fs').click().catch(()=>{});}
+await p.evaluate(()=>window.APEpisodePresentation.fullscreen(true));
 await p.waitForFunction(()=>{const v=document.getElementById('video');return v.readyState>=3&&v.currentTime>0.1&&v.duration>0});
 const tag=theme+'@'+W;
 const S=()=>p.evaluate(()=>{const v=document.getElementById('video'),bar=document.getElementById('progress');const track=getComputedStyle(bar,'::-webkit-slider-runnable-track').backgroundImage;return{t:v.currentTime,d:v.duration,paused:v.paused,val:Number(bar.value),p:bar.style.getPropertyValue('--p'),dis:bar.disabled,label:document.getElementById('time-progress').textContent,track,bar:bar.getBoundingClientRect().toJSON()}});
@@ -29,7 +29,7 @@ const id=()=>p.evaluate(()=>document.activeElement.id);
 await p.evaluate(()=>document.getElementById('video').pause());
 for(const kind of ['vod','episode']){
 await p.evaluate(kind=>document.getElementById('player').dataset.playbackKind=kind,kind);
-const rows=await p.evaluate(()=>{const v=e=>!e.disabled&&!e.hidden&&e.offsetParent!==null;const a=['seek-back','pause','progress','seek-forward'].map(x=>document.getElementById(x)).filter(v);const b=['stop','red-sub','red-aspect','red-fs','quick-toggle','retry'].map(x=>document.getElementById(x)).filter(v);Array.from(document.querySelectorAll('#player-ui button')).filter(v).forEach(e=>{if(!a.includes(e)&&!b.includes(e))b.push(e)});return[a.map(e=>e.id),b.map(e=>e.id)]});
+const rows=await p.evaluate(()=>{const v=e=>!e.disabled&&!e.hidden&&e.offsetParent!==null;const a=['seek-back','pause','progress','seek-forward'].map(x=>document.getElementById(x)).filter(v);const b=['stop','red-sub','red-audio','red-aspect','red-fs','quick-toggle','retry'].map(x=>document.getElementById(x)).filter(v);Array.from(document.querySelectorAll('#player-ui button')).filter(v).forEach(e=>{if(!a.includes(e)&&!b.includes(e))b.push(e)});return[a.map(e=>e.id),b.map(e=>e.id)]});
 for(let row=0;row<2;row++)for(let ix=0;ix<rows[row].length;ix++){
 const cur=rows[row][ix];await focus(cur);
 const scroll=await p.evaluate(()=>[scrollX,scrollY,document.querySelector('#player-ui').scrollTop]);
