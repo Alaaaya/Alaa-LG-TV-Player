@@ -1,6 +1,6 @@
 const{chromium}=require('/home/kit/tmp/player124/node_modules/playwright'),fs=require('fs'),assert=require('assert/strict'),path=require('path');
 const DIST='file://'+path.resolve(__dirname,'../dist/index.html');
-(async()=>{const video=fs.readFileSync('/home/kit/tmp/ovfix/clip4.webm');
+(async()=>{const video=fs.readFileSync('/home/kit/tmp/ovfix/seek65.webm');
 const b=await chromium.launch({executablePath:'/home/kit/tmp/player124/chrome-linux/chrome',headless:true,args:['--no-sandbox','--autoplay-policy=no-user-gesture-required']});
 try{for(const theme of ['apple','navy','red','blue'])for(const W of [1920,1280]){const H=W*9/16;const c=await b.newContext({bypassCSP:true,viewport:{width:W,height:H}}),p=await c.newPage();
 await p.addInitScript(t=>localStorage.setItem('ap-theme',t),theme);
@@ -37,9 +37,9 @@ await p.evaluate(()=>{const v=document.getElementById('video');v.loop=false;v.cu
 (await p.evaluate(()=>{const v=document.getElementById('video');return JSON.stringify({seekable:v.seekable.length&&[v.seekable.start(0),v.seekable.end(0)],t:v.currentTime,rs:v.readyState,ui:document.getElementById('player-ui').className,hid:document.getElementById('seek-forward').hidden,kind:document.getElementById('player').dataset.playbackKind})}));const before=await S();await focusId('seek-forward');await p.keyboard.press('Enter');await p.waitForTimeout(150);const f=await S();
 assert.ok(f.t>before.t,tag+' forward moved '+JSON.stringify([before,f]));assert.ok(Math.abs(f.val-f.t/f.d*100)<0.5,tag+' fwd sync');
 await focusId('seek-back');await p.keyboard.press('Enter');await p.waitForTimeout(150);const bk=await S();
-assert.equal(bk.t,0,tag+' back clamps to 0 (clip < 30s)');assert.equal(bk.val,0);
+assert.ok(bk.t<0.3,tag+' back returns near start');assert.ok(bk.val<1);
 await focusId('seek-forward');await p.keyboard.press('Enter');await p.waitForTimeout(150);const e=await S();
-assert.ok(Math.abs(e.t-e.d)<0.05||e.t>0,tag+' end');assert.ok(e.t<=e.d+1e-6);assert.ok(e.val<=100.0001);
+assert.ok(e.t>=29.9,tag+' forward 30 seconds');assert.ok(e.t<=e.d+1e-6);assert.ok(e.val<=100.0001);
 // scrubber via keyboard
 await focusId('progress');await p.keyboard.press('Home');await p.waitForTimeout(100);let h=await S();assert.equal(h.t,0);assert.equal(h.val,0);
 await p.keyboard.press('End');await p.waitForTimeout(100);h=await S();assert.ok(Math.abs(h.val-100)<.01);assert.ok(h.t<=h.d&&h.t>=h.d-0.1,tag+' End seeks to end '+h.t+' '+h.d);
@@ -53,11 +53,35 @@ await p.evaluate(()=>{document.getElementById('player-ui').classList.remove('dim
 for(const id of ['pause','seek-forward','stop']){await focusId(id);const ring=await p.evaluate(i=>{const el=document.getElementById(i),cs=getComputedStyle(el),r=el.getBoundingClientRect();return{outline:cs.outlineStyle,ow:cs.outlineWidth,shadow:cs.boxShadow,tf:cs.transform,radius:cs.borderTopLeftRadius,x:r.x,y:r.y,w:r.width,h:r.height}},id);
 assert.ok(ring.outline==='none'||ring.ow==='0px',tag+id+' no outline');assert.match(ring.shadow,/rgb\(255, 255, 255\) 0px 0px 0px 2px/);assert.doesNotMatch(ring.shadow,/\d+px \d+px 2\dpx/);assert.equal(ring.tf,'none');assert.notEqual(ring.radius,'0px');
 await p.evaluate(()=>document.activeElement.blur());const un=await p.evaluate(i=>{const r=document.getElementById(i).getBoundingClientRect();return[r.x,r.y,r.width,r.height]},id);assert.deepEqual(un,[ring.x,ring.y,ring.w,ring.h],tag+id+' no layout shift');}
-// subtitle picker ring
-if(theme==='red'){const ok=await p.evaluate(()=>{const l=document.getElementById('red-sublist');l.hidden=false;const bt=document.createElement('button');bt.textContent='OFF';document.getElementById('red-sublist-items').appendChild(bt);bt.focus();const cs=getComputedStyle(bt);const r={o:cs.outlineStyle,s:cs.boxShadow,t:cs.transform};l.hidden=true;bt.remove();return r});assert.equal(ok.o,'none');assert.match(ok.s,/255, 255, 255\) 0px 0px 0px 2px/);}
+// Real subtitle picker OFF button, every theme.
+await focusId('red-sub');await p.keyboard.press('Enter');
+await p.waitForFunction(()=>!document.getElementById('red-sublist').hidden);
+const ring=await p.evaluate(()=>{const b=document.activeElement,c=getComputedStyle(b);return{txt:b.textContent,o:c.outlineStyle,s:c.boxShadow,t:c.transform}});
+assert.match(ring.txt,/OFF|إيقاف/);assert.equal(ring.o,'none');assert.match(ring.s,/255, 255, 255\) 0px 0px 0px 2px/);assert.equal(ring.t,'none');
+await p.keyboard.press('Escape');
+// Hidden-controls +/-10s, numeric LG keycodes, held repeats, no focus changes.
+for(const playing of [false,true]){
+await p.evaluate(playing=>{const v=document.getElementById('video');v.currentTime=20;v.loop=false;if(playing)v.play();else v.pause();document.getElementById('pause').focus();document.getElementById('player-ui').classList.add('dim')},playing);
+await p.waitForTimeout(250);await p.evaluate(()=>document.getElementById('player-ui').classList.add('dim'));await p.waitForTimeout(50);const before=await S(),hiddenFocus=await p.evaluate(()=>document.activeElement.id);
+await p.evaluate(id=>window.__hiddenFocus=id,hiddenFocus);await p.keyboard.press('ArrowRight');await p.waitForTimeout(100);const right=await S();
+assert.ok(right.t-before.t>=9.8&&right.t-before.t<10.6,tag+' right ten '+JSON.stringify({before,right,playing}));
+assert.ok(await p.evaluate(()=>document.getElementById('player-ui').classList.contains('dim')&&!document.getElementById('seek-feedback').hidden&&document.activeElement.id===window.__hiddenFocus),tag+' hidden no focus steal');
+await p.evaluate(()=>document.dispatchEvent(new KeyboardEvent('keydown',{keyCode:37,which:37,bubbles:true})));await p.waitForTimeout(100);
+assert.ok(Math.abs((await S()).t-before.t)<.8,tag+' numeric left ten');
+await p.evaluate(()=>{for(let i=0;i<9;i++)document.dispatchEvent(new KeyboardEvent('keydown',{keyCode:39,which:39,repeat:true,bubbles:true}))});await p.waitForTimeout(120);
+assert.ok(Math.abs((await S()).t-(await S()).d)<.2,tag+' repeated right clamps');
+await p.evaluate(()=>{for(let i=0;i<9;i++)document.dispatchEvent(new KeyboardEvent('keydown',{keyCode:37,which:37,repeat:true,bubbles:true}))});await p.waitForTimeout(100);
+assert.ok((await S()).t<.4,tag+' repeated left clamps');
+await p.waitForTimeout(1600);assert.ok(await p.evaluate(()=>document.getElementById('seek-feedback').hidden),tag+' feedback autohide');
+assert.equal(await p.evaluate(()=>document.activeElement.id),hiddenFocus);
+await p.evaluate(()=>{document.getElementById('video').pause();document.getElementById('player-ui').classList.remove('dim')});
+}
+await p.evaluate(()=>{const v=document.getElementById('video');v.currentTime=20;document.getElementById('progress').focus()});await p.waitForTimeout(100);
+await p.keyboard.press('ArrowRight');await p.waitForTimeout(120);assert.ok(Math.abs((await S()).t-30)<.3,tag+' visible scrubber ten');
+await focusId('pause');const navTime=(await S()).t;await p.keyboard.press('ArrowRight');assert.equal((await S()).t,navTime,tag+' visible navigation no seek');
 // unknown / NaN / Infinity / zero duration (synthetic: duration property overridden)
 for(const dv of [0,NaN,Infinity]){await p.evaluate(dv=>{const v=document.getElementById('video');Object.defineProperty(v,'duration',{configurable:true,get(){return dv}});v.dispatchEvent(new Event('durationchange'))},dv);const u=await S();assert.equal(u.label,'--:-- / --:--',tag+' unknown '+dv);assert.ok(u.dis);assert.equal(u.val,0);
-await focusId('seek-forward');const t0=await S();await p.keyboard.press('Enter');assert.equal((await S()).t,t0.t,'no seek on unknown');}
+await focusId('seek-forward');const t0=await S();await p.keyboard.press('Enter');assert.equal((await S()).t,t0.t,'no seek on unknown');await p.evaluate(()=>{document.getElementById('pause').focus();document.getElementById('player-ui').classList.add('dim')});for(const k of ['ArrowLeft','ArrowRight']){await p.keyboard.press(k);assert.equal((await S()).t,t0.t,tag+' arrow no seek unknown '+dv);}}
 await p.evaluate(()=>{delete document.getElementById('video').duration;document.getElementById('video').dispatchEvent(new Event('durationchange'))});assert.ok(!(await S()).dis);
 await c.close();console.log('PASS',tag);}
 // live

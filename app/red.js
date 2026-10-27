@@ -143,7 +143,7 @@ document.addEventListener('keydown',function(e){
  if(!player.hidden&&list.hidden&&document.activeElement===$('progress')){
   var seekKey=code(e);
   if(seekKey==='ArrowDown'||seekKey==='ArrowUp'){e.preventDefault();e.stopImmediatePropagation();$('pause').focus();return;}
-  if(seekKey==='ArrowLeft'||seekKey==='ArrowRight'){e.preventDefault();e.stopImmediatePropagation();if(isFinite(video.duration))video.currentTime=Math.max(0,Math.min(video.duration,video.currentTime+(seekKey==='ArrowRight'?5:-5)));return;}
+  if(seekKey==='ArrowLeft'||seekKey==='ArrowRight'){e.preventDefault();e.stopImmediatePropagation();if(isFinite(video.duration)&&video.duration>0&&isFinite(video.currentTime))video.currentTime=Math.max(0,Math.min(video.duration,video.currentTime+(seekKey==='ArrowRight'?10:-10)));return;}
   if(seekKey==='Enter'){e.preventDefault();e.stopImmediatePropagation();$('pause').click();return;}
  }
  if(!player.hidden&&!isRed()){

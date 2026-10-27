@@ -1137,3 +1137,9 @@ body.no-glass[data-theme] #player-ui button:focus,body.no-glass[data-theme] #pla
 #player.quick-open #live-now{visibility:hidden}
 #player[data-playback-kind=live] #player-ui:before,#player[data-playback-kind=live] #player-ui button{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 @media(max-width:1300px){#player[data-playback-kind=live] #live-now{left:24px;bottom:22px;padding:10px 16px}#player[data-playback-kind=live] #live-now strong{font-size:22px}}
+
+/* Lightweight, non-focusable VOD seek feedback. Full controls stay hidden. */
+#seek-feedback{position:absolute;left:22%;right:22%;bottom:7%;z-index:12;direction:ltr;pointer-events:none;background:rgba(12,14,19,.88);border-radius:12px;padding:14px 20px;color:#fff;font-size:clamp(16px,1.5vw,25px);display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;backdrop-filter:none}
+#seek-feedback-time{font-variant-numeric:tabular-nums}
+#seek-feedback-track{flex-basis:100%;height:4px;border-radius:3px;background:rgba(255,255,255,.35);overflow:hidden}
+#seek-feedback-fill{height:100%;background:var(--accent,#ed3549);width:0}

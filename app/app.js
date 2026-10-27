@@ -861,7 +861,7 @@ if(/\.m3u8(?:$|\?)/i.test(url))source.type='application/vnd.apple.mpegurl';else 
 video.appendChild(source);video.load();video.play().catch(function(){$('play-state').textContent='اضغط تشغيل للمحاولة مجدداً أو جرّب قناة أخرى.';});showControls();$('stop').focus();
 playTimeout=setTimeout(function(){if(video.readyState<3)$('play-state').textContent='البث ما زال قيد التحميل. تحقّق من المزوّد أو جرّب قناة أخرى.';},20000);
 $('seek-back').hidden=$('seek-forward').hidden=item.kind==='live';updateProgress();}
-function stop(focus){clearTimeout(zapTimer);$('zap-banner').hidden=true;clearTimeout(playTimeout);clearTimeout(hideTimer);video.pause();video.removeAttribute('src');video.replaceChildren();video.load();state.playing=null;$('player').removeAttribute('data-playback-kind');$('player').hidden=true;if(focus!==false)focusFirst();}
+function stop(focus){clearSeekFeedback();clearTimeout(zapTimer);$('zap-banner').hidden=true;clearTimeout(playTimeout);clearTimeout(hideTimer);video.pause();video.removeAttribute('src');video.replaceChildren();video.load();state.playing=null;$('player').removeAttribute('data-playback-kind');$('player').hidden=true;if(focus!==false)focusFirst();}
 var zapTimer;
 function hideControls(){clearTimeout(hideTimer);$('player-ui').classList.add('dim');}
 function zapChannel(delta){
@@ -873,13 +873,29 @@ play(next);hideControls();
 var banner=$('zap-banner');banner.textContent='';banner.hidden=true;
 clearTimeout(zapTimer);zapTimer=setTimeout(function(){banner.hidden=true;},3000);
 }
-function showControls(){clearTimeout(hideTimer);$('player-ui').classList.remove('dim');hideTimer=setTimeout(function(){if(!video.paused&&video.readyState>=3)$('player-ui').classList.add('dim');},6000);}
-video.addEventListener('playing',function(){clearTimeout(playTimeout);$('play-state').textContent='قيد التشغيل';if($('zap-banner').hidden)showControls();});
-video.addEventListener('waiting',function(){$('play-state').textContent='جارٍ التخزين المؤقت…';if($('zap-banner').hidden)showControls();});
+function showControls(){clearSeekFeedback();clearTimeout(hideTimer);$('player-ui').classList.remove('dim');hideTimer=setTimeout(function(){if(!video.paused&&video.readyState>=3)$('player-ui').classList.add('dim');},6000);}
+video.addEventListener('playing',function(){clearTimeout(playTimeout);$('play-state').textContent='قيد التشغيل';if($('zap-banner').hidden&&!quietSeekActive)showControls();});
+video.addEventListener('waiting',function(){$('play-state').textContent='جارٍ التخزين المؤقت…';if($('zap-banner').hidden&&!quietSeekActive)showControls();});
 video.addEventListener('error',function(){if(!state.playing)return;$('play-state').textContent='تعذّر تشغيل البث. قد تكون صيغة الفيديو غير مدعومة أو المزوّد غير متاح.';showControls();});
-video.addEventListener('ended',function(){$('play-state').textContent='انتهى التشغيل';showControls();});
+video.addEventListener('ended',function(){$('play-state').textContent='انتهى التشغيل';if(!quietSeekActive)showControls();});
 function toggle(){if(video.paused)video.play().catch(function(){$('play-state').textContent='تعذّر بدء التشغيل';});else video.pause();showControls();}
-function seek(delta){var d=playerDuration();if(state.playing&&state.playing.kind!=='live'&&d){video.currentTime=Math.max(0,Math.min(d,(isFinite(video.currentTime)?video.currentTime:0)+delta));updateProgress();showControls();}}
+var seekFeedbackTimer=0,quietSeekActive=false;
+function clearSeekFeedback(){clearTimeout(seekFeedbackTimer);seekFeedbackTimer=0;quietSeekActive=false;var el=$('seek-feedback');if(el)el.hidden=true;}
+function updateSeekFeedback(){if(!quietSeekActive)return;var d=playerDuration(),t=Math.max(0,Math.min(d,Number(video.currentTime)||0));$('seek-feedback-fill').style.width=(d?t/d*100:0)+'%';$('seek-feedback-time').textContent=timestamp(t)+' / '+timestamp(d);}
+function seek(delta,quiet){var d=playerDuration();if(!state.playing||state.playing.kind==='live'||!d)return;
+if(quiet){quietSeekActive=true;clearTimeout(hideTimer);$('player-ui').classList.add('dim');}
+video.currentTime=Math.max(0,Math.min(d,(isFinite(video.currentTime)?video.currentTime:0)+delta));updateProgress();
+if(quiet){$('seek-feedback-direction').textContent=delta>0?'+10 ثانية':'−10 ثواني';$('seek-feedback').hidden=false;updateSeekFeedback();clearTimeout(seekFeedbackTimer);seekFeedbackTimer=setTimeout(clearSeekFeedback,1500);}else showControls();}
+['timeupdate','seeking','seeked'].forEach(function(n){video.addEventListener(n,updateSeekFeedback);});
+// Capture before theme navigation. Seeking never moves focus or opens full controls.
+document.addEventListener('keydown',function(e){
+var k=({37:'ArrowLeft',39:'ArrowRight'})[e.keyCode]||e.key;
+if(k!=='ArrowLeft'&&k!=='ArrowRight'||$('player').hidden||!state.playing||state.playing.kind==='live'||!$('quick-channels').hidden)return;
+var picker=$('red-sublist');if(picker&&!picker.hidden)return;
+var hidden=$('player-ui').classList.contains('dim');
+if(!hidden&&document.activeElement!==$('progress'))return;
+e.preventDefault();e.stopImmediatePropagation();seek(k==='ArrowRight'?10:-10,hidden);
+},true);
 function back(){if($('player').hidden&&$('connection').hidden&&homeInline.tile){if(homeInline.origin&&!$('series-detail').hidden){++state.request;returnHomeInline();return;}if(state.view==='home'&&$('movie-detail').hidden&&$('series-detail').hidden){homeTileFocus();return;}}if(!$('movie-detail').hidden&&$('player').hidden&&$('connection').hidden){++state.request;$('movie-back').click();return;}if($('home-details').open){$('home-details').close();$('home-info').focus();return;}if(!$('quick-channels').hidden){$('quick-channels').hidden=true;hideControls();$('stop').focus();return;}if(!$('player').hidden){stop();return;}if(!$('manual').hidden){$('manual').hidden=true;$('manual-toggle').focus();return;}if(!$('connection').hidden){connection(false);return;}if(!$('series-detail').hidden){$('series-detail').hidden=true;render();focusFirst();return;}if(state.episodes){state.items=state.episodes;state.episodes=null;state.group='All';state.page=0;$('search').value='';render();focusFirst();return;}if(state.view!=='home'){state.view='home';state.filter='all';render();$('nav-home').focus();return;}if(window.webOS&&webOS.platformBack)webOS.platformBack();else if(window.PalmSystem&&PalmSystem.stageReady)window.close();else connection(true);}
 $('providers').onchange=function(){selectProvider(this.value);};
 document.querySelectorAll('[data-kind]').forEach(function(b){b.onclick=function(){navigate(b.dataset.kind);};});
