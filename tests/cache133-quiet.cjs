@@ -7,10 +7,10 @@ const entry='file://'+path.resolve(process.argv[2]||'dist')+'/index.html';
 const out=process.argv[3]||'/tmp/cache133-quiet.json';
 const cors={'access-control-allow-origin':'*','access-control-allow-headers':'*'};
 const ACTION={live:'get_live_streams',movies:'get_vod_streams',series:'get_series'};
-let profile,context,page,errors=[],checks=[],calls=[],mode={changed:false,hold:false,fail:false},held=[];
-const baseCats=Array.from({length:4},(_,i)=>({category_id:String(i+1),category_name:'Category '+(i+1)}));
+let profile,context,page,errors=[],checks=[],calls=[],mode={changed:false,hold:false,fail:false,failAction:null,ncats:4},held=[];
+const mkCats=n=>Array.from({length:n},(_,i)=>({category_id:String(i+1),category_name:'Category '+(i+1)}));
 function payload(a,cat){
- if(a.endsWith('_categories'))return mode.changed?baseCats.concat([{category_id:'5',category_name:'Category 5'}]):baseCats;
+ if(a.endsWith('_categories')){const b=mkCats(mode.ncats);return mode.changed?b.concat([{category_id:'99',category_name:'Category 5'}]):b;}
  if(a==='get_live_streams'||a==='get_vod_streams'||a==='get_series'){
   const data=Array.from({length:90},(_,i)=>({stream_id:Number(cat)*100+i,series_id:Number(cat)*100+i,category_id:cat,name:a+' '+cat+' Title '+i,stream_icon:'https://images.example/'+cat+'/'+i+'.svg',cover:'https://images.example/'+cat+'/'+i+'.svg',added:i,container_extension:'mp4'}));
   if(mode.changed&&cat==='2'){data[3].name=a+' RENAMED';data.unshift({stream_id:8999,series_id:8999,category_id:cat,name:a+' FRONTNEW',stream_icon:'https://images.example/new.svg',cover:'https://images.example/new.svg',added:99,container_extension:'mp4'});}
@@ -23,10 +23,10 @@ async function launch(){
  page=context.pages()[0];page.on('pageerror',e=>errors.push(e.message));
  await page.route('**/*',async r=>{
   const u=new URL(r.request().url());if(u.protocol==='file:')return r.continue();
-  if(u.hostname.includes('supabase'))return r.fulfill({headers:cors,json:u.pathname.includes('register_device')?{}:{status:'active',expires_at:'2030-01-01',playlists:[{id:'fixture',name:'Test',type:'xtream',server:'https://fixture.example',username:'fixture',password:'fixture'}]}});
-  if(u.hostname==='fixture.example'){
+  if(u.hostname.includes('supabase'))return r.fulfill({headers:cors,json:u.pathname.includes('register_device')?{}:{status:'active',expires_at:'2030-01-01',playlists:[{id:'fixture',name:'Test',type:'xtream',server:'https://fixture.example',username:'fixture',password:'fixture'}].concat(mode.two?[{id:'fixture2',name:'Second',type:'xtream',server:'https://fixture2.example',username:'fixture',password:'fixture'}]:[])}});
+  if(u.hostname==='fixture.example'||u.hostname==='fixture2.example'){
    const a=u.searchParams.get('action'),cat=u.searchParams.get('category_id');calls.push({a,cat});
-   if(mode.fail)return r.abort();
+   if(mode.fail||(mode.failAction&&a===mode.failAction))return r.abort();
    if(mode.hold&&a!=='get_vod_info'&&a!=='get_series_info'){await new Promise(res=>held.push(res));}
    return r.fulfill({headers:cors,json:payload(a,cat)});
   }
@@ -46,7 +46,7 @@ async function openCategory(kind,name){
 async function closeCtx(){if(context)await context.close().catch(()=>{});context=null;}
 async function releaseAll(){while(held.length)held.shift()();}
 async function quietCase(kind){
- profile=fs.mkdtempSync(path.join(os.tmpdir(),'ap-quiet133-'));mode={changed:false,hold:false,fail:false};calls=[];held=[];
+ profile=fs.mkdtempSync(path.join(os.tmpdir(),'ap-quiet133-'));mode={changed:false,hold:false,fail:false,failAction:null,ncats:4};calls=[];held=[];
  try{
   // run 1: seed persistent cache with category 2 and lists
   await launch();await openCategory(kind,'Category 2');await page.waitForTimeout(1500);await closeCtx();
@@ -58,6 +58,7 @@ async function quietCase(kind){
   await page.waitForTimeout(900);
   const pre=await page.evaluate(()=>{const el=document.getElementById('items'),a=document.activeElement;return {top:el.scrollTop,idx:Number(a.dataset.index),name:a.querySelector('.item-name').textContent,off:a.offsetTop-el.scrollTop,inItems:el.contains(a)};});
   assert(pre.inItems&&pre.idx>=10&&pre.top>0,kind+' fixture must be scrolled with focus deep in list '+JSON.stringify(pre));
+  for(let i=0;i<50&&!held.length;i++)await page.waitForTimeout(100);
   assert(held.length>0,kind+' refresh requests must be held (cache first, quiet)');
   mode.changed=true;mode.hold=false;await page.evaluate(()=>{window.__fl=0;document.addEventListener('focusout',e=>{if(e.target.closest&&e.target.closest('#items'))window.__fl++;},true);});
   await releaseAll();
@@ -76,7 +77,7 @@ async function quietCase(kind){
  }finally{await releaseAll();await closeCtx();fs.rmSync(profile,{recursive:true,force:true});}
 }
 async function manualCase(){
- profile=fs.mkdtempSync(path.join(os.tmpdir(),'ap-manual133-'));mode={changed:false,hold:false,fail:false};calls=[];held=[];
+ profile=fs.mkdtempSync(path.join(os.tmpdir(),'ap-manual133-'));mode={changed:false,hold:false,fail:false,failAction:null,ncats:4};calls=[];held=[];
  try{
   await launch();await openCategory('movies','Category 2');await page.waitForTimeout(1500);await closeCtx();
   mode.hold=true;await launch();await openCategory('movies','Category 2');
@@ -109,8 +110,55 @@ async function manualCase(){
   checks.push('manual: offline failure reports failure, cached list stays');
  }finally{await releaseAll();await closeCtx();fs.rmSync(profile,{recursive:true,force:true});}
 }
+
+async function extraCases(){
+ profile=fs.mkdtempSync(path.join(os.tmpdir(),'ap-partial133-'));mode={changed:false,hold:false,fail:false,failAction:null,ncats:4};calls=[];held=[];
+ try{
+  await launch();await openCategory('movies','Category 2');await page.waitForTimeout(1500);await closeCtx();
+  await launch();await openCategory('movies','Category 2');await page.waitForTimeout(2500);
+  mode.changed=true;mode.failAction='get_series_categories';
+  await page.evaluate(()=>{window.__b=document.getElementById('refresh-list');window.__b.click();});
+  await page.waitForFunction(()=>!window.__b.disabled,null,{timeout:40000});
+  const st=await page.evaluate(()=>({s:document.getElementById('status').textContent,c:document.querySelector('#count').textContent}));
+  assert(st.s.startsWith('تم تحديث جزء من القائمة'),'partial failure message, got '+st.s);
+  assert(st.c.startsWith('91 '),'successful parts still applied '+st.c);
+  checks.push('manual: one failed job of 4 -> partial message, successful parts applied');
+  mode.failAction=null;
+  await page.evaluate(()=>{document.documentElement.dataset.apManualTimeout='1500';document.getElementById('player').hidden=false;window.__b.click();});
+  await page.waitForFunction(()=>!window.__b.disabled,null,{timeout:20000});
+  const ps=await page.evaluate(()=>document.getElementById('status').textContent);
+  assert(ps.includes('متوقف مؤقتاً'),'paused message '+ps);
+  await page.evaluate(()=>{document.getElementById('player').hidden=true;});
+  checks.push('manual: player visible -> bounded timeout, paused/not-done message, button re-enabled');
+ }finally{await releaseAll();await closeCtx();fs.rmSync(profile,{recursive:true,force:true});}
+ profile=fs.mkdtempSync(path.join(os.tmpdir(),'ap-prov133-'));mode={changed:false,hold:false,fail:false,failAction:null,ncats:4,two:true};calls=[];held=[];
+ try{
+  await launch();await openCategory('movies','Category 2');await page.waitForTimeout(1500);await closeCtx();
+  await launch();await openCategory('movies','Category 2');await page.waitForTimeout(2500);
+  mode.hold=true;mode.changed=true;
+  await page.evaluate(()=>{window.__b=document.getElementById('refresh-list');window.__b.click();});
+  await page.waitForTimeout(800);
+  await page.evaluate(()=>{const sel=document.getElementById('providers');sel.value='fixture2';sel.dispatchEvent(new Event('change',{bubbles:true}));});
+  await page.waitForTimeout(500);mode.hold=false;await releaseAll();await page.waitForTimeout(3000);
+  const ps=await page.evaluate(()=>document.getElementById('status').textContent);
+  assert(!ps.startsWith('تم تحديث')&&!ps.startsWith('تعذّر التحديث')&&!ps.includes('جزء'),'old provider completion must not set status: '+ps);
+  assert.equal(errors.length,0,'no page errors '+errors);
+  checks.push('manual: provider switched while pending -> old completion sets no status/UI');
+ }finally{await releaseAll();await closeCtx();fs.rmSync(profile,{recursive:true,force:true});}
+ profile=fs.mkdtempSync(path.join(os.tmpdir(),'ap-queue133-'));mode={changed:false,hold:false,fail:false,failAction:null,ncats:12};calls=[];held=[];
+ try{
+  await launch();for(let i=1;i<=12;i++)await openCategory('movies','Category '+i).catch(()=>{});await page.waitForTimeout(1000);await closeCtx();
+  await launch();await openCategory('movies','Category 2');
+  await page.evaluate(()=>{window.__b=document.getElementById('refresh-list');window.__b.click();});
+  await page.waitForFunction(()=>!window.__b.disabled,null,{timeout:60000});
+  const q=await page.evaluate(()=>({max:Number(document.documentElement.dataset.apQueueMax),manual:Number(document.documentElement.dataset.apManualJobs),now:Number(document.documentElement.dataset.apQueue),s:document.getElementById('status').textContent}));
+  assert(q.manual<=4,'manual job set <=4: '+JSON.stringify(q));
+  assert(q.s.startsWith('تم تحديث'),'manual done: '+JSON.stringify(q));
+  checks.push('queue proof (12 cached categories): manual explicit set='+q.manual+', max refresh queue observed='+q.max+', queue at completion='+q.now);
+ }finally{await releaseAll();await closeCtx();fs.rmSync(profile,{recursive:true,force:true});}
+}
 (async()=>{
  for(const k of ['movies','series','live'])await quietCase(k);
- await manualCase();
+ await manualCase();await extraCases();
  fs.writeFileSync(out,JSON.stringify({status:'PASS',checks,errors},null,2));console.log(JSON.stringify({status:'PASS',checks,errors},null,1));
 })().catch(e=>{console.error(e);process.exit(1);});
