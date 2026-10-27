@@ -1,10 +1,10 @@
 
 const {chromium}=require('/home/kit/tmp/player124/node_modules/playwright'),path=require('path'),assert=require('assert');
-const dist=path.resolve(process.argv[2]||'dist');
+const dist=path.resolve(process.argv[2]||'dist'),out=process.argv[3]||'artifacts/red133-nav',fsx=require('fs');fsx.mkdirSync(out,{recursive:true});const W=+(process.argv[4]||1920),HH=W===1920?1080:720;const proof={viewport:[W,HH],episodes:80,checks:[]};const ok=(n,v)=>proof.checks.push({n,v});
 (async()=>{
 const b=await chromium.launch({executablePath:'/home/kit/tmp/player124/chrome-linux/chrome',headless:true,args:['--no-sandbox']});
 try{
-const p=await b.newPage({bypassCSP:true,viewport:{width:1920,height:1080}});
+const p=await b.newPage({bypassCSP:true,viewport:{width:W,height:HH}});
 const cors={'access-control-allow-origin':'*','access-control-allow-headers':'*'};
 await p.route('**/*',async r=>{const u=new URL(r.request().url());if(u.protocol==='file:')return r.continue();
 if(u.hostname.includes('supabase'))return r.fulfill({headers:cors,json:u.pathname.includes('register_device')?{}:{status:'active',playlists:[{id:'bench',type:'xtream',server:'https://fixture.example',username:'test',password:'test',name:'Benchmark'}]}});
@@ -34,20 +34,20 @@ await p.waitForSelector('#items button');await p.waitForTimeout(500);
 await p.evaluate(()=>document.querySelector('#items button').click());
 await p.waitForFunction(()=>document.querySelectorAll('#episode-list button').length>5);await p.waitForTimeout(300);
 const geo=()=>p.evaluate(()=>{const l=document.querySelector('#episode-list'),rs=[...l.querySelectorAll('.episode-row')];return {rows:rs.length,h:rs[0].offsetHeight,pitch:rs.length>1?rs[1].offsetTop-rs[0].offsetTop:0,sh:l.scrollHeight,ch:l.clientHeight,st:l.scrollTop,sp:[...l.querySelectorAll('.episode-spacer')].map(s=>s.offsetHeight)}});
-let g=await geo();assert.strictEqual(g.pitch,64,'row pitch 64 got '+g.pitch);
+let g=await geo();assert.strictEqual(g.pitch,64,'row pitch 64 got '+g.pitch);ok('initial geometry',g);
 assert.ok(Math.abs(g.sh-80*64)<=64,'scrollHeight ~ items*64: '+g.sh);
 await p.evaluate(()=>document.querySelector('.episode-row').focus());
 await key('ArrowDown',40);assert.strictEqual(await idx(),40);
 await key('ArrowUp',20);assert.strictEqual(await idx(),20);
 await key('ArrowDown',59);assert.strictEqual(await idx(),79,'end item');
-g=await geo();assert.ok(g.sp.every(x=>x<=64*80),'spacer ok');
+g=await geo();assert.ok(g.sp.every(x=>x<=64*80),'spacer ok');ok('end geometry',g);assert.ok(g.rows<=31,'window <=30 rows');assert.ok(g.sp.reduce((a,b)=>a+b,0)+g.rows*64<=80*64+64,'no huge gap');await p.screenshot({path:out+'/episodes-end-'+W+'.png'});
 const vis=await p.evaluate(()=>{const a=document.activeElement.getBoundingClientRect(),l=document.querySelector('#episode-list').getBoundingClientRect();return a.top>=l.top-1&&a.bottom<=l.bottom+1});
 assert.ok(vis,'last focused visible');
 // scroll away and back
 await p.evaluate(()=>{document.activeElement.blur();document.querySelector('#episode-list').scrollTop=0});await p.waitForTimeout(200);
 g=await geo();assert.strictEqual(g.st,0);assert.ok((await p.evaluate(()=>document.querySelector('[data-episode-index="0"]')))!==null,'top painted');
 await p.evaluate(()=>{const l=document.querySelector('#episode-list');l.scrollTop=l.scrollHeight});await p.waitForTimeout(300);
-assert.ok(await p.evaluate(()=>!!document.querySelector('[data-episode-index="79"]')),'bottom painted');
+assert.ok(await p.evaluate(()=>!!document.querySelector('[data-episode-index="79"]')),'bottom painted');g=await geo();ok('after scrollaway bottom',g);assert.ok(g.st+g.ch>=g.sh-2,'bottom reached');await p.screenshot({path:out+'/episodes-bottom-'+W+'.png'});
 // inline playback + subtitles
 await p.evaluate(()=>{const v=document.getElementById('video');v.play=function(){return Promise.resolve()};v.pause=function(){};const t1=v.addTextTrack('subtitles','English','en'),t2=v.addTextTrack('subtitles','Arabic','ar');t1.mode='disabled';t2.mode='disabled';document.querySelector('[data-episode-index="79"]').focus()});
 await key('Enter');await p.waitForTimeout(500);
@@ -73,6 +73,6 @@ await p.evaluate(()=>{document.getElementById('player').hidden=true;});
 await p.evaluate(()=>document.getElementById('theme-apple').click());await p.waitForTimeout(300);
 const ap=await p.evaluate(()=>({cls:document.body.className,fs:document.body.classList.contains('red-inline')||document.body.classList.contains('red-fs'),first:document.querySelector('.episode-row').getBoundingClientRect().top,tops:[...document.querySelectorAll('.episode-row')].slice(0,6).map(e=>Math.round(e.getBoundingClientRect().left))}));
 assert.ok(!ap.fs,'red classes cleared');assert.strictEqual(new Set(ap.tops.slice(0,5)).size,5,'apple 5 cols '+ap.tops);
-console.log('red133-nav PASS');
+proof.pass=true;fsx.writeFileSync(out+'/proof-'+W+'.json',JSON.stringify(proof,null,1));console.log('red133-nav PASS',W);
 }finally{await b.close();}
 })().catch(e=>{console.error('FAIL',e.message);process.exit(1)});
