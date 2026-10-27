@@ -1170,3 +1170,40 @@ body.no-glass[data-theme] #red-sublist:not([hidden]),
 body.no-glass[data-theme] #red-sublist button{
   background:rgba(28,30,38,.96)!important;
 }
+
+/* Live 1.3.4 reference composition. Video and neutral scrims, never a boxed bar. */
+body[data-theme] #player[data-playback-kind=live] #live-now{
+ display:block;inset:0;width:100%;height:100%;padding:0;border:0;border-radius:0;
+ background:linear-gradient(to bottom,rgba(0,0,0,.52),transparent 25%,transparent 56%,rgba(0,0,0,.76));
+ pointer-events:none;backdrop-filter:none;-webkit-backdrop-filter:none;direction:ltr;
+}
+#live-now[hidden]{display:none!important}
+body[data-theme] #live-now .live-brand{position:absolute;left:4.2%;top:5%;width:7vw;height:7vw;max-height:125px;background:transparent;border-radius:0;overflow:visible;display:flex;align-items:center;justify-content:center}
+#live-now .live-brand img{padding:0;object-fit:contain;width:100%;height:100%}
+#live-now .live-brand .logo-initials{font-size:2.7vw;color:white;text-shadow:0 2px 5px #000}
+#live-now .live-status{position:absolute;right:4.2%;top:5.4%;display:flex;align-items:center;gap:1.4vw;font-size:2.1vw;line-height:1.2;font-variant-numeric:tabular-nums}
+#live-weather{display:flex;align-items:center;gap:.7vw}
+#live-weather[hidden]{display:none}
+#live-weather svg{width:2.3vw;height:2.3vw}
+body[data-theme] #live-now .live-channel-text{position:absolute;left:4.2%;bottom:15%;width:33%;text-align:left}
+#live-now .live-badge{display:inline-block;background:#ed554f;color:white;border:0;border-radius:.35vw;font-size:1.05vw;letter-spacing:0;font-weight:600;line-height:1.4;padding:.24vw .72vw}
+body[data-theme] #player #live-now strong{display:block;font-size:2.35vw;font-weight:750;line-height:1.22;margin-top:.65vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#live-now .live-channel-name{display:block;color:#d0d0d0;font-size:1.35vw;line-height:1.45;margin-top:.3vw;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+#live-elapsed{display:block;font-size:2vw;font-variant-numeric:tabular-nums;margin-top:2.3vw;line-height:1.2}
+#live-now .live-transport{position:absolute;left:50%;bottom:14.7%;transform:translateX(-50%);display:flex;align-items:center;gap:2.4vw;padding-bottom:2.5vw}
+#live-now button{pointer-events:auto;padding:0;display:flex;align-items:center;justify-content:center;background:transparent;color:#fff;border:0;box-shadow:none;border-radius:50%;width:3.5vw;height:3.5vw;min-width:0;min-height:0;transition:none}
+#live-now button svg{width:1.9vw;height:1.9vw}
+#live-now #live-pause{width:5.5vw;height:5.5vw;background:rgba(255,255,255,.22)}
+#live-now #live-pause svg{width:2.4vw;height:2.4vw}
+#live-now #live-list{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:2vw;height:2vw}
+#live-now #live-list svg{width:1.4vw;height:1.4vw}
+#live-now .live-actions{position:absolute;right:4.2%;bottom:15%;display:flex;gap:1.6vw;align-items:center}
+#live-now #live-favorite{color:var(--accent,#ed554f)}
+#live-now #live-favorite.saved svg{fill:currentColor}
+body[data-theme=red] #live-now #live-favorite{color:#ef3548}
+body[data-theme] #live-now button:focus{outline:.16vw solid var(--accent,#fff);outline-offset:.35vw;background:rgba(255,255,255,.16)}
+#live-panel{position:absolute;z-index:30;right:4.2%;bottom:17%;width:27vw;padding:2vw;background:rgba(18,20,26,.97);color:white;border-radius:1vw;direction:ltr;backdrop-filter:none}
+#live-panel h2{font-size:1.7vw;margin:0 0 1vw}
+#live-panel button{display:block;width:100%;padding:.8vw;font-size:1.3vw;text-align:left;margin:.3vw 0}
+#live-panel p{font-size:1.3vw}
+#live-panel button:focus{outline:3px solid var(--accent);outline-offset:1px}

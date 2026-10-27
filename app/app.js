@@ -853,33 +853,93 @@ $('episode-list').addEventListener('scroll',function(){if(this.contains(document
 function selectEpisode(e){seriesSelected=e;}
 $('series-back').onclick=function(){if(homeInline.origin){returnHomeInline();return;}$('series-detail').hidden=true;render();focusFirst();};
 var video=$('video'),playTimeout;
-function play(item){stopPreview();var id=key(item);recent=recent.filter(function(k){return k!==id;});recent.unshift(id);setSaved('ap-recent',recent);var url=A.safeURL(item.url);if(!url){status('رابط البث غير مدعوم');return;}stop(false);state.playing=item;$('player').dataset.playbackKind=item.kind==='live'?'live':'vod';
+function play(item){stopPreview();var id=key(item);recent=recent.filter(function(k){return k!==id;});recent.unshift(id);setSaved('ap-recent',recent);var url=A.safeURL(item.url);if(!url){status('رابط البث غير مدعوم');return;}stop(false);state.playing=item;liveStarted=Date.now();if(item.kind==='live')setTimeout(loadLiveWeather,0);$('player').dataset.playbackKind=item.kind==='live'?'live':'vod';
 $('player').hidden=false;$('quick-channels').hidden=true;quickList();$('playing-name').textContent=item.name;$('play-state').textContent='جارٍ فتح البث…';var source=document.createElement('source');source.src=url;
 if(/\.m3u8(?:$|\?)/i.test(url))source.type='application/vnd.apple.mpegurl';else if(/\.ts(?:$|\?)/i.test(url))source.type='video/mp2t';
 video.appendChild(source);video.load();video.play().catch(function(){$('play-state').textContent='اضغط تشغيل للمحاولة مجدداً أو جرّب قناة أخرى.';});showControls();$('stop').focus();
 playTimeout=setTimeout(function(){if(video.readyState<3)$('play-state').textContent='البث ما زال قيد التحميل. تحقّق من المزوّد أو جرّب قناة أخرى.';},20000);
 $('seek-back').hidden=$('seek-forward').hidden=item.kind==='live';updateProgress();}
-function stop(focus){hideLiveBar();clearSeekFeedback();clearTimeout(zapTimer);$('zap-banner').hidden=true;clearTimeout(playTimeout);clearTimeout(hideTimer);video.pause();video.removeAttribute('src');video.replaceChildren();video.load();state.playing=null;$('player').removeAttribute('data-playback-kind');$('player').hidden=true;if(focus!==false)focusFirst();}
-var zapTimer,liveClockTimer;
+function stop(focus){if(livePanel){livePanel.remove();livePanel=null;}var lb=$('live-now');if(lb)lb.dataset.channel='';hideLiveBar();clearSeekFeedback();clearTimeout(zapTimer);$('zap-banner').hidden=true;clearTimeout(playTimeout);clearTimeout(hideTimer);video.pause();video.removeAttribute('src');video.replaceChildren();video.load();state.playing=null;$('player').removeAttribute('data-playback-kind');$('player').hidden=true;if(focus!==false)focusFirst();}
+var zapTimer,liveClockTimer,liveStarted=0,livePanel=null,liveWeather=null,liveWeatherRequested=false;
 function hideLiveBar(){clearTimeout(zapTimer);clearInterval(liveClockTimer);var b=$('live-now');if(b)b.hidden=true;}
+function liveTimer(){clearTimeout(zapTimer);if(!livePanel)zapTimer=setTimeout(hideLiveBar,4000);}
+function weatherValue(){try{var w=JSON.parse(storeRead('ap-live-weather')||'null');return w&&Date.now()-w.at<1800000&&isFinite(w.temp)?w:null;}catch(e){return null;}}
+function loadLiveWeather(){
+if(liveWeatherRequested)return;liveWeatherRequested=true;
+liveWeather=weatherValue();if(liveWeather)return;
+var x=new XMLHttpRequest();x.open('GET','https://api.open-meteo.com/v1/forecast?latitude=51.4287788&longitude=6.8778347&current=temperature_2m,weather_code&timezone=Europe%2FBerlin');x.timeout=3500;
+x.onload=function(){try{if(x.status!==200)return;var c=JSON.parse(x.responseText).current;if(!c||typeof c.temperature_2m!=='number'||typeof c.weather_code!=='number')return;liveWeather={at:Date.now(),temp:c.temperature_2m,code:c.weather_code};storeWrite('ap-live-weather',JSON.stringify(liveWeather));paintLiveTick();}catch(e){}};x.onerror=x.ontimeout=function(){};x.send();
+}
+function liveIcon(name){var paths={
+prev:'<path d="M6 5v14M19 5 8 12l11 7z"/>',next:'<path d="M18 5v14M5 5l11 7-11 7z"/>',
+pause:'<path d="M8 5v14M16 5v14"/>',play:'<path d="m8 5 11 7-11 7z"/>',
+down:'<path d="m5 9 7 7 7-7"/>',
+sub:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M6 12h4m4 0h4M6 15h12"/>',
+star:'<path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9z"/>',
+settings:'<path d="m9 3-1 3-3 1 1 3-2 2 2 2-1 3 3 1 1 3 3-1 3 1 1-3 3-1-1-3 2-2-2-2 1-3-3-1-1-3-3 1z"/><circle cx="12" cy="12" r="3"/>',
+cloud:'<path d="M6 18a4 4 0 0 1-1-8 6 6 0 0 1 11-2 5 5 0 0 1 1 10z"/>',
+sun:'<circle cx="12" cy="12" r="4"/><path d="M12 1v3m0 16v3M1 12h3m16 0h3M4 4l2 2m12 12 2 2M4 20l2-2M18 6l2-2"/>',
+rain:'<path d="M6 15a4 4 0 0 1-1-8 6 6 0 0 1 11-2 5 5 0 0 1 1 10M8 19l-1 3m6-3-1 3m6-3-1 3"/>'};
+return '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+(paths[name]||paths.settings)+'</svg>';}
+function liveButton(id,label,icon,fn){var b=button('',fn);b.id=id;b.setAttribute('aria-label',label);b.title=label;b.innerHTML=liveIcon(icon);return b;}
+function paintLiveTick(){
+var clock=$('live-clock');if(clock)clock.textContent=new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:false});
+var elapsed=$('live-elapsed');if(elapsed){var n=Math.floor((Date.now()-liveStarted)/1000);elapsed.textContent=[Math.floor(n/3600),Math.floor(n/60)%60,n%60].map(function(v){return String(v).padStart(2,'0');}).join(':');}
+var weather=$('live-weather'),w=liveWeather&&Date.now()-liveWeather.at<1800000?liveWeather:null;if(weather){weather.hidden=!w;if(w){weather.innerHTML=liveIcon(w.code===0?'sun':w.code>=51?'rain':'cloud');weather.appendChild(document.createTextNode(Math.round(w.temp)+'°'));weather.title='Mülheim · Open-Meteo';}}
+var pause=$('live-pause');if(pause){pause.innerHTML=liveIcon(video.paused?'play':'pause');pause.setAttribute('aria-label',video.paused?'تشغيل':'إيقاف مؤقت');}
+}
+function closeLivePanel(){if(!livePanel)return;var id=livePanel.dataset.returnFocus;livePanel.remove();livePanel=null;showLiveBar();var b=$(id);if(b)b.focus();}
+function openLivePanel(type){
+if(livePanel)closeLivePanel();clearTimeout(zapTimer);
+var panel=document.createElement('div');panel.id='live-panel';panel.dataset.returnFocus=type==='sub'?'live-sub':'live-settings';panel.setAttribute('role','dialog');panel.setAttribute('aria-label',type==='sub'?'الترجمة':'إعدادات المشغل');livePanel=panel;
+var heading=document.createElement('h2');heading.textContent=type==='sub'?'الترجمة':'إعدادات المشغل';panel.appendChild(heading);
+function choice(label,fn){var b=button(label,fn);panel.appendChild(b);return b;}
+choice('رجوع',closeLivePanel);
+if(type==='sub'){var tracks=video.textTracks||[];choice('OFF',function(){for(var i=0;i<tracks.length;i++)tracks[i].mode='disabled';});
+for(var i=0;i<tracks.length;i++)(function(t){choice(t.label||t.language||'Track '+(i+1),function(){for(var j=0;j<tracks.length;j++)tracks[j].mode='disabled';t.mode='showing';});})(tracks[i]);
+if(!tracks.length){var p=document.createElement('p');p.textContent='لا توجد ترجمات متاحة';panel.appendChild(p);}
+}else{[['contain','الحجم الأصلي'],['cover','تكبير'],['fill','ملء الشاشة']].forEach(function(row){choice(row[1],function(){video.style.objectFit=row[0];});});}
+$('player').appendChild(panel);panel.querySelector('button').focus();
+}
 function showLiveBar(){
 if(!state.playing||state.playing.kind!=='live'||!$('quick-channels').hidden)return;
-var item=state.playing,b=$('live-now');if(!b){b=document.createElement('div');b.id='live-now';$('player').appendChild(b);}
-b.replaceChildren();b.appendChild(channelLogo(item));
+var item=state.playing,b=$('live-now');
+if(!b){b=document.createElement('div');b.id='live-now';$('player').appendChild(b);}
+var same=b.dataset.channel===key(item),focusId=b.contains(document.activeElement)?document.activeElement.id:'';
+if(!same){
+b.dataset.channel=key(item);b.replaceChildren();
+var logo=channelLogo(item);logo.classList.add('live-brand');b.appendChild(logo);
+var status=document.createElement('div');status.className='live-status';status.innerHTML='<time id="live-clock"></time><span id="live-weather" hidden></span>';b.appendChild(status);
 var text=document.createElement('div');text.className='live-channel-text';
-var title=document.createElement('div');title.className='live-channel-title';
-var num=document.createElement('span');num.className='live-channel-number';
-var list=state.filtered.filter(function(i){return i.kind==='live';}),index=list.findIndex(function(i){return key(i)===key(item);});
-num.textContent=String(index>=0?index+1:1);title.appendChild(num);
-var name=document.createElement('strong');name.textContent=(item.name||'').replace(/^\s*\d+\s*[-|·:]\s*/,'');title.appendChild(name);text.appendChild(title);
-var cat=document.createElement('span');cat.className='live-category';cat.textContent=item.group||'';text.appendChild(cat);b.appendChild(text);
-var info=document.createElement('div');info.className='live-broadcast-info';
-var badge=document.createElement('span');badge.className='live-badge';badge.textContent='LIVE';info.appendChild(badge);
-var q=String(item.quality||'')+' '+String(item.name||''),match=q.match(/(?:^|[\s|_()[\]-])(4K|UHD|FHD|HD)(?=$|[\s|_()[\]-])/i);
-if(match){var quality=document.createElement('span');quality.className='live-quality';quality.textContent=match[1].toUpperCase()==='UHD'?'4K':match[1].toUpperCase();info.appendChild(quality);}
-var clock=document.createElement('time');clock.className='live-clock';function tick(){clock.textContent=new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:false});}tick();info.appendChild(clock);b.appendChild(info);
-b.hidden=false;clearTimeout(zapTimer);clearInterval(liveClockTimer);liveClockTimer=setInterval(tick,1000);zapTimer=setTimeout(hideLiveBar,4000);
+var badge=document.createElement('span');badge.className='live-badge';badge.textContent='Live';text.appendChild(badge);
+var name=document.createElement('strong');name.textContent=(item.name||'').replace(/^\s*\d+\s*[-|·:]\s*/,'');text.appendChild(name);
+var channel=document.createElement('span');channel.className='live-channel-name';channel.textContent=(item.name||'').replace(/^\s*\d+\s*[-|·:]\s*/,'');text.appendChild(channel);
+var elapsed=document.createElement('time');elapsed.id='live-elapsed';text.appendChild(elapsed);b.appendChild(text);
+var controls=document.createElement('div');controls.className='live-transport';
+controls.appendChild(liveButton('live-prev','القناة السابقة','prev',function(){zapChannel(-1);}));
+controls.appendChild(liveButton('live-pause','إيقاف مؤقت','pause',toggle));
+controls.appendChild(liveButton('live-next','القناة التالية','next',function(){zapChannel(1);}));
+controls.appendChild(liveButton('live-list','قائمة القنوات','down',openChannelList));b.appendChild(controls);
+var actions=document.createElement('div');actions.className='live-actions';
+actions.appendChild(liveButton('live-sub','الترجمة','sub',function(){openLivePanel('sub');}));
+var star=liveButton('live-favorite','المفضلة','star',function(){var k=key(state.playing);favorites=saved(favorites,state.playing)?favorites.filter(function(v){return v!==k;}):favorites.concat(k);setSaved('ap-favorites',favorites);star.classList.toggle('saved',saved(favorites,state.playing));star.setAttribute('aria-pressed',saved(favorites,state.playing)?'true':'false');});
+star.classList.toggle('saved',saved(favorites,item));star.setAttribute('aria-pressed',saved(favorites,item)?'true':'false');actions.appendChild(star);
+actions.appendChild(liveButton('live-settings','إعدادات المشغل','settings',function(){openLivePanel('settings');}));b.appendChild(actions);
 }
+b.hidden=false;paintLiveTick();clearInterval(liveClockTimer);liveClockTimer=setInterval(paintLiveTick,1000);liveTimer();
+if(focusId&&$(focusId))$(focusId).focus();
+// Only a first playback schedules the request, never a focus/remote-key interaction.
+}
+document.addEventListener('keydown',function(e){
+if($('player').hidden||!state.playing||state.playing.kind!=='live')return;
+var k=({37:'ArrowLeft',38:'ArrowUp',39:'ArrowRight',40:'ArrowDown',13:'Enter'})[e.keyCode]||e.key;
+if(livePanel){e.preventDefault();e.stopImmediatePropagation();if(k==='Escape'||k==='BrowserBack'||e.keyCode===461){closeLivePanel();return;}var buttons=Array.from(livePanel.querySelectorAll('button')),ix=buttons.indexOf(document.activeElement);if(k==='ArrowDown'||k==='ArrowUp'){var next=buttons[Math.max(0,Math.min(buttons.length-1,ix+(k==='ArrowDown'?1:-1)))];if(next)next.focus();}else if(k==='Enter'&&!e.repeat)document.activeElement.click();return;}
+var b=$('live-now');if(!b||b.hidden||!$('quick-channels').hidden)return;
+if(b.contains(document.activeElement)){
+if(k==='Enter'){e.preventDefault();e.stopImmediatePropagation();if(!e.repeat)document.activeElement.click();liveTimer();return;}
+if(/^Arrow/.test(k)){e.preventDefault();e.stopImmediatePropagation();var ids=['live-prev','live-pause','live-next','live-sub','live-favorite','live-settings'];var ix=ids.indexOf(document.activeElement.id);if(k==='ArrowDown')$('live-list').focus();else if(k==='ArrowUp')$('live-pause').focus();else $(ids[Math.max(0,Math.min(ids.length-1,(ix<0?1:ix)+(k==='ArrowRight'?1:-1)))]).focus();liveTimer();return;}
+}
+},true);
 
 function hideControls(){clearTimeout(hideTimer);$('player-ui').classList.add('dim');}
 function zapChannel(delta){
@@ -890,6 +950,7 @@ var next=list[(Math.max(0,index)+delta+list.length)%list.length];
 play(next);hideControls();
 showLiveBar();
 }
+document.addEventListener('ap-vod-controls',function(){showControls();});
 function showControls(){if(state.playing&&state.playing.kind==='live'){showLiveBar();return;}clearSeekFeedback();clearTimeout(hideTimer);$('player-ui').classList.remove('dim');hideTimer=setTimeout(function(){if(!video.paused&&video.readyState>=3)$('player-ui').classList.add('dim');},6000);}
 video.addEventListener('playing',function(){clearTimeout(playTimeout);$('play-state').textContent='قيد التشغيل';if($('zap-banner').hidden&&!quietSeekActive)showControls();});
 video.addEventListener('waiting',function(){$('play-state').textContent='جارٍ التخزين المؤقت…';if($('zap-banner').hidden&&!quietSeekActive)showControls();});
@@ -1068,7 +1129,7 @@ if(state.playing&&state.playing.kind==='live'&&(key==='ArrowUp'||key==='ArrowDow
 e.preventDefault();zapChannel(key==='ArrowUp'||e.keyCode===33||e.keyCode===427?-1:1);return;
 }
 if(key==='Enter'){e.preventDefault();if(!e.repeat){if(state.playing&&state.playing.kind==='live')openChannelList();else{showControls();$('pause').focus();}}return;}
-if(state.playing&&state.playing.kind==='live'&&(key==='ArrowLeft'||key==='ArrowRight')){e.preventDefault();showLiveBar();return;}
+if(state.playing&&state.playing.kind==='live'&&(key==='ArrowLeft'||key==='ArrowRight')){e.preventDefault();showLiveBar();$('live-pause').focus();return;}
 if(key==='ArrowLeft'||key==='ArrowRight'){
 e.preventDefault();if($('player-ui').classList.contains('dim')){showControls();$('pause').focus();return;}if(!$('player-ui').classList.contains('dim')){
 var controls=Array.from($('player-ui').querySelectorAll('button')).filter(function(b){return !b.disabled&&b.getBoundingClientRect().height;});
