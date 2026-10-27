@@ -176,3 +176,15 @@ Empty initial VOD categories are skipped until populated, category-specific
 requests remain separate from Live. Playback pipeline was intentionally
 unchanged: real LG playback was confirmed by the owner on 1.2.4; desktop
 Chromium87 codec failure is not proof of an LG regression.
+
+### Persistent catalog cache in 1.3.1
+
+IndexedDB stores provider-scoped catalog responses and the home presentation snapshot. Startup hydrates the last valid provider configuration and home rows before network synchronization. Cached categories and lists are returned immediately; responses older than 12 hours refresh silently. VOD and series requests now use the same cache path and the correct `category_id` query parameter. Xtream returns a category list in one response, so the entire category response, including its first visible page, is retained.
+
+Idle prefetch visits every live, movie and series category with one background catalog request at a time, pauses during playback/hidden screens, and retains existing records if storage fills. It no longer deletes an arbitrary record after 150 responses. Writes await transaction completion. Foreground navigation can still request a category which has not finished prefetching. A provider timeout or quota exhaustion may leave that category uncached; open it online to retry on a later session.
+
+A first-ever installation cannot display remote catalogs offline. Allow activation and initial prefetch to complete online first. An offline restart can browse cached home, lists and categories, but streaming itself still requires the provider connection. Movie/episode details are available offline only when fetched previously. Expired saved panel configurations do not restore managed providers. A successful panel response replaces the saved configuration, including revocations.
+
+Artwork URLs are retained in cached records. Browser image-cache warming is bounded to 120 unique images, one at a time, with a four-second timeout. This is not an offline image archive; webOS/browser eviction and provider cache headers can remove artwork. Local fallback art remains available. Provider configuration and stream URLs remain private local app data and must not be included in shared test logs.
+
+`node tests/offline-cache131.cjs dist artifacts/cache131/offline.json` exercises persistent Chromium 87 process restarts, whole-network offline browsing, the fresh 12-hour rule, stale background refresh concurrency, retention above 150 records, quota failures and an empty offline installation.
