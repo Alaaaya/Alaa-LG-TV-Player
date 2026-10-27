@@ -452,3 +452,5 @@ margin:12px 0 0;direction:rtl;unicode-bidi:plaintext;
 .home-reference nav button{color:#dce3ee!important;background:transparent!important}
 .home-reference nav button .nav-icon{opacity:1}
 .home-reference nav button.selected{color:white!important;background:#c82f43!important}
+/* Catalog pages show one title grid, without repeated promotional shelves. */
+#browser.vod-view #hero,#browser.vod-view #movie-discovery{display:none!important}
