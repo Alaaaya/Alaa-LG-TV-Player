@@ -564,20 +564,41 @@ document.querySelectorAll('nav button').forEach(function(b){b.classList.remove('
 if(kind===state.kind){render();focusFirst();}else{state.kind=kind;load();}
 }
 function stopPreview(){var v=$('preview');if(v.hidden&&!v.childNodes.length)return;v.pause();v.removeAttribute('src');v.replaceChildren();v.load();v.hidden=true;}
-var movieItem=null;
+var movieItem=null,movieRelated=[],movieRelatedEpoch=0;
+function renderRelatedMovies(item,related){
+var source=uniqueTitles((related|| (state.kind==='movies'?state.items:[])).concat(homeCatalog.movies));
+movieRelated=source.filter(function(i){return i.kind==='movies'&&i.id!==item.id&&i.group===item.group;}).slice(0,120);
+var grid=$('movie-related');grid.replaceChildren();grid.scrollTop=0;
+movieRelated.forEach(function(i,n){
+var card=button('',function(){open(i);});card.dataset.relatedIndex=n;card.setAttribute('role','listitem');
+card.appendChild(image(i.logo,null,i.name));
+var title=document.createElement('strong');title.textContent=i.name;card.appendChild(title);
+var meta=document.createElement('small');meta.textContent=[i.year,i.rating&&'★ '+i.rating].filter(Boolean).join(' · ');card.appendChild(meta);grid.appendChild(card);
+});
+if(!movieRelated.length){var note=document.createElement('p');note.className='note';note.textContent='لا توجد أفلام أخرى في هذا التصنيف.';grid.appendChild(note);}
+}
+async function loadRelatedMovies(item,epoch){
+if(!item.provider)return;
+var cat=vodCategories.movies.find(function(c){return c.category_name===item.group;});
+if(!cat)return;
+try{var list=await xcCatalog(item.provider,'movies',cat.category_id);
+if(epoch!==movieRelatedEpoch||!movieItem||movieItem.id!==item.id||$('movie-detail').hidden)return;
+if(!$('movie-related').contains(document.activeElement))renderRelatedMovies(item,list);
+}catch(e){/* Keep the cached same-category titles if this optional list is unavailable. */}
+}
 function showMovie(item){
-movieItem=item;stopPreview();$('home').hidden=true;$('browser').hidden=true;$('series-detail').hidden=true;$('movie-detail').hidden=false;
+var first=!movieItem||movieItem.id!==item.id||$('movie-detail').hidden;movieItem=item;stopPreview();$('home').hidden=true;$('browser').hidden=true;$('series-detail').hidden=true;$('movie-detail').hidden=false;
 $('movie-title').textContent=item.name;$('movie-meta').textContent=[metadata(item),item.genre,item.duration].filter(Boolean).join(' · ');
 $('movie-description').textContent=item.description||'';
 ['movie-poster','movie-backdrop'].forEach(function(id){$(id).replaceChildren();});
 $('movie-poster').appendChild(image(item.logo,null,item.name));
 $('movie-backdrop').appendChild(image(item.backdrop,null,item.name));
 var pr=progressFor(item);$('movie-resume').hidden=!(pr&&pr.time>10&&pr.duration-pr.time>10);
-$('movie-play').onclick=function(){storeWrite('ap-progress-'+key(item),'null');play(item);};
+$('movie-play').onclick=function(){storeWrite('ap-progress-'+key(item),'null');play(movieItem);};$('movie-poster').onclick=$('movie-play').onclick;
 $('movie-resume').onclick=function(){play(item);};
 $('movie-favorite').textContent=saved(favorites,item)?'♥ المفضلة':'♡ المفضلة';
 $('movie-favorite').onclick=function(){var k=key(item);favorites=saved(favorites,item)?favorites.filter(function(x){return x!==k;}):favorites.concat(k);setSaved('ap-favorites',favorites);showMovie(item);};
-$('movie-back').focus();
+if(first){var relatedEpoch=++movieRelatedEpoch;renderRelatedMovies(item);loadRelatedMovies(item,relatedEpoch);$('movie-play').focus();}
 }
 $('movie-back').onclick=function(){$('movie-detail').hidden=true;navigate('movies');};
 async function open(item){
@@ -822,6 +843,22 @@ if(state.kind!=='live'&&categoryWindow.nodes.length){var cb=categoryWindow.nodes
 focusFirst(true);return;
 }
 if(key==='ArrowLeft'){e.preventDefault();return;}
+}
+if($('player').hidden&&$('connection').hidden&&!$('movie-detail').hidden&&!nav.contains(active)&&/^Arrow/.test(key)){
+e.preventDefault();
+var relatedIndex=active.dataset.relatedIndex;
+if(relatedIndex!=null){
+var ri=Number(relatedIndex),target=ri+(key==='ArrowDown'?6:key==='ArrowUp'?-6:key==='ArrowRight'?1:-1);
+if(key==='ArrowLeft'&&ri%6===0){(nav.querySelector('button.selected')||$('nav-home')).focus();return;}
+if(key==='ArrowUp'&&ri<6){$('movie-play').focus();return;}
+if(target>=0&&target<movieRelated.length){var card=$('movie-related').querySelector('[data-related-index="'+target+'"]');if(card){card.focus();card.scrollIntoView({block:'nearest'});}}return;
+}
+var top=[$('movie-back'),$('movie-poster'),$('movie-play'),$('movie-resume'),$('movie-favorite')].filter(function(b){return !b.hidden;});
+if(key==='ArrowDown'){var firstRelated=$('movie-related').querySelector('button');if(firstRelated)firstRelated.focus();return;}
+if(key==='ArrowUp'){$('movie-back').focus();return;}
+var mi=top.indexOf(active)+(key==='ArrowRight'?1:-1);
+if(mi<0){(nav.querySelector('button.selected')||$('nav-home')).focus();return;}
+if(top[mi])top[mi].focus();return;
 }
 if($('player').hidden&&active.dataset.episodeIndex!=null&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].indexOf(key)>=0){
 e.preventDefault();var ix=Number(active.dataset.episodeIndex);
