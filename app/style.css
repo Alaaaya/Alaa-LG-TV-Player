@@ -660,3 +660,7 @@ body[data-theme][data-theme] #screen,body[data-theme][data-theme] #screen.home-r
 .category-symbol img{width:24px;height:24px;object-fit:contain}
 body[data-theme] #organize-panel{background:var(--panel);border-color:var(--accent)}
 body[data-theme] #organize-panel button:focus{background:var(--accent)!important;color:var(--on-accent)!important}
+/* Reference hero controls and tile labels follow the selected global palette. */
+body[data-theme] #home-play,body[data-theme] #movie-play,body[data-theme] #series-start,body[data-theme] #hero-dots button.selected{background:var(--accent)!important;color:var(--on-accent)!important}
+body[data-theme] #home-tiles button:focus{transform:none!important;outline-color:var(--accent)!important}
+body[data-theme] #home-tiles button:focus small,body[data-theme] #home-tiles button:focus strong{color:var(--on-accent)!important}

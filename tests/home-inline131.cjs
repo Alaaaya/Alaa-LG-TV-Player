@@ -45,6 +45,7 @@ await p.keyboard.press('Escape');assert(await p.locator('#home').isVisible());as
 await p.evaluate(()=>document.querySelector('nav [data-kind="movies"]').click());await p.waitForFunction(()=>!document.querySelector('#browser').hidden);assert(await p.locator('#home').isHidden());
 await p.evaluate(()=>document.querySelector('#nav-home').click());
 offline=true;await p.locator('[data-home-tile="movies"]').click();await p.waitForFunction(()=>document.querySelector('#home-inline-items button'));assert(await p.locator('#home').isVisible());offline=false;
+const boxes=await p.evaluate(()=>[...document.querySelectorAll('#home-tiles button'),...document.querySelectorAll('#home-inline-items button')].map(e=>{const r=e.getBoundingClientRect();return {left:r.left,right:r.right};}));assert(boxes.every(r=>r.left>=0&&r.right<=width+1),'Home tiles and inline columns stay inside viewport');
 await p.screenshot({path:'artifacts/cache131/home-inline-'+width+'.png'});
 result[width]='PASS all six tiles, category/content Dpad, Back focus, movie/series return, live playback, hero/Home route, selected Apple tile, sidebar separate, cached offline inline';
 }
