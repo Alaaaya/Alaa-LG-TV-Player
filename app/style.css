@@ -473,3 +473,6 @@ button:focus,#items button:focus,body.apple button:focus,.home-reference button:
 #home-play,#home-info,#movie-play,#movie-resume,#series-start,#series-continue,#episode-play,#play-selected,#preview-selected,#sync{background:#c82f43!important;color:#fff!important;border-radius:8px}
 input,select,body.apple input,body.apple select{background:#101929!important;border-color:#26344b!important;color:#eff2fa!important}
 #theme-apple,#theme-blue{display:none!important}
+/* LG GPU budget: preserve navy/red colors, remove expensive focus compositing. */
+button,input,select,.item-icon,.tile-art{transition:transform .12s,opacity .12s!important;filter:none!important;backdrop-filter:none!important}
+button:focus,#items button:focus,.home-reference button:focus,body.apple button:focus{box-shadow:none!important;filter:none!important;outline:3px solid #ed3549!important}
