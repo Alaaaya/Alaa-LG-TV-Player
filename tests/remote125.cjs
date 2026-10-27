@@ -41,8 +41,23 @@ await remote(40);check(await page.evaluate(()=>document.activeElement.dataset.ki
 await page.screenshot({path:art+'/focus-live-sidebar-1.2.5.png'});
 await remote(13);check(await page.evaluate(()=>document.querySelector('#home').hidden),true);
 check(await page.evaluate(()=>document.querySelector('#items').contains(document.activeElement)),true);
+await remote(37);check(await page.evaluate(()=>document.querySelector('#subcategories').contains(document.activeElement)),true);
+await remote(37);check(await page.evaluate(()=>document.querySelector('#categories').contains(document.activeElement)),true);
+await remote(40);await remote(13);
+check(await page.evaluate(()=>document.querySelector('#categories').contains(document.activeElement)),true);
 await remote(37);check(await page.evaluate(()=>document.activeElement.dataset.kind),'live');
-await remote(39);check(await page.evaluate(()=>document.querySelector('#items').contains(document.activeElement)),true);
+await remote(39);check(await page.evaluate(()=>document.querySelector('#categories').contains(document.activeElement)),true);
+await remote(39);await remote(39);
+check(await page.evaluate(()=>document.querySelector('#items').contains(document.activeElement)),true);
+for(let i=0;i<30;i++)await remote(40);
+check(await page.evaluate(()=>Number(document.activeElement.dataset.index)>=30),true);
+await remote(39);check(await page.evaluate(()=>document.activeElement.id),'play-selected');
+await remote(40);check(await page.evaluate(()=>document.activeElement.id),'preview-selected');
+await remote(13);check(await page.evaluate(()=>document.querySelector('#preview').hidden),false);
+await page.screenshot({path:art+'/live-preview-focus-1.2.5.png'});
+await remote(461);check(await page.evaluate(()=>document.querySelector('#items').contains(document.activeElement)),true);
+await remote(461);await remote(461);await remote(461);
+
 await page.screenshot({path:art+'/focus-live-content-1.2.5.png'});
 await remote(461);check(await page.evaluate(()=>document.querySelector('#home').hidden),false);
 await page.locator('#nav-home').focus();await remote(40);await remote(40);await remote(13);
@@ -53,6 +68,19 @@ await remote(461);
 check(await page.evaluate(()=>document.querySelector('#home-movies').querySelectorAll('button').length),6);
 check(await page.evaluate(()=>document.querySelector('#home-series').querySelectorAll('button').length),5);
 check(await page.evaluate(()=>Array.from(document.querySelectorAll('#home-tiles button')).every(b=>b.querySelector('.tile-art').getBoundingClientRect().bottom<=b.querySelector('small').getBoundingClientRect().top)),true);
+
+await page.locator('#nav-home').focus();await remote(40);await remote(40);await remote(40);await remote(13);
+await waitFor(()=>document.querySelector('#count').textContent.includes('36'));
+await remote(40);check(await page.evaluate(()=>document.querySelector('#items').contains(document.activeElement)),true);
+await remote(13);check(await page.evaluate(()=>document.querySelector('#series-detail').hidden),false);
+await page.screenshot({path:art+'/series-remote-1.2.5.png'});
+await remote(461);await remote(461);
+await page.locator('#settings-open').focus();await remote(13);
+check(await page.evaluate(()=>document.querySelector('#connection').hidden),false);
+await remote(40);await remote(38);await remote(461);
+check(await page.evaluate(()=>document.querySelector('#connection').hidden),true);
+check(await page.evaluate(()=>document.body.className.includes('apple')),false);
+check(await page.evaluate(()=>document.querySelectorAll('#header-tools button svg').length),4);
 await page.screenshot({path:art+'/home-categories-1.2.5.png'});
 await page.screenshot({path:art+'/home-1.2.5-file87.png'});await page.locator('nav [data-kind="live"]').click();await page.waitForTimeout(200);await page.screenshot({path:art+'/live-1.2.5-file87.png'});
 

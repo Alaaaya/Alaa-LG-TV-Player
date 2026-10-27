@@ -119,3 +119,14 @@ provider replies, numeric-only remote events and 57 checks. Covers movie
 HTTP failure while series succeeds, retry recovery despite failed movie
 categories, visible counts without overlap, sidebar/content navigation,
 favorites and move persistence. Screenshots are in artifacts/*1.2.5*.png.
+
+The additional LG Live report exposed an actual focus-loss race: the scroll
+handler rebuilt virtual rows after remote focus moved, deleting the focused
+button. It now leaves the current virtual window intact while its focused row
+is valid. Live navigation explicitly traverses sidebar, categories, filters,
+channels and preview controls. Vertical navigation stays within each column;
+Back steps left a column before returning Home. Numeric OK activates controls
+without browser default focus behavior. Header icons use SVG, avoiding missing
+font glyphs. A one-time 1.2.5 migration selects the requested red theme; later
+manual theme choices are preserved. Chrome87 remote suite now has 72 checks,
+including virtual scrolling, preview activation, series detail and settings.
