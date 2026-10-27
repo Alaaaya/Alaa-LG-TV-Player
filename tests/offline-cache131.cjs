@@ -77,6 +77,7 @@ async function visit(){
   await page.evaluate(()=>document.querySelector('#categories button').click());
   await page.waitForFunction(()=>document.querySelector('#count').textContent.startsWith('120 '));
   assert(await page.locator('#items button').count()>0);
+  await page.screenshot({path:'artifacts/release132/offline-live.png'});
   checks.push('Whole-network offline process restart restores home hero/rows, all categories and live All=120');
   await page.evaluate(()=>document.querySelector('#nav-home').click());
   for(const tile of ['live','movies','series']){
@@ -90,6 +91,7 @@ async function visit(){
   }
   checks.push('Cold network-offline Home inline Live/Movies/Series cached rows, hero retained, Dpad tiles/categories/content/Back');
 
+  await page.screenshot({path:'artifacts/release132/offline-home.png'});
   for(const id of ['nav-favorites','nav-recent','nav-search','settings-open']){
    await page.evaluate(id=>document.getElementById(id).click(),id);
    assert(await page.locator('nav button.selected').count()===1);
