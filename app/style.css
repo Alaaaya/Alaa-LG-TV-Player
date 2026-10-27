@@ -535,3 +535,15 @@ body.apple #home-info,body.apple #movie-resume,body.apple #series-continue,body.
 #browser.poster-view #items{grid-auto-rows:auto}
 #browser.poster-view #items button{align-self:start}
 #browser.poster-view #items button:focus{transform:none!important}
+body.apple #connection{left:250px;right:0;top:100px;bottom:60px;padding:36px 48px;direction:ltr;text-align:left;overflow:auto}
+#connection .connect-wrap{width:850px;max-width:100%;margin:0;display:flex;flex-direction:column;align-items:stretch;gap:14px}
+#connection h1{font-size:36px;margin:4px 0}
+#connection p{margin:4px 0;line-height:1.5}
+#connection-close{float:none;align-self:flex-start;min-width:320px;text-align:left}
+#connection .activation-card{background:#2b2b2f;border:1px solid #48484e;border-radius:16px;padding:22px 26px;text-align:left}
+#connection #device-code{font-size:52px;letter-spacing:7px;margin:14px 0;text-align:left}
+#connection .panel-url{text-align:left;font-size:19px}
+#connection .actions{display:flex;flex-direction:column;gap:12px;margin:8px 0}
+#connection .actions button{text-align:left;min-height:66px;font-size:24px}
+#connection .note{font-size:17px}
+body.apple nav button.selected .nav-icon{color:#242429!important}
