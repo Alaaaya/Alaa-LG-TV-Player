@@ -806,12 +806,12 @@ body[data-theme=red] #red-pills button:before{content:none}
 body[data-theme=red] #red-pills b{color:var(--accent);margin-right:8px}
 body[data-theme=red] #red-pills button:focus b{color:#fff}
 #red-sublist{display:none}
-body[data-theme=red] #red-sublist:not([hidden]){display:block;position:absolute;right:calc(70px*var(--pu));top:calc(70px*var(--pu));width:calc(270px*var(--pu));padding:calc(16px*var(--pu));background:#1a1a1a;border-radius:calc(18px*var(--pu));z-index:3;max-height:70%;overflow:auto}
-body[data-theme=red] #red-sublist h3{margin:0 0 calc(12px*var(--pu));padding-bottom:calc(10px*var(--pu));border-bottom:1px solid #333;text-align:center;font-size:calc(18px*var(--pu))}
-body[data-theme=red] #red-sublist button{display:block;width:100%;margin:0 0 calc(8px*var(--pu));padding:calc(10px*var(--pu));border:1px solid #555;border-radius:calc(22px*var(--pu));background:transparent;text-align:center;font-size:calc(18px*var(--pu));color:#fff}
-body[data-theme=red] #red-sublist button.selected{background:var(--accent);border-color:var(--accent);font-weight:700}
-body[data-theme=red] #red-sublist button:focus{outline:3px solid #fff;outline-offset:2px}
-body[data-theme=red] #red-sublist p{margin:0;font-size:calc(15px*var(--pu));color:#9a9a9a;text-align:center}
+#red-sublist:not([hidden]){display:block;position:absolute;right:calc(70px*var(--pu));top:calc(70px*var(--pu));width:calc(270px*var(--pu));padding:calc(16px*var(--pu));background:#1a1a1a;border-radius:calc(18px*var(--pu));z-index:3;max-height:70%;overflow:auto}
+#red-sublist h3{margin:0 0 calc(12px*var(--pu));padding-bottom:calc(10px*var(--pu));border-bottom:1px solid #333;text-align:center;font-size:calc(18px*var(--pu))}
+#red-sublist button{display:block;width:100%;margin:0 0 calc(8px*var(--pu));padding:calc(10px*var(--pu));border:1px solid #555;border-radius:calc(22px*var(--pu));background:transparent;text-align:center;font-size:calc(18px*var(--pu));color:#fff}
+#red-sublist button.selected{background:var(--accent);border-color:var(--accent);font-weight:700}
+#red-sublist button:focus{outline:3px solid #fff;outline-offset:2px}
+#red-sublist p{margin:0;font-size:calc(15px*var(--pu));color:#9a9a9a;text-align:center}
 body[data-theme=red] #red-sub-close{position:absolute;right:calc(10px*var(--pu));top:calc(8px*var(--pu));width:calc(40px*var(--pu));height:calc(40px*var(--pu));border-radius:50%;z-index:4;background:#262626;font-size:calc(20px*var(--pu))}
 body[data-theme=red] #series-detail #series-copy{display:block}
 body[data-theme=red] #series-detail #series-description{display:-webkit-box;text-align:left;max-width:none}
@@ -951,3 +951,9 @@ body[data-theme] #quick-channels #quick-list button:focus-visible{
   #quick-list .channel-logo{flex-basis:48px!important;width:48px!important;min-width:48px!important;height:40px!important}
   #quick-list .quick-name{font-size:16px!important}
 }
+
+/* The existing native-track picker is available in every player theme. */
+body:not([data-theme=red]) #red-pills{display:flex;gap:12px;margin-top:12px;direction:ltr}
+body:not([data-theme=red]) #red-pills #red-aspect,body:not([data-theme=red]) #red-pills #red-fs{display:none}
+body:not([data-theme=red]) #red-sub{min-width:150px;padding:12px 20px;font-size:21px}
+body:not([data-theme=red]) #red-sub b{margin-right:10px}

@@ -1,4 +1,4 @@
-/* Red 1.3.3 layouts: classic script, no dependencies. Loaded after app.js. Only acts when data-theme=red. */
+/* Red layouts and shared native subtitle picker. Loaded after app.js. */
 (function(){
 'use strict';
 var body=document.body;
@@ -103,7 +103,7 @@ function markPlaying(){
  for(var i=0;i<rows.length;i++){var s=rows[i].querySelector('strong');rows[i].classList.toggle('playing',on&&!!s&&name.indexOf(txt(s))>=0);}
 }
 /* observers: attribute/child changes only, no layout reads */
-function all(){sync();if(!isRed())return;updateCrumb();updateMeta();markPlaying();paintPills();}
+function all(){sync();paintPills();if(!isRed())return;updateCrumb();updateMeta();markPlaying();}
 var queued=false;
 var mo=new MutationObserver(function(){if(queued)return;queued=true;setTimeout(function(){queued=false;all();},0);});
 mo.observe(detail,{attributes:true,attributeFilter:['hidden']});
@@ -121,7 +121,8 @@ document.querySelector('nav').addEventListener('click',function(){setTimeout(upd
 /* stopping the inline player returns focus to the selected episode */
 var wasHidden=player.hidden;
 new MutationObserver(function(){
- if(player.hidden&&!wasHidden&&isRed()&&!detail.hidden){list.hidden=true;
+ if(player.hidden&&!wasHidden)list.hidden=true;
+ if(player.hidden&&!wasHidden&&isRed()&&!detail.hidden){
   setTimeout(function(){var ae=document.activeElement;if(ae===document.body||!ae.offsetParent||ae.id==='series-back'){var r=$('episode-list').querySelector('.episode-row.playing')||$('episode-list').querySelector('.episode-row');if(r)r.focus();}},0);}
  wasHidden=player.hidden;
 }).observe(player,{attributes:true,attributeFilter:['hidden']});
@@ -136,6 +137,28 @@ function rows(){
  return [top,bot];
 }
 document.addEventListener('keydown',function(e){
+ if(!player.hidden&&!isRed()){
+  var sharedKey=code(e),sharedActive=document.activeElement;
+  if(!list.hidden){
+   e.preventDefault();e.stopImmediatePropagation();
+   if(isBack(e)){closeList();return;}
+   var choices=Array.prototype.slice.call(list.querySelectorAll('button')).filter(visible),at=choices.indexOf(sharedActive);
+   if(sharedKey==='ArrowDown'||sharedKey==='ArrowUp'){var next=choices[at+(sharedKey==='ArrowDown'?1:-1)];if(next)next.focus();}
+   else if(sharedKey==='Enter'&&!e.repeat&&sharedActive&&list.contains(sharedActive))sharedActive.click();
+   return;
+  }
+  if(ui.contains(sharedActive)&&!ui.classList.contains('dim')){
+   if(sharedKey==='Enter'&&sharedActive.tagName==='BUTTON'){e.preventDefault();e.stopImmediatePropagation();if(!e.repeat)sharedActive.click();return;}
+   if(sharedKey==='ArrowDown'||sharedKey==='ArrowUp'){
+    e.preventDefault();e.stopImmediatePropagation();
+    if(sharedKey==='ArrowDown')bSub.focus();else $('pause').focus();
+    return;
+   }
+   if((sharedKey==='ArrowLeft'||sharedKey==='ArrowRight')&&sharedActive===bSub){
+    e.preventDefault();e.stopImmediatePropagation();$('pause').focus();return;
+   }
+  }
+ }
  if(!isRed()||player.hidden&&detail.hidden)return;
  var k=code(e),a=document.activeElement;
  if(isBack(e)){
