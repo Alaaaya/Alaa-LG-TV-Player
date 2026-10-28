@@ -70,7 +70,7 @@ await rememberConfig();providers();
 if(c.status==='active'&&c.playlists.length&&!state.provider){await selectProvider(c.playlists[0].id);connection(false);}
 else if(!state.provider){connection(true);}
 status(c.status==='active'?tr('متصل بلوحة التحكم'):tr('Device ')+code+' · '+c.status);
-}catch(e){$('activation').textContent=errorMessage(e);status('Panel unavailable · '+errorMessage(e));if(!state.provider)connection(true);}
+}catch(e){$('activation').textContent=errorMessage(e);status(tr('لوحة التحكم غير متاحة')+' · '+errorMessage(e));if(!state.provider)connection(true);}
 finally{state.panelBusy=false;$('sync').disabled=false;}}
 function providers(){var select=$('providers'),old=state.provider&&state.provider.id;select.replaceChildren();state.providers.forEach(function(p){var o=document.createElement('option');o.value=p.id;o.textContent=p.name||tr('Playlist');select.appendChild(o);});if(old&&state.providers.some(function(p){return p.id===old;}))select.value=old;}
 
