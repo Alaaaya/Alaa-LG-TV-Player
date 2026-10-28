@@ -1293,3 +1293,16 @@ body[data-theme] #home-shelves .home-posters small{height:26px;flex:0 0 26px;lin
 body[data-theme] #home-shelves .home-posters button:focus small{color:#f0f3fa!important;text-shadow:0 1px 2px #000}
 
 #live-elapsed[hidden],.live-channel-name[hidden]{display:none!important}
+
+/* 1.3.6: Chromium 79/87 outlines are rectangular; static shadows follow the control shape. */
+body[data-theme] #player #live-now button{
+ border-radius:50%!important;
+ background:rgba(255,255,255,.08);
+}
+body[data-theme] #player #live-now button:focus,
+body[data-theme] #player #player-ui button:focus{
+ outline:none!important;
+ box-shadow:0 0 0 3px #fff,0 0 0 5px rgba(0,0,0,.55)!important;
+ filter:none!important;
+ transition:none!important;
+}
