@@ -1306,3 +1306,14 @@ body[data-theme] #player #player-ui button:focus{
  filter:none!important;
  transition:none!important;
 }
+
+/* App-wide 1.3.6 focus. Inset rings stay inside clipped/virtualized cards;
+   box-shadow follows each node's existing radius, never a shared radius.
+   Repeated root specificity supersedes historical theme/route focus outlines. */
+body[data-theme] #screen#screen#screen :focus:not(#progress){
+ outline:none!important;
+ box-shadow:inset 0 0 0 3px #fff,inset 0 0 0 5px #16181d!important;
+ filter:none!important;
+ transform:none!important;
+ transition:none!important;
+}
