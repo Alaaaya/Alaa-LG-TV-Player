@@ -329,10 +329,10 @@ var saved=await cacheRead('device-config'),c=saved&&saved.data;
 if(c&&storeRead('ap-config-disabled')!=='1'&&(!c.expires||Date.parse(c.expires)>Date.now()))state.providers=(c.providers||[]).filter(function(p){return p.manual||c.status==='active';});
 var p=c&&(state.providers.find(function(p){return p.id===c.selected;})||state.providers[0]);
 if(p){state.provider=p;state.status=c.status;state.expires=c.expires;providers();}
-var generation=providerGeneration,syncing=sync();
-if(p){var hydrated=await hydrateProvider(p);if(hydrated&&generation===providerGeneration&&state.provider===p){render();homeContent();connection(false);}}
+var generation=providerGeneration,hydrated=false,syncing=sync();
+if(p){hydrated=await hydrateProvider(p);if(hydrated&&generation===providerGeneration&&state.provider===p){render();homeContent();connection(false);}}
 await syncing;
-if(state.provider===p&&p)loadHomeCatalog(p);
+if(state.provider===p&&p&&generation===providerGeneration){if(hydrated)loadHomeCatalog(p);else await load();}
 }
 function preconnectProvider(p){try{var origin=new URL(p.server||p.url).origin;if(!document.querySelector('link[data-provider-connect]')){var link=document.createElement('link');link.rel='preconnect';link.href=origin;link.dataset.providerConnect='1';document.head.appendChild(link);}}catch(e){}}
 var liveCategories=[];
