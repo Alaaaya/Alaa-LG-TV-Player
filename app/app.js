@@ -154,7 +154,7 @@ return u.href;
 }
 function compactRows(action,data){
 if(action!=='get_live_streams'||!Array.isArray(data))return data;
-return data.map(function(x){return {stream_id:x.stream_id,name:x.name,stream_icon:x.stream_icon,category_id:x.category_id,num:x.num};});
+return data.map(function(x){return {stream_id:x.stream_id,name:x.name,stream_icon:x.stream_icon,category_id:x.category_id,category_ids:x.category_ids,num:x.num};});
 }
 function rowsSignature(data){try{var s=JSON.stringify(data),h=2166136261,h2=5381;for(var i=0;i<s.length;i++){var c=s.charCodeAt(i);h=Math.imul(h^c,16777619);h2=(Math.imul(h2,33)+c)|0;}return (Array.isArray(data)?data.length:'o')+':'+s.length+':'+(h>>>0)+':'+(h2>>>0);}catch(e){return '';}}
 function refreshPump(){
@@ -224,7 +224,7 @@ saveHomeSnapshot(p);
 function itemAllowed(item,p){if(!p||p.type!=='xtream')return true;var kind=item.kind==='episodes'?'series':item.kind,ids=item.category_ids||[item.category_id];return ids.length&&ids.every(function(id){return A.categoryAllowed(p,kind,id);});}
 async function xc(p,action,id,prefetch,forceJob){
 var generation=providerGeneration,media=/live/.test(action)?'live':/vod/.test(action)?'movies':'series',isCategories=/_categories$/.test(action),isList=/^(get_live_streams|get_vod_streams|get_series)$/.test(action);
-function check(){if(generation!==providerGeneration||state.provider!==p)throw Error('Stale catalog');if(p.type==='xtream'&&!p.manual&&!p._policy)throw Error('Unsupported category policy');if(isList&&!A.categoryAllowed(p,media,id))throw Error('Hidden category');if(/_info$/.test(action)){var item=(homeCatalog[media]||[]).find(function(i){return String(i.id)===String(id);});if(!item||!itemAllowed(item,p))throw Error('Hidden item');}}
+function check(){if(generation!==providerGeneration||state.provider!==p)throw Error('Stale catalog');if(p.type==='xtream'&&!p.manual&&!p._policy)throw Error('Unsupported category policy');if(isList&&!A.categoryAllowed(p,media,id))throw Error('Hidden category');if(/_info$/.test(action)){var item=(homeCatalog[media]||[]).concat(homeInline.items||[],movieRelated||[],state.items||[]).find(function(i){return String(i.id)===String(id);});if(!item||!itemAllowed(item,p))throw Error('Hidden item');}}
 function filtered(data){check();if(isCategories)return data.filter(function(x){return A.categoryAllowed(p,media,x.category_id);});if(isList)return A.visibleRows(p,media,data);return data;}
 check();var k=await catalogKey(p,action,id),cached=await cacheRead(k);
 function refresh(){if(k&&cacheJobs[k])return cacheJobs[k];
@@ -325,6 +325,7 @@ await cacheWrite('device-config',{providers:state.providers,status:state.status,
 async function bootCatalog(){
 try{await initIdentity();}catch(e){$('activation').textContent='Secure storage unavailable';connection(true);return;}
 var saved=await cacheRead('device-config'),c=saved&&saved.data;
+if(c&&storeRead('ap-config-disabled')!=='1'&&(!c.expires||Date.parse(c.expires)>Date.now()))state.providers=(c.providers||[]).filter(function(p){return p.manual||c.status==='active';});
 await sync();if(state.status!==null)return;
 if(storeRead('ap-config-disabled')!=='1'&&c&&(c.status==='active'||(c.providers||[]).some(function(p){return p.manual;}))){
 var valid=!c.expires||Date.parse(c.expires)>Date.now();
