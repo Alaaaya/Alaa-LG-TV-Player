@@ -24,9 +24,9 @@ document.addEventListener('webOSLaunch',function(e){receiveFeatured(e.detail);})
 document.addEventListener('webOSRelaunch',function(e){receiveFeatured(e.detail);});
 try{if(window.PalmSystem)featuredQueue.accept(window.PalmSystem.launchParams);}catch(e){}
 var state={kind:'live',group:'All',items:[],filtered:[],providers:[],provider:null,page:0,selected:null,playing:null,request:0,status:null,panelBusy:false,episodes:null,expires:null,view:'home',filter:'all',virtualStart:0},pageSize=24,hideTimer;
-var statusTimer,statusRevision=0;
+var statusTimer;
 function status(s){
-statusRevision++;var el=$('status');clearTimeout(statusTimer);el.textContent=s;
+var el=$('status');clearTimeout(statusTimer);el.textContent=s;
 el.hidden=!s||/^(تم تحميل|متصل بلوحة التحكم)/.test(s);
 if(!el.hidden)statusTimer=setTimeout(function(){el.hidden=true;},7000);
 }
@@ -60,7 +60,7 @@ if(show)$('sync').focus();else{render();focusFirst();}
 function focusFirst(force){
 if(!force&&document.querySelector('nav').contains(document.activeElement))return;if(!$('movie-detail').hidden){$('movie-back').focus();return;}if(!$('series-detail').hidden){$('series-back').focus();return;}if(state.view==='home'&&$('connection').hidden){$('home-play').focus();return;}var el=$('items').querySelector('button')||document.querySelector('nav button.selected');if(el)el.focus();}
 async function sync(){
-if(state.panelBusy)return;var panelStatusRevision=statusRevision;state.panelBusy=true;$('sync').disabled=true;$('activation').textContent=tr('جارٍ التحقق من التفعيل…');
+if(state.panelBusy)return;state.panelBusy=true;$('sync').disabled=true;$('activation').textContent=tr('جارٍ التحقق من التفعيل…');
 try{await rpc('register_device',{p_device_code:code,p_mac:'webOS-'+code,p_model:'LG webOS · Alaa Player 1.2.5'});var c=A.config(await rpc('get_device_config',{p_device_code:code}));state.status=c.status;state.expires=c.expires_at;storeWrite('ap-config-disabled',c.status==='active'?'0':'1');
 state.providers=state.providers.filter(function(p){return p.manual;}).concat(c.playlists);
 $('activation').textContent=c.status==='active'?tr('تم التفعيل')+(c.expires_at?tr(' · ينتهي ')+new Date(c.expires_at).toLocaleDateString():'')+' · '+c.playlists.length+tr(' قوائم'):c.status==='expired'?tr('انتهى التفعيل. جدّد الجهاز من لوحة التحكم.'):tr('بانتظار تفعيل الجهاز من لوحة التحكم.');
@@ -69,8 +69,8 @@ if(state.provider&&!state.provider.manual){var updated=state.providers.find(func
 await rememberConfig();providers();
 if(c.status==='active'&&c.playlists.length&&!state.provider){await selectProvider(c.playlists[0].id);connection(false);}
 else if(!state.provider){connection(true);}
-if(statusRevision===panelStatusRevision)status(c.status==='active'?tr('متصل بلوحة التحكم'):tr('Device ')+code+' · '+c.status);
-}catch(e){$('activation').textContent=errorMessage(e);if(statusRevision===panelStatusRevision)status(tr('لوحة التحكم غير متاحة')+' · '+errorMessage(e));if(!state.provider)connection(true);}
+if(!state.provider)status(c.status==='active'?tr('متصل بلوحة التحكم'):tr('Device ')+code+' · '+c.status);
+}catch(e){$('activation').textContent=errorMessage(e);if(!state.provider)status(tr('لوحة التحكم غير متاحة')+' · '+errorMessage(e));if(!state.provider)connection(true);}
 finally{state.panelBusy=false;$('sync').disabled=false;}}
 function providers(){var select=$('providers'),old=state.provider&&state.provider.id;select.replaceChildren();state.providers.forEach(function(p){var o=document.createElement('option');o.value=p.id;o.textContent=p.name||tr('Playlist');select.appendChild(o);});if(old&&state.providers.some(function(p){return p.id===old;}))select.value=old;}
 
