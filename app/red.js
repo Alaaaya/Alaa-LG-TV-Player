@@ -21,6 +21,16 @@ var plEm=el('em',null,null,'');pl.appendChild(document.createTextNode(tr('Playli
 pla.appendChild(el('em',null,null,'Alaa Player'));pla.appendChild(el('small',null,null,'webOS'));
 pills.appendChild(pl);pills.appendChild(pla);
 header.insertBefore(crumb,clockbox);header.insertBefore(pills,clockbox);
+/* 1.3.8 home header: wide search pill + small working icons (no page chip) */
+var brandStrong=document.querySelector('.brand strong');if(brandStrong){brandStrong.textContent='';brandStrong.appendChild(document.createTextNode('Alaa '));var bi=el('span',null,'brand-accent','Player');brandStrong.appendChild(bi);}
+var sp=el('button','red-search','red-search'),spI=el('span',null,'red-search-ic');spI.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M16 16l5 5"/></svg>';sp.type='button';sp.appendChild(spI);sp.appendChild(el('span',null,'red-search-tx',tr('ابحث عن قناة، فيلم أو مسلسل ...')));
+sp.onclick=function(){$('nav-search').click();};
+var ics=el('div','red-icons');
+function ic(id,label,svg,target){var b=el('button',id,'red-ic');b.type='button';b.setAttribute('aria-label',label);b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+svg+'</svg>';b.onclick=function(){$(target).click();};ics.appendChild(b);}
+ic('red-ic-fav',tr('المفضلة'),'<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/>','nav-favorites');
+ic('red-ic-recent',tr('المشاهدة الأخيرة'),'<circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/>','nav-recent');
+ic('red-ic-set',tr('الإعدادات'),'<circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1"/>','settings-open');
+header.insertBefore(sp,clockbox);header.insertBefore(ics,clockbox);
 function txt(n){return (n&&n.textContent||'').replace(/\s+/g,' ').trim();}
 function updateCrumb(){
  if(!isRed())return;
