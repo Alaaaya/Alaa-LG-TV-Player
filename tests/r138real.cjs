@@ -29,5 +29,8 @@ for(const k of ['live','movies','series']){
 await p.evaluate(k=>{(document.querySelector('nav [data-kind="'+k+'"]')||document.getElementById(k)).click();},k);
 await p.waitForFunction(()=>document.querySelector('#items button'));await p.waitForTimeout(900);
 out[k]=await p.evaluate(()=>{const it=document.getElementById('items'),f=it.querySelector('button'),ir=it.getBoundingClientRect(),fr=f.getBoundingClientRect();return {itemsTop:Math.round(ir.top),firstTop:Math.round(fr.top),gap:Math.round(fr.top-ir.top),scrollTop:it.scrollTop,emptyCounts:[...document.querySelectorAll('#categories small')].filter(s=>!s.textContent.trim()&&getComputedStyle(s).display!=='none').length,activeFocus:document.activeElement.id||document.activeElement.tagName};});
+await p.locator('#items button').first().focus();
+let moves=0,vis=true;for(let i=0;i<14;i++){await p.keyboard.press('ArrowDown');await p.waitForTimeout(120);moves++;const v=await p.evaluate(()=>{const e=document.activeElement,r=e.getBoundingClientRect();return e.closest('#items')?(r.top>=0&&r.bottom<=innerHeight+2):false;});if(!v)vis=false;}
+out[k].focusScroll={moves,alwaysVisible:vis,focusTop:await p.evaluate(()=>Math.round(document.activeElement.getBoundingClientRect().top)),itemsCount:await p.evaluate(()=>document.querySelectorAll('#items button').length),name:await p.evaluate(()=>(document.activeElement.textContent||'').slice(0,20)),scrollTop:await p.evaluate(()=>document.getElementById('items').scrollTop)};
 await p.screenshot({path:pre+k+'.png'});}
 console.log(JSON.stringify({theme,out,errors},null,1));await b.close();})();
