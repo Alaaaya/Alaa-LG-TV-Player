@@ -1,4 +1,4 @@
-// 1.3.8 renders+assertions on Chromium 87. usage: node tests/r138.cjs [theme] [outprefix]
+// 1.3.9 renders+assertions on Chromium 87. usage: node tests/r138.cjs [theme] [outprefix]
 const {chromium}=require('/home/kit/tmp/player124/node_modules/playwright'),fs=require('fs'),path=require('path');
 const theme=process.argv[2]||'red',pre=process.argv[3]||'/home/kit/tmp/r138/'+theme+'-';
 const shows=JSON.parse(fs.readFileSync('/home/kit/tv13-real/shows.json','utf8'));

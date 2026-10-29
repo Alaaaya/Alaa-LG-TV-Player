@@ -21,7 +21,7 @@ var plEm=el('em',null,null,'');pl.appendChild(document.createTextNode(tr('Playli
 pla.appendChild(el('em',null,null,'Alaa Player'));pla.appendChild(el('small',null,null,'webOS'));
 pills.appendChild(pl);pills.appendChild(pla);
 header.insertBefore(crumb,clockbox);header.insertBefore(pills,clockbox);
-/* 1.3.8 home header: wide search pill + small working icons (no page chip) */
+/* 1.3.9 home header: wide search pill + small working icons (no page chip) */
 var brandStrong=document.querySelector('.brand strong');if(brandStrong){brandStrong.textContent='';brandStrong.appendChild(document.createTextNode('Alaa '));var bi=el('span',null,'brand-accent','Player');brandStrong.appendChild(bi);}
 var sp=el('button','red-search','red-search'),spI=el('span',null,'red-search-ic');spI.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M16 16l5 5"/></svg>';sp.type='button';sp.appendChild(spI);sp.appendChild(el('span',null,'red-search-tx',tr('ابحث عن قناة، فيلم أو مسلسل ...')));
 sp.onclick=function(){$('nav-search').click();};
