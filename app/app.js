@@ -655,7 +655,7 @@ function episodeCols(){var L=redLayout();return L?L.episodes.cols:5;}
 function renderWindow(start){
 var el=$('items'),rowHeight=state.kind==='live'?93:158;var G=state.kind!=='live'&&!state.episodes?gridSpec():null,cols=G?G.cols:1;start=Math.floor(start/cols)*cols;var ps=G?G.page:pageSize;rowHeight=G?G.row:rowHeight;state.virtualStart=start;el.replaceChildren();
 function spacer(height){var d=document.createElement('div');d.className='virtual-space';d.style.height=height+'px';el.appendChild(d);}
-spacer(start/cols*rowHeight);
+if(G){el.style.paddingTop=(start/cols*rowHeight)+'px';}else{el.style.paddingTop='';el.style.paddingBottom='';spacer(start/cols*rowHeight);}
 state.filtered.slice(start,start+ps).forEach(function(item,index){
 var b=button('',function(){select(item);open(item);});b.dataset.index=start+index;b.dataset.organizeChannel=key(item);b.setAttribute('role','listitem');
 var num=document.createElement('span');num.className='number';num.textContent=String(start+index+1).padStart(2,'0');b.appendChild(num);
@@ -668,7 +668,7 @@ var meta=document.createElement('span');meta.className=item.kind==='live'?'live'
 if(item.kind==='live'){var heart=document.createElement('span');heart.className='row-heart';heart.textContent=saved(favorites,item)?'♥':'♡';heart.setAttribute('aria-label',tr('المفضلة'));heart.onclick=function(e){e.stopPropagation();var k=key(item);if(saved(favorites,item))favorites=favorites.filter(function(x){return x!==k;});else favorites.push(k);setSaved('ap-favorites',favorites);heart.textContent=saved(favorites,item)?'♥':'♡';select(item);};b.appendChild(heart);}
 b.onfocus=function(){clearTimeout(focusDetailTimer);focusDetailTimer=setTimeout(function(){select(item);},120);};el.appendChild(b);if(organize&&organize.mode==='move'&&organize.target.type==='channels'&&key(item)===organize.target.id){b.classList.add('moving-item');b.focus();}
 });
-spacer(Math.ceil(Math.max(0,state.filtered.length-start-ps)/cols)*rowHeight);
+if(G){el.style.paddingBottom=(Math.ceil(Math.max(0,state.filtered.length-start-ps)/cols)*rowHeight)+'px';}else spacer(Math.ceil(Math.max(0,state.filtered.length-start-ps)/cols)*rowHeight);
 if(!state.filtered.length){var empty=document.createElement('p');empty.className='catalog-empty';empty.textContent=!state.provider?tr('اربط جهازك أو أضف قائمة من الإعدادات'):state.provider.type==='m3u'&&state.kind!=='live'?tr('تظهر عناصر M3U ضمن البث المباشر. استخدم Xtream للأفلام والمسلسلات.'):state.filter==='favorites'?tr('لم تضف عناصر للمفضلة بعد'):state.filter==='recent'?tr('لم تشاهد أي عناصر بعد'):$('search').value?tr('لا توجد نتائج مطابقة للبحث'):tr('لا توجد عناصر في هذه القائمة');el.appendChild(empty);}
 }
 var scrollFrame=false;
