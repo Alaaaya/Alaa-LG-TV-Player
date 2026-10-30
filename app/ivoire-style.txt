@@ -582,7 +582,7 @@ select.sel{width:240px}
 .cover{position:absolute;inset:0;display:flex;align-items:flex-end;padding:16px;overflow:hidden}
 .cover .ct{font-family:var(--serif);font-size:20px;line-height:1.2;color:#f3ebdd;unicode-bidi:plaintext;text-align:left;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .art img,.pc img,.arch img,.wp img,.pp img,.th img,.wb img{width:100%;height:100%;object-fit:cover}
-.lg{display:grid;place-items:center;overflow:hidden;background:#fff}
+.lg{position:relative;display:grid;place-items:center;overflow:hidden;background:#1c1814}
 .lg img{width:100%;height:100%;object-fit:contain}
 .lgf{width:100%;height:100%;display:grid;place-items:center;color:#fbf6ee;font-family:var(--serif);font-weight:700;font-size:20px}
 .opts{display:flex;flex-wrap:wrap;gap:14px;margin-top:26px}

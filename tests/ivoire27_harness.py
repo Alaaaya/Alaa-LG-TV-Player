@@ -11,7 +11,7 @@ def svg(w,h,t,c):return f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" he
 async def route(r):
   u=urllib.parse.urlparse(r.request.url);q=urllib.parse.parse_qs(u.query)
   if 'supabase' in u.hostname:
-    return await r.fulfill(headers={'access-control-allow-origin':'*','access-control-allow-headers':'*'},json={'status':'registered'} if 'register_device' in u.path else {'status':'active','expires_at':'2028-01-01','playlists':[{'id':'t1','type':'xtream','server':'https://provider.example','name':'المزوّد','username':'u','password':'p'}]})
+    return await r.fulfill(headers={'access-control-allow-origin':'*','access-control-allow-headers':'*'},json={'status':'registered'} if 'register_device' in u.path else {'status':'active','expires_at':'2028-01-01','playlists':[{'id':'t1','type':'xtream','server':os.environ.get('XS','https://provider.example'),'name':'المزوّد','username':os.environ.get('XU','u'),'password':os.environ.get('XP','p')}]})
   if u.hostname=='images.example':
     n=u.path.split('-')[-1].split('.')[0]
     if 'badge' in u.path:
@@ -26,6 +26,20 @@ async def route(r):
     elif a=='get_series':d=[{'series_id':3001+i,'name':f'مسلسل تجريبي {i+1}','category_id':str(i%4+1),'cover':f'https://images.example/poster-{i+3}.svg','rating':'7.8','year':'2024','backdrop_path':[f'https://images.example/back-{i}.svg'],'plot':'ملخص تجريبي.'} for i in range(36)]
     elif a=='get_series_info':d={'info':{'plot':'ملخص تجريبي من المزوّد عن أحداث المسلسل وشخصياته.','genre':'دراما'},'episodes':{'1':[{'id':4001+k,'episode_num':k+1,'title':f'الحلقة {k+1}','info':{'plot':'وصف الحلقة.','duration':'00:43:20'},'container_extension':'mp4'} for k in range(6)],'2':[{'id':4101,'episode_num':1,'title':'بداية جديدة','container_extension':'mp4'}]}}
     return await r.fulfill(json=d,headers={'access-control-allow-origin':'*','access-control-allow-headers':'*'})
+  if os.environ.get('XS') and u.hostname in os.environ['XS']:
+    try:
+      resp=await r.fetch(timeout=90000);h=dict(resp.headers);h['access-control-allow-origin']='*';h['access-control-allow-headers']='*'
+      return await r.fulfill(response=resp,headers=h)
+    except Exception as e:return await r.abort()
+  if os.environ.get('XS') and u.hostname not in ('127.0.0.1','localhost'):
+    import urllib.request as UR
+    def get():
+      req=UR.Request(r.request.url,headers={'User-Agent':'Mozilla/5.0'})
+      with UR.urlopen(req,timeout=60) as f:return f.read(),f.headers.get('content-type','application/octet-stream')
+    try:
+      body,ct=await asyncio.get_event_loop().run_in_executor(None,get)
+      return await r.fulfill(body=body,content_type=ct,headers={'access-control-allow-origin':'*','access-control-allow-headers':'*'})
+    except Exception as e:return await r.abort()
   return await r.continue_()
 INIT="""HTMLMediaElement.prototype.load=function(){};HTMLMediaElement.prototype.play=function(){return Promise.resolve()};HTMLMediaElement.prototype.pause=function(){};localStorage.setItem('ap-theme','%s');"""
 async def setup(theme,ctxp=None):
