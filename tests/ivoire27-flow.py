@@ -1,0 +1,30 @@
+import asyncio,sys,os
+sys.argv=[sys.argv[0]]
+from ivoire27_harness import *
+async def main():
+  p,b,pg,errs=await setup('ivoire')
+  out='iv';os.makedirs(out,exist_ok=True)
+  async def s(n):await pg.wait_for_timeout(900);await pg.screenshot(path=f'{out}/{n}.png')
+  async def k(key,n=1):
+    for _ in range(n):await pg.keyboard.press(key);await pg.wait_for_timeout(120)
+  async def scr():return await pg.evaluate("window.APIvoire&&APIvoire.screen()")
+  async def fk():return await pg.evaluate("(()=>{const a=document.getElementById('ivoire-exact').shadowRoot.activeElement;return a&&a.dataset.key})()")
+  await s('home');print('home',await scr(),await fk())
+  await pg.click('#ivoire-exact >> [data-key="tab-live"]');await s('live');print('live',await scr(),await fk())
+  await k('ArrowDown',2);print('fk',await fk());await k('ArrowLeft');print('left',await fk());await k('ArrowRight',2);print('right',await fk())
+  await pg.click('#ivoire-exact >> [data-key="ch-2"]');await s('player-live');print('pl',await scr(),await fk())
+  await pg.click('#ivoire-exact >> [data-key="k-list"]');await s('player-live-list');print('pll',await scr(),await fk())
+  await k('Escape');await pg.wait_for_timeout(500);print('after esc',await scr());await k('Escape');await pg.wait_for_timeout(500);print('after esc2',await scr())
+  await pg.click('#ivoire-exact >> [data-key="tab-movies"]');await s('movies');print('mov',await scr(),await fk())
+  await k('ArrowRight');await k('ArrowDown');print(await fk())
+  await pg.click('#ivoire-exact >> [data-key="it-0"]');await s('movie-detail');print('md',await scr(),await fk())
+  await k('Escape');await pg.wait_for_timeout(400)
+  await pg.click('#ivoire-exact >> [data-key="tab-series"]');await s('series');print('ser',await scr())
+  await pg.click('#ivoire-exact >> [data-key="it-0"]');await pg.wait_for_timeout(1500);await s('series-detail');print('sd',await scr(),await fk())
+  await pg.click('#ivoire-exact >> [data-key="ep-0"]');await s('player-series');print('ps',await scr())
+  await k('Escape');await pg.wait_for_timeout(600);print('back',await scr());await k('Escape');await pg.wait_for_timeout(600);print('back2',await scr());await k('Escape');await pg.wait_for_timeout(600);print('back3',await scr())
+  await pg.click('#ivoire-exact >> [data-key="tab-settings"]');await s('settings');print('set',await scr(),await fk())
+  await pg.click('#ivoire-exact >> [data-key="sec-1"]');await pg.click('#ivoire-exact >> [data-key="mode-night"]');await s('settings-night')
+  await pg.click('#ivoire-exact >> [data-key="tab-home"]');await s('home-night')
+  print('ERR',errs);await b.close();await p.stop()
+asyncio.run(main())

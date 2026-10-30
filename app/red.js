@@ -370,7 +370,7 @@ function patch(){
  }
  qa('img').forEach(function(im){im.removeAttribute('onerror');im.onerror=function(){im.style.opacity='.1';};});
 }
-function themes(){var box=document.createElement('div');box.className='theme-options';['apple','navy','red','blue','aya','alaa','harak','muse','velour','jamra'].forEach(function(t){var b=document.createElement('div');b.className='button';b.textContent=t==='jamra'?'جمرة':t;bind(b,function(){cmd('theme',t);},'theme-'+t);box.appendChild(b);});stage.appendChild(box);box.firstChild.focus();}
+function themes(){var box=document.createElement('div');box.className='theme-options';['apple','navy','red','blue','aya','alaa','harak','muse','velour','jamra','ivoire'].forEach(function(t){var b=document.createElement('div');b.className='button';b.textContent=t==='jamra'?'جمرة':t==='ivoire'?'Ivoire':t;bind(b,function(){cmd('theme',t);},'theme-'+t);box.appendChild(b);});stage.appendChild(box);box.firstChild.focus();}
 function update(){
  if(!bridge())return;
  snap=bridge().snapshot();

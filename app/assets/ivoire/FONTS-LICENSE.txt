@@ -1,0 +1,2 @@
+Ivoire theme fonts: Playfair Display, Amiri, IBM Plex Sans Arabic.
+All licensed under the SIL Open Font License 1.1 (https://openfontlicense.org).

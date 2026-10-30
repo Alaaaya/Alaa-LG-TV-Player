@@ -22,4 +22,4 @@ Playfair Display + Amiri (display), IBM Plex Sans Arabic (UI). Embedded offline.
 ## Focus
 Single "viewfinder" focus indicator with four animated camera corners.
 
-Mockup tested: 10 screens, 316 clicks, 110 D-pad presses, 0 runtime errors. Not yet ported into the webOS app (`app/`).
+Mockup tested: 10 screens, 316 clicks, 110 D-pad presses, 0 runtime errors. Ported into the webOS app on branch ivoire-2.7 (see docs/ivoire27.md).

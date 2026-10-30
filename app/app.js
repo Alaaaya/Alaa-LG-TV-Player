@@ -587,7 +587,7 @@ if(src)img.src=src;else img.onerror();
 return img;
 }
 // Display-only provider decoration cleanup; IDs, provider names and search remain untouched.
-function posterTitle(name){if((document.body.dataset.theme==='aya'||document.body.dataset.theme==='alaa'||document.body.dataset.theme==='harak'||document.body.dataset.theme==='muse'||(document.body.dataset.theme==='velour'||document.body.dataset.theme==='jamra')))name=String(name||'').replace(/^\s*(?:(?:AR|AS|EN|FR|TR)(?:[- ](?:TR|SUBS?|S|D|DO))*(?:\s*[-:|]\s*)|TOP\s*[-:|]\s*)/i,'');return String(name||'').replace(/^\s*(?:(?:4K|8K|FHD|UHD|HD)\s*-\s*(?:SH|AR\s*-\s*TR\s*-\s*D|AR\s*-\s*DO|AR\s*-\s*D|AR)\s*[-:|]\s*|SH[- ](?:4K|8K|FHD|UHD|HD)\s*[-:|]\s*)/i,'').trim();}
+function posterTitle(name){if((document.body.dataset.theme==='aya'||document.body.dataset.theme==='alaa'||document.body.dataset.theme==='harak'||document.body.dataset.theme==='muse'||(document.body.dataset.theme==='velour'||document.body.dataset.theme==='jamra'||document.body.dataset.theme==='ivoire')))name=String(name||'').replace(/^\s*(?:(?:AR|AS|EN|FR|TR)(?:[- ](?:TR|SUBS?|S|D|DO))*(?:\s*[-:|]\s*)|TOP\s*[-:|]\s*)/i,'');return String(name||'').replace(/^\s*(?:(?:4K|8K|FHD|UHD|HD)\s*-\s*(?:SH|AR\s*-\s*TR\s*-\s*D|AR\s*-\s*DO|AR\s*-\s*D|AR)\s*[-:|]\s*|SH[- ](?:4K|8K|FHD|UHD|HD)\s*[-:|]\s*)/i,'').trim();}
 function posterMetadata(i){return [i.year&&/^\d{4}$/.test(String(i.year))?i.year:'',i.rating&&isFinite(Number(i.rating))&&Number(i.rating)>0?'★ '+i.rating:''].filter(Boolean).join(' · ');}
 window.APPosterDisplay={title:posterTitle,metadata:posterMetadata};
 function metadata(item){return [item.year,item.seasons?item.seasons+tr(' مواسم'):'',item.episodeCount?item.episodeCount+tr(' حلقات'):'',item.rating?'★ '+item.rating:'',item.quality].filter(Boolean).join('  ·  ');}
@@ -1281,15 +1281,15 @@ $('filter-recent').onclick=function(){state.filter='recent';renderItems();};
 document.querySelectorAll('[data-home-kind]').forEach(function(b){b.onclick=function(){navigate(b.dataset.homeKind);};});
 // Persistent palettes; Aya shares Red geometry without altering existing defaults.
 function theme(value,persist){
-if(['apple','navy','red','blue','aya','alaa','harak','muse','velour','jamra'].indexOf(value)<0)value='apple';
+if(['apple','navy','red','blue','aya','alaa','harak','muse','velour','jamra','ivoire'].indexOf(value)<0)value='apple';
 document.body.dataset.theme=value;
 document.body.classList.toggle('apple',value==='apple');
 document.body.classList.toggle('blue',value==='blue');
-['apple','navy','red','blue','aya','alaa','harak','muse','velour','jamra'].forEach(function(t){var b=$('theme-'+t);b.classList.toggle('selected',value===t);b.setAttribute('aria-pressed',value===t?'true':'false');});
+['apple','navy','red','blue','aya','alaa','harak','muse','velour','jamra','ivoire'].forEach(function(t){var b=$('theme-'+t);b.classList.toggle('selected',value===t);b.setAttribute('aria-pressed',value===t?'true':'false');});
 if(persist!==false)storeWrite('ap-theme',value);
 if(typeof episodeWindow!=='undefined'&&episodeWindow.items.length&&!$('series-detail').hidden)paintEpisodes(episodeWindow.start);
 }
-['apple','navy','red','blue','aya','alaa','harak','muse','velour','jamra'].forEach(function(t){$('theme-'+t).onclick=function(){theme(t);};});
+['apple','navy','red','blue','aya','alaa','harak','muse','velour','jamra','ivoire'].forEach(function(t){$('theme-'+t).onclick=function(){theme(t);};});
 theme(storeRead('ap-theme')||'apple',false);
 function channelSize(value,persist){
 if(['small','medium','large'].indexOf(value)<0)value='small';
@@ -1684,7 +1684,7 @@ window.APJamra={
  var candidate=(homeCatalog.movies||[]).concat(homeCatalog.series||[]),hero=candidate[heroIndex%Math.max(candidate.length,1)]||{};
  function clean(m){if(!m)return null;var copy=Object.assign({},m);copy.name=posterTitle(m.name);return copy;}
  var now=new Date(),v=$('video'),sec=function(t){t=Math.max(0,Math.floor(t||0));return String(Math.floor(t/3600)).padStart(2,'0')+':'+String(Math.floor(t%3600/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0');};
- return {screen:screen,ready:!!state.provider||!$('connection').hidden,nativeOpen:!$('connection').hidden||!!livePanel,items:state.filtered.map(clean),movies:(homeCatalog.movies||[]).map(clean),hero:clean(hero),item:clean(series?seriesItem:movie?movieItem:null),episodes:seriesEpisodes.filter(function(e){return seriesSeason==null||e.season===seriesSeason;}),channels:(state.kind==='live'?state.filtered:homeCatalog.live||[]).map(clean),selected:clean(state.selected),playing:clean(state.playing),group:state.group,categories:groups,search:$('search').value,controls:state.playing&&state.playing.kind==='live'?!$('live-now').hidden:!$('player-ui').classList.contains('dim'),time:now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),date:now.toLocaleDateString('ar',{weekday:'long',day:'numeric',month:'long'}),progress:sec(v.currentTime)+' / '+sec(v.duration),percent:isFinite(v.duration)&&v.duration>0?v.currentTime/v.duration*100:0};
+ return {screen:screen,ready:!!state.provider||!$('connection').hidden,nativeOpen:!$('connection').hidden||!!livePanel,items:state.filtered.map(clean),movies:(homeCatalog.movies||[]).map(clean),seriesHome:(homeCatalog.series||[]).map(clean),liveHome:(homeCatalog.live||[]).map(clean),hero:clean(hero),item:clean(series?seriesItem:movie?movieItem:null),episodes:seriesEpisodes.filter(function(e){return seriesSeason==null||e.season===seriesSeason;}),channels:(state.kind==='live'?state.filtered:homeCatalog.live||[]).map(clean),selected:clean(state.selected),playing:clean(state.playing),group:state.group,categories:groups,search:$('search').value,controls:state.playing&&state.playing.kind==='live'?!$('live-now').hidden:!$('player-ui').classList.contains('dim'),time:now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),date:now.toLocaleDateString('ar',{weekday:'long',day:'numeric',month:'long'}),progress:sec(v.currentTime)+' / '+sec(v.duration),percent:isFinite(v.duration)&&v.duration>0?v.currentTime/v.duration*100:0};
  },
  act:function(action,arg){
  if(action==='wake'){if(!$('player').hidden)showControls();return;}

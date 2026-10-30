@@ -20,7 +20,7 @@ const hash = text => "'sha256-" + crypto.createHash('sha256').update(text).diges
   css = css.replace(/url\(["']?(assets\/[^"')]+\.woff2)["']?\)/g, (_, file) =>
     'url("data:font/woff2;base64,' + fs.readFileSync(path.join(src,file)).toString('base64') + '")');
   const scripts = [];
-  for (const file of ['i18n.js','panel-public.js','core.js','featured.js','app.js','red.js','lang.js']) {
+  for (const file of ['i18n.js','panel-public.js','core.js','featured.js','app.js','red.js','ivoire.js','lang.js']) {
     const result = await esbuild.transform(fs.readFileSync(path.join(src,file),'utf8'), {
       sourcefile:file, target:'chrome79', charset:'utf8', minify:true, legalComments:'inline'
     });
@@ -31,7 +31,7 @@ const hash = text => "'sha256-" + crypto.createHash('sha256').update(text).diges
   // Exact hashes permit only our generated scripts/styles, never arbitrary inline JS.
   const csp = [
     "default-src 'none'", 'script-src ' + scripts.map(hash).join(' '),
-    'style-src ' + hash(css) + ' ' + hash(fs.readFileSync(path.join(src,'jamra-style.txt'),'utf8')), "font-src data:",
+    'style-src ' + hash(css) + ' ' + hash(fs.readFileSync(path.join(src,'jamra-style.txt'),'utf8')) + ' ' + hash(fs.readFileSync(path.join(src,'ivoire-style.txt'),'utf8')), "font-src data:",
     "connect-src http: https:", "img-src 'self' file: http: https: data:",
     "media-src http: https: blob:", "object-src 'none'", "base-uri 'none'"
   ].join('; ');
@@ -39,7 +39,7 @@ const hash = text => "'sha256-" + crypto.createHash('sha256').update(text).diges
   html = html.replace('<link rel="stylesheet" href="style.css">', () => '<style>' + css + '</style>');
   let index=0;
   html = html.replace(/<script src="[^"]+"><\/script>/g, () => '<script>' + scripts[index++] + '</script>');
-  if(index!==7 || /<script[^>]+src=|rel="stylesheet"/.test(html)) throw Error('Unexpected entry HTML');
+  if(index!==8 || /<script[^>]+src=|rel="stylesheet"/.test(html)) throw Error('Unexpected entry HTML');
   fs.writeFileSync(path.join(out,'index.html'), html);
   fs.writeFileSync(path.join(out,'build-info.json'), JSON.stringify({
     version:JSON.parse(fs.readFileSync(path.join(src,'appinfo.json'))).version,
