@@ -50,7 +50,7 @@ async function walk(name,root,seed){
  const focus=nodes().filter(e=>seen.has(tag(e))).map(e=>{e.focus();const s=getComputedStyle(e);return {id:e.id,outline:s.outlineWidth};});
  return {targets:targets.length,reached:targets.length-missing.length,edges:edges.length,bad,missing,focusMissing:focus.filter(e=>e.outline==='0px')};
  },{root});
- await p.screenshot({path:path.join(out,theme+'-'+name+'.jpg')});
+ await p.waitForTimeout(250);await p.screenshot({path:path.join(out,theme+'-'+name+'.jpg')});
  results.push({theme,page:name,...result});console.log(theme,name,result.reached+'/'+result.targets,'bad',result.bad.length,'missing',JSON.stringify(result.missing));
 }
 await walk('home','#home','#search');

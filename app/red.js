@@ -6,9 +6,9 @@ function $(id){return document.getElementById(id);}
 var video=$('video'),player=$('player'),detail=$('series-detail'),ui=$('player-ui');
 if(!body||!video||!player||!detail||!ui)return;
 var fs=false;
-function isRed(){return (body.dataset.theme==='red'||(body.dataset.theme==='aya'||body.dataset.theme==='alaa'||body.dataset.theme==='harak'||body.dataset.theme==='muse'||body.dataset.theme==='velour'));}
+function isRed(){return (body.dataset.theme==='red'||(body.dataset.theme==='aya'||body.dataset.theme==='alaa'||body.dataset.theme==='harak'||body.dataset.theme==='muse'||(body.dataset.theme==='velour'||body.dataset.theme==='jamra')));}
 window.APRed={
- layout:function(){return {grid:body.dataset.theme==='muse'||body.dataset.theme==='velour'?{cols:6,row:310,page:30}:body.dataset.theme==='harak'?{cols:5,row:344,page:30}:body.dataset.theme==='alaa'?{cols:6,row:300,page:30}:(body.dataset.theme==='aya'||body.dataset.theme==='alaa'||body.dataset.theme==='harak'||body.dataset.theme==='muse'||body.dataset.theme==='velour')?{cols:4,row:430,page:24}:{cols:5,row:398,page:25},episodes:(body.dataset.theme==='aya'||body.dataset.theme==='alaa'||body.dataset.theme==='harak'||body.dataset.theme==='muse'||body.dataset.theme==='velour')?{cols:2,size:30,row:112}:{cols:1,size:30,row:64}};},
+ layout:function(){return body.dataset.theme==='jamra'?{grid:{cols:6,row:356,page:30},episodes:{cols:2,size:30,row:112}}:{grid:body.dataset.theme==='muse'||(body.dataset.theme==='velour'||body.dataset.theme==='jamra')?{cols:6,row:310,page:30}:body.dataset.theme==='harak'?{cols:5,row:344,page:30}:body.dataset.theme==='alaa'?{cols:6,row:300,page:30}:(body.dataset.theme==='aya'||body.dataset.theme==='alaa'||body.dataset.theme==='harak'||body.dataset.theme==='muse'||(body.dataset.theme==='velour'||body.dataset.theme==='jamra'))?{cols:4,row:430,page:24}:{cols:5,row:398,page:25},episodes:(body.dataset.theme==='aya'||body.dataset.theme==='alaa'||body.dataset.theme==='harak'||body.dataset.theme==='muse'||(body.dataset.theme==='velour'||body.dataset.theme==='jamra'))?{cols:2,size:30,row:112}:{cols:1,size:30,row:64}};},
  episodeMode:function(full){fs=full;sync();paintPills();},
  inlineFree:function(){return body.classList.contains('red-inline')&&!player.contains(document.activeElement);}
 };
@@ -272,4 +272,19 @@ window.addEventListener('keydown',function(e){
  }
 },true);
 all();
+})();
+
+/* Jamra focus light tracks actual remote focus; dormant in all other themes. */
+(function(){
+ var ring=document.createElement('div');ring.id='jamra-ring';ring.setAttribute('aria-hidden','true');document.body.appendChild(ring);
+ var running=false,x=0,y=0,w=0,h=0,last=0;
+ function tick(t){
+  if(document.body.dataset.theme!=='jamra'){running=false;return;}
+  var e=document.activeElement,b=e&&e.getBoundingClientRect();
+  if(!e||e===document.body||!b.width||!b.height||e.closest('[hidden]')){ring.style.visibility='hidden';}
+  else{ring.style.visibility='visible';var a=1-Math.exp(-Math.min(50,t-(last||t-16))/70);x+=(b.left-3-x)*a;y+=(b.top-3-y)*a;w+=(b.width+6-w)*a;h+=(b.height+6-h)*a;ring.style.left=x+'px';ring.style.top=y+'px';ring.style.width=w+'px';ring.style.height=h+'px';ring.style.borderRadius=getComputedStyle(e).borderRadius;}
+  last=t;requestAnimationFrame(tick);
+ }
+ function start(){if(!running&&document.body.dataset.theme==='jamra'){running=true;last=0;requestAnimationFrame(tick);}}
+ new MutationObserver(start).observe(document.body,{attributes:true,attributeFilter:['data-theme']});start();
 })();
