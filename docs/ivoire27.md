@@ -19,3 +19,5 @@ Verification (headless Chromium, mocked panel + Xtream provider, built dist with
 - tests/ivoire27-flow.py: home, live, player-live, channel drawer, movies, movie detail, series, series detail + episodes, series player, settings, night mode, Back from every screen — 0 runtime errors.
 - tests/ivoire27-remote.py: 150 random D-pad presses across the 5 tabs, focus never lost; switching ivoire <-> jamra hides/shows the right renderer.
 - Not tested on a physical LG TV or a real provider. No .ipk built here (ares-package not available in this environment).
+
+App screenshots (real app build, dist with CSP, mocked provider data): docs/ivoire27-screens/ — home, live, player-live, player-live-list, movies, movie-detail, series, series-detail, player-series, settings, settings-night.
