@@ -1676,6 +1676,39 @@ window.addEventListener('keydown',function(e){
   var first=focusables()[0];if(first){consume();restoreRemoteFocus(first);}return;
  }
 },true);
+window.APJamra={
+ snapshot:function(){
+ var playing=!$('player').hidden&&state.playing,series=!$('series-detail').hidden,movie=!$('movie-detail').hidden,screen=playing&&(!episodePresentation||episodePresentation.full)?(state.playing.kind==='live'?(!$('quick-channels').hidden?'player-live-list':'player-live'):'player-series'):!$('connection').hidden?'settings':series?'series-detail':movie?'movie-detail':state.view==='home'?'home':state.kind==='series'?'series':state.kind==='movies'?'movies':'live';
+ var groups=Array.from($('categories').querySelectorAll('button')).map(function(b){return {name:(b.querySelector('strong')||b).textContent.replace(/\s+\d+$/,''),value:b.dataset.group||''};});
+ var cs=(state.kind==='live'?liveCategories:vodCategories[state.kind]||[]);groups=[{name:'الكل',value:'All'}].concat(cs.map(function(c){return {name:c.category_name,value:c.category_name};}));
+ var candidate=(homeCatalog.movies||[]).concat(homeCatalog.series||[]),hero=candidate[heroIndex%Math.max(candidate.length,1)]||{};
+ function clean(m){if(!m)return null;var copy=Object.assign({},m);copy.name=posterTitle(m.name);return copy;}
+ var now=new Date(),v=$('video'),sec=function(t){t=Math.max(0,Math.floor(t||0));return String(Math.floor(t/3600)).padStart(2,'0')+':'+String(Math.floor(t%3600/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0');};
+ return {screen:screen,ready:!!state.provider||!$('connection').hidden,nativeOpen:!$('connection').hidden||!!livePanel,items:state.filtered.map(clean),movies:(homeCatalog.movies||[]).map(clean),hero:clean(hero),item:clean(series?seriesItem:movie?movieItem:null),episodes:seriesEpisodes.filter(function(e){return seriesSeason==null||e.season===seriesSeason;}),channels:(state.kind==='live'?state.filtered:homeCatalog.live||[]).map(clean),selected:clean(state.selected),playing:clean(state.playing),group:state.group,categories:groups,search:$('search').value,controls:state.playing&&state.playing.kind==='live'?!$('live-now').hidden:!$('player-ui').classList.contains('dim'),time:now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),date:now.toLocaleDateString('ar',{weekday:'long',day:'numeric',month:'long'}),progress:sec(v.currentTime)+' / '+sec(v.duration),percent:isFinite(v.duration)&&v.duration>0?v.currentTime/v.duration*100:0};
+ },
+ act:function(action,arg){
+ if(action==='wake'){if(!$('player').hidden)showControls();return;}
+ if(action==='nav'){if(arg===0)$('nav-home').click();else if(arg===5)connection(true);else if(arg===4)navigate(state.kind,'favorites');else navigate(['','live','movies','series'][arg]);}
+ else if(action==='open')open(arg);
+ else if(action==='play'){if(arg.kind==='series'){if(seriesEpisodes[0])play(seriesEpisodes[0]);}else play(arg);if(episodePresentation)setEpisodeFullscreen(true);}
+ else if(action==='episode'){var ep=seriesEpisodes.filter(function(e){return seriesSeason==null||e.season===seriesSeason;})[arg];if(ep){play(ep);setEpisodeFullscreen(true);}}
+ else if(action==='channel'){open(arg);$('quick-channels').hidden=true;}
+ else if(action==='back')back();
+ else if(action==='list')openChannelList();
+ else if(action==='quality'){$('live-quality').click();}
+ else if(action==='favorite'){var k=key(arg);favorites=saved(favorites,arg)?favorites.filter(function(x){return x!==k;}):favorites.concat(k);setSaved('ap-favorites',favorites);}
+ else if(action==='later'){if(!$('series-later').hidden)$('series-later').click();}
+ else if(action==='pause')$('pause').click();
+ else if(action==='seek')$('video').currentTime=Math.max(0,$('video').currentTime+arg);
+ else if(action==='category'){state.group=arg;state.virtualStart=0;render();focusFirst();}
+ else if(action==='search'){$('search').value=arg;$('search').dispatchEvent(new Event('input',{bubbles:true}));}
+ else if(action==='theme')theme(arg);
+ else if(action==='glass')$('glass-toggle').click();
+ else if(action==='nativeSettings')connection(true);
+ else if(action==='controls')showControls();
+ else if(action==='season'){var bs=Array.from($('season-tabs').querySelectorAll('button'));var ix=bs.findIndex(function(b){return b.classList.contains('selected');});if(bs.length)bs[(ix+1)%bs.length].click();}
+ }
+};
 featuredWriter.clear();bootCatalog();setInterval(sync,30*60*1000);setInterval(function(){if(state.expires&&Date.parse(state.expires)<=Date.now()&&state.provider&&!state.provider.manual){stop();featuredQueue.clear();resetFeatured();clearHomeUI();state.items=[];state.provider=null;state.request++;render();$('activation').textContent=tr('انتهى التفعيل. جدّد الجهاز من لوحة التحكم.');connection(true);}},60000);
 })();
 

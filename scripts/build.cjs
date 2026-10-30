@@ -31,7 +31,7 @@ const hash = text => "'sha256-" + crypto.createHash('sha256').update(text).diges
   // Exact hashes permit only our generated scripts/styles, never arbitrary inline JS.
   const csp = [
     "default-src 'none'", 'script-src ' + scripts.map(hash).join(' '),
-    'style-src ' + hash(css), "font-src data:",
+    'style-src ' + hash(css) + ' ' + hash(fs.readFileSync(path.join(src,'jamra-style.txt'),'utf8')), "font-src data:",
     "connect-src http: https:", "img-src 'self' file: http: https: data:",
     "media-src http: https: blob:", "object-src 'none'", "base-uri 'none'"
   ].join('; ');
