@@ -390,6 +390,8 @@ function update(){
   stage.innerHTML=base;stage.classList.toggle('playing',screen.indexOf('player')===0);stage.classList.toggle('reduced',localStorage.getItem('ap-jamra-motion')==='off');
   q('#app').innerHTML=screen==='home'?home():screen==='live'?live():screen==='movies'?library(false):screen==='series'?library(true):screen==='movie-detail'?detail(false):screen==='series-detail'?detail(true):screen==='settings'?settings():player(screen==='player-series',screen==='player-live-list');
   patch();qa('[style]').forEach(function(el){var v=el.getAttribute('style');el.removeAttribute('style');el.style.cssText=v;});lastKey=key;
+  /* QA 2.7.1: a re-render of the SAME screen (focus/selection change, hero rotation) must not replay the entrance animation: every D-pad press made all cards fade in again */
+  if(old===screen)qa('.rise').forEach(function(el){el.style.animation='none';});
   var f=old===screen&&focusKey?q('[data-key="'+focusKey+'"]'):null;f=f||q('.focused[tabindex]')||q('[data-key="cat-0"]')||q('[data-key="ch-0"]')||q('[tabindex]');if(f){f.focus();var rb=f.getBoundingClientRect(),sc=Math.min(innerWidth/1920,innerHeight/1080);rx=rb.x/sc-4;ry=rb.y/sc-4;rw=rb.width/sc+8;rh=rb.height/sc+8;}
  }
  if(screen.indexOf('player')===0){stage.classList.toggle('hidden-controls',!snap.controls&&screen!=='player-live-list');var pc=q('.pfoot>span');if(pc)pc.textContent=snap.progress;var pz=q('.playbuttons .pause');if(pz){var pg=snap.paused?'▷':'Ⅱ';if(pz.textContent!==pg)pz.textContent=pg;var pl=q('.playbuttons .plabel');if(pl)pl.textContent=snap.paused?'تشغيل':'إيقاف مؤقت';}var pi=q('.progress i');if(pi){pi.style.width=snap.percent+'%';pi.parentNode.style.setProperty('--jamra-progress',snap.percent+'%');}}

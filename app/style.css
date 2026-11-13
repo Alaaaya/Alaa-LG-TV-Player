@@ -5168,3 +5168,10 @@ body.ivoire-exact-active #screen:before,body.ivoire-exact-active #screen:after{d
 #screen #player:not(#qa0):not(#qa1) #live-now #live-list.ap-ctl{width:67px!important;height:67px!important;min-width:67px!important}
 #screen #player:not(#qa0):not(#qa1) #red-pills{gap:34px!important;overflow:visible!important}
 #screen #player:not(#qa0):not(#qa1) #red-pills>.ap-ctl{margin:0!important}
+/* QA 2.7.1: live heading subtitle ("220 قناة · <long category>") wrapped under the filter bar; keep it on one line */
+#browser .section-title #count{white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;max-width:100%}
+/* QA 2.7.1: the narrow library search box cut its Arabic placeholder mid-word; ellipsis instead */
+#browser #search{text-overflow:ellipsis}
+#browser #search::placeholder{text-overflow:ellipsis}
+/* QA 2.7.1: Aya-family live bar - the elapsed clock (46px line box) overlapped the top of the round controls row */
+#screen #player #live-now #live-elapsed{line-height:1.02!important;margin-bottom:6px!important}
