@@ -872,7 +872,8 @@ $('home').hidden=false;$('browser').hidden=true;
 $('screen').classList.add('home-reference');document.querySelectorAll('nav button').forEach(function(b){b.classList.toggle('selected',b.id==='nav-home');});
 homeTileFocus();
 }
-function stopDetailPlayback(){if(episodePresentation&&!episodePresentation.full){stop(false);if(video.parentNode)video.parentNode.removeChild(video);var slot=$('episode-mini-slot');if(slot)slot.remove();}}
+/* QA 2.7.1: closing the series page while an episode played docked used to DETACH #video from #player for good - every later play (live, movie, episode) had no video element and the bridge snapshot threw 'currentTime of null' on every tick. stop() already releases the stream; keep the element in place. */
+function stopDetailPlayback(){if(episodePresentation&&!episodePresentation.full){stop(false);if(video.parentNode!==$('player'))$('player').insertBefore(video,$('player').firstChild.nextSibling);var slot=$('episode-mini-slot');if(slot)slot.remove();}}
 function dismissPanels(){stopDetailPlayback();$('connection').hidden=true;$('movie-detail').hidden=true;$('series-detail').hidden=true;$('settings-open').classList.remove('selected');}
 function navigate(kind,filter){stopDetailPlayback();
 homeInline.origin=false;dismissPanels();
