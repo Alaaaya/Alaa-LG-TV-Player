@@ -1730,6 +1730,8 @@ function focusPlayerPrimary(){
  for(var i=0;i<ids.length;i++){var b=$(ids[i]);if(qaVisible(b)){b.focus({preventScroll:true});return;}}
 }
 var qaLastControl=null;
+/* QA 2.7.1: Settings (#connection) - the theme-picker row sat flush on the panel's bottom edge (focus ring and the second row clipped). Keep the focused control at least 64px inside the scroll box. */
+document.addEventListener('focusin',function(e){var box=$('connection'),t=e.target;if(!box||box.hidden||!box.contains(t)||t===box)return;var b=box.getBoundingClientRect(),r=t.getBoundingClientRect(),m=64,s=box.scrollTop;if(r.bottom>b.bottom-m)s+=r.bottom-(b.bottom-m);else if(r.top<b.top+m)s-=(b.top+m)-r.top;if(s!==box.scrollTop)box.scrollTop=Math.max(0,s);},true);
 document.addEventListener('focusin',function(e){var t=e.target;if(t&&t.id&&(($('player-ui')&&$('player-ui').contains(t))||($('live-now')&&$('live-now').contains(t))))qaLastControl=t.id;},true);
 function restoreControlFocus(){
  if(!state.playing||$('player').hidden||document.body.classList.contains('episode-inline')||qaShadowThemeActive())return;
